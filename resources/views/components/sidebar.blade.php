@@ -31,28 +31,20 @@
         </div>
 
         <!-- Sidebar Menu -->
-        <nav class="mt-2 d-flex flex-column justify-content-between">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
+        <nav class="mt-2 d-flex flex-column">
+            <ul class="nav nav-pills nav-sidebar flex-column flex-grow-1" data-widget="treeview" role="menu" data-accordion="false">
                 @if (auth()->check() && auth()->user()->level->level_code === 'ADM')
-                    <li class="nav-item bg-[#1A2151]">
-                        <a href="/" class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
+                    <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>
-                                Dashboard
-                            </p>
+                            <p>Dashboard</p>
                         </a>
                     </li>
-                @endif
 
-                @if (auth()->check() && auth()->user()->level->level_code === 'ADM')
-                    <li class="nav-item bg-[#1A2151] {{ request()->is('*manajemen*') ? 'menu-is-opening menu-open' : '' }}">
+                    <li class="nav-item bg- bg-[#1A2151] {{ request()->is('*manajemen*') ? 'menu-is-opening menu-open' : '' }}">
                         <a href="#" class="nav-link {{ request()->is('*manajemen*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-gear"></i>
-                            <p>
-                                Manajemen
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
+                            <p>Manajemen <i class="right fas fa-angle-left"></i></p>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
@@ -65,16 +57,14 @@
                     </li>
                 @endif
 
-                <hr>
+                <li class="bd-links-span-all my-3 border-top"></li>
 
                 <li class="nav-item bg-[#1A2151]">
-                    <form action="{{ route('logout') }}" class="nav-link" method="POST">
+                    <form action="{{ route('logout') }}" method="POST" class="nav-link">
                         @csrf
-                        <i class="nav-icon fas fa-solid fa-right-from-bracket"></i>
                         <button type="submit" class="btn btn-transparent p-0">
-                            <p>
-                                Logout
-                            </p>
+                            <i class="nav-icon fas fa-right-from-bracket"></i>
+                            <p class="mb-0">Logout</p>
                         </button>
                     </form>
                 </li>

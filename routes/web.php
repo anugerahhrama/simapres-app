@@ -14,13 +14,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+Route::pattern('id', '[0-9]+');
+
+Route::get('/dashboard', function () {
     return view('index');
-})->middleware(['auth', 'level:ADM']);
+})->name('dashboard')->middleware(['auth', 'level:ADM']);
 
 Route::prefix('manajemen')->group(function () {
+
+    // Levels
     Route::resource('levels', LevelController::class)->middleware(['auth', 'level:ADM']);
-    Route::post('/list', [LevelController::class, 'list']);
+    Route::prefix('levels')->controller(LevelController::class)->name('levels.')->middleware(['auth', 'level:ADM'])->group(function () {
+        Route::post('list',  'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
+
+    // 
 });
 
 require __DIR__ . '/auth.php';

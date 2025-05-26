@@ -1,7 +1,7 @@
 @extends('layouts.guest')
 
 @section('content')
-    <div class="login-box">
+    <div class="login-box" style="background-image: url({{ asset('assets/img/bg-login.png') }})">
 
         <div class="card card-outline card-primary">
             <div class="card-header text-center">

@@ -10,6 +10,9 @@ class AuthenticatedSessionController extends Controller
 {
     public function create()
     {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
         return view('auth.login');
     }
 
@@ -22,7 +25,7 @@ class AuthenticatedSessionController extends Controller
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('/');
+            return redirect()->route('dashboard');
         }
 
         return back()->withErrors([
@@ -35,6 +38,6 @@ class AuthenticatedSessionController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }
