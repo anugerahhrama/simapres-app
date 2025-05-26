@@ -20,6 +20,7 @@ Route::get('/', function () {
 
 Route::prefix('manajemen')->group(function () {
     Route::resource('levels', LevelController::class)->middleware(['auth', 'level:ADM']);
+    Route::post('/list', [LevelController::class, 'list']);
 });
 
 require __DIR__ . '/auth.php';
