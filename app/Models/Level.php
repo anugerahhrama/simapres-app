@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Level extends Model
 {
@@ -17,8 +18,13 @@ class Level extends Model
         'nama_level'
     ];
 
-    public function user(): BelongsTo
+    /**
+     * Get the user associated with the Level
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function user(): HasOne
     {
-        return $this->belongsTo(User::class, 'level_id');
+        return $this->hasOne(User::class, 'level_id');
     }
 }
