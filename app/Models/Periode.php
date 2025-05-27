@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Periode extends Model
 {
@@ -17,11 +17,16 @@ class Periode extends Model
         'semester',
         'tanggal_mulai',
         'tanggal_selesai',
-        'status'
+        'status',
     ];
 
-    // public function detailUser(): BelongsTo
-    // {
-    //     return $this->belongsTo(DetailUser::class, 'periode_id');
-    // }
+    /**
+     * Get all of the comments for the Periode
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function user(): HasMany
+    {
+        return $this->hasMany(RiwayatPeriode::class, 'periode_id');
+    }
 }
