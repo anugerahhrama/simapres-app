@@ -5,6 +5,8 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -44,8 +46,105 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    /**
+     * Get the user that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function level(): BelongsTo
     {
         return $this->belongsTo(Level::class, 'level_id', 'id');
     }
+
+    /**
+     * Get all of the comments for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function detailUser(): HasOne
+    {
+        return $this->hasOne(DetailUser::class, 'user_id');
+    }
+
+    /**
+     * Get all of the comments for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function periode(): HasMany
+    {
+        return $this->hasMany(RiwayatPeriode::class, 'user_id');
+    }
+
+    /**
+     * Get all of the comments for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function minat(): HasMany
+    {
+        return $this->hasMany(UserMinat::class, 'user_id');
+    }
+
+    /**
+     * Get all of the comments for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(UserKeahlian::class, 'user_id');
+    }
+
+    /**
+     * Get all of the pendaftaranLomba for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pendaftaranLomba(): HasMany
+    {
+        return $this->hasMany(PendaftaranLombas::class, 'user_id');
+    }
+
+    /**
+     * Get all of the rekomendasiLomba for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function rekomendasiLomba(): HasMany
+    {
+        return $this->hasMany(RekomendasiLomba::class, 'user_id');
+    }
+
+    /**
+     * Get all of the dosen for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dosen(): HasMany
+    {
+        return $this->hasMany(Bimbingan::class, 'dosen_id');
+    }
+
+    /**
+     * Get all of the mahasiswa for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function mahasiswa(): HasMany
+    {
+        return $this->hasMany(Bimbingan::class, 'mahasiswa_id');
+    }
+
+    /**
+     * Get all of the prestasi for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function prestasi(): HasMany
+    {
+        return $this->hasMany(Prestasi::class, 'mahasiswa_id');
+    }
+
+    
 }
