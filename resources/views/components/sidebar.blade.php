@@ -53,6 +53,12 @@
                                     <p>Level</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('periodes.index') }}" class="nav-link {{ request()->is('*periode*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Periode</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endif
