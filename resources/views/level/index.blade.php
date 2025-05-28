@@ -4,7 +4,7 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <div class="card-tools">
-                <button onclick="modalAction('{{ route('prestasi.create_ajax') }}')" class="btn btn-sm btn-primary mt-1">Tambah Ajax</button>
+                <button onclick="modalAction('{{ route('levels.create') }}')" class="btn btn-sm btn-primary mt-1">Tambah Ajax</button>
             </div>
         </div>
         <div class="card-body">
@@ -17,29 +17,25 @@
             <div class="row mb-3">
                 <div class="col-md-12">
                     <div class="form-group-row">
-                        <label class="col-1 control-label col-form-label">Filter</label>
+                        <label class="col-1 control-label col-form-label">Filter:</label>
                         <div class="col-3">
-                            <select class="form-control" id="prestasi_id" name="prestasi_id">
+                            <select class="form-control" id="level_id" name="level_id" required>
                                 <option value="">- Semua -</option>
-                                @foreach ($prestasis as $item)
-                                    <option value="{{ $item->id }}">{{ $item->nama_kegiatan }}</option>
+                                @foreach ($levels as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_level }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                 </div>
             </div>
-            <table class="table table-bordered table-striped table-hover table-sm" id="table_prestasi">
+            <table class="table table-bordered table-striped table-hover table-sm" id="table_level">
                 <thead>
                     <tr>
-                        <th>No</th>
-                        <th>Judul Lomba</th>
-                        <th>Nama Kegiatan</th>
-                        <th>Kategori</th>
-                        <th>Penyelenggara</th>
-                        <th>Mahasiswa</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
+                        <th>ID</th>
+                        <th>Level Kode</th>
+                        <th>Level Nama</th>
+                        <th>aksi</th>
                     </tr>
                 </thead>
             </table>
@@ -59,16 +55,16 @@
             });
         }
 
-        var dataPrestasi;
+        var dataLevel;
         $(document).ready(function() {
-            dataPrestasi = $('#table_prestasi').DataTable({
+            dataLevel = $('#table_level').DataTable({
                 serverSide: true,
                 ajax: {
-                    "url": "{{ route('prestasi.list') }}",
+                    "url": "{{ route('levels.list') }}",
                     "dataType": "json",
                     "type": "POST",
                     "data": function(d) {
-                        d.prestasi_id = $('#prestasi_id').val();
+                        d.level_id = $('#level_id').val();
                     }
                 },
                 columns: [{
@@ -78,52 +74,28 @@
                         searchable: false
                     },
                     {
-                        data: "judul_lomba",
+                        data: "level_code",
                         className: "",
                         orderable: true,
                         searchable: true
                     },
                     {
-                        data: "nama_kegiatan",
+                        data: "nama_level",
                         className: "",
                         orderable: true,
                         searchable: true
-                    },
-                    {
-                        data: "kategori",
-                        className: "",
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        data: "penyelenggara",
-                        className: "",
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        data: "mahasiswa_nama",
-                        className: "",
-                        orderable: true,
-                        searchable: true
-                    },
-                    {
-                        data: "status",
-                        className: "text-center",
-                        orderable: false,
-                        searchable: false
                     },
                     {
                         data: "aksi",
-                        className: "text-center",
+                        className: "",
                         orderable: false,
                         searchable: false
                     }
                 ]
             });
 
-            $('#prestasi_id').on('change', function() {
-                dataPrestasi.ajax.reload();
+            $('#level_id').on('change', function() {
+                dataLevel.ajax.reload();
             });
         });
     </script>
