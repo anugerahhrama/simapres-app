@@ -41,69 +41,69 @@
     </div>
 </form>
 
-@push('js')
-    <script>
-        $(document).ready(function() {
-                    $("#form-tambah").validate({
-                            rules: {
-                                tahun_ajaran: {
-                                    required: true,
-                                    maxlength: 4
-                                },
-                                semester: {
-                                    required: true,
-                                    minlength: 3,
-                                    maxlength: 100,
-                                },
-                                tanggal_mulai: {
-                                    required: true,
-                                    date: true
-                                },
-                                tanggal_selesai: {
-                                    required: true,
-                                    date: true
-                                },
-                                submitHandler: function(form) {
-                                    $.ajax({
-                                        url: form.action,
-                                        type: form.method,
-                                        data: $(form).serialize(),
-                                        success: function(response) {
-                                            if (response.status) {
-                                                $('#myModal').modal('hide');
-                                                Swal.fire({
-                                                    icon: 'success',
-                                                    title: 'Berhasil',
-                                                    text: response.message
-                                                });
-                                                dataPeriode.ajax.reload();
-                                            } else {
-                                                $('.error-text').text('');
-                                                $.each(response.msgField, function(prefix, val) {
-                                                    $('#error-' + prefix).text(val[0]);
-                                                });
-                                                Swal.fire({
-                                                    icon: 'error',
-                                                    title: 'Terjadi Kesalahan',
-                                                    text: response.message
-                                                });
-                                            }
-                                        }
-                                    });
-                                    return false;
-                                },
-                                errorElement: 'span',
-                                errorPlacement: function(error, element) {
-                                    error.addClass('invalid-feedback');
-                                    element.closest('.form-group').append(error);
-                                },
-                                highlight: function(element, errorClass, validClass) {
-                                    $(element).addClass('is-invalid');
-                                },
-                                unhighlight: function(element, errorClass, validClass) {
-                                    $(element).removeClass('is-invalid');
-                                }
+<script>
+    $(document).ready(function() {
+        $("#form-tambah").validate({
+            rules: {
+                tahun_ajaran: {
+                    required: true,
+                    maxlength: 50
+                },
+                semester: {
+                    required: true,
+                    number: true,
+                    min: 1,
+                    max: 12
+                },
+                tanggal_mulai: {
+                    required: true,
+                    date: true
+                },
+                tanggal_selesai: {
+                    required: true,
+                    date: true
+                },
+            },
+            submitHandler: function(form) {
+                $.ajax({
+                    url: form.action,
+                    type: form.method,
+                    data: $(form).serialize(),
+                    success: function(response) {
+                        if (response.status) {
+                            $('#myModal').modal('hide');
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: response.message
                             });
-                    });
-    </script>
-@endpush
+                            dataPeriode.ajax.reload();
+                        } else {
+                            $('.error-text').text('');
+                            $.each(response.msgField, function(prefix, val) {
+                                $('#error-' + prefix).text(val[0]);
+                            });
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Terjadi Kesalahan',
+                                text: response.message
+                            });
+                        }
+                    }
+                });
+                return false;
+            },
+            errorElement: 'span',
+            errorPlacement: function(error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function(element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function(element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+    });
+</script>
