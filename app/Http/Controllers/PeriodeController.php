@@ -27,7 +27,7 @@ class PeriodeController extends Controller
     public function list(Request $request)
     {
         $periode = Periode::select('id', 'tahun_ajaran', 'semester', 'tanggal_mulai', 'tanggal_selesai')
-        ->orderBy('semester', 'asc');
+            ->orderBy('semester', 'asc');
 
         if ($request->periode_id) {
             $periode->where('id', $request->periode_id);
@@ -64,10 +64,10 @@ class PeriodeController extends Controller
     {
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
-                'tahun_ajaran' => 'required|integer',
-                'semester' => 'required|string|max:100',
+                'tahun_ajaran' => 'required|string|max:50',
+                'semester' => 'required|in:1,2,3,4,5,6,7,8,9,10,11,12',
                 'tanggal_mulai' => 'required|date',
-                'tanggal_selesai' => 'required|date'
+                'tanggal_selesai' => 'required|date|after:tanggal_mulai'
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -116,10 +116,10 @@ class PeriodeController extends Controller
     {
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
-                'tahun_ajaran'    => 'required|integer',
-                'semester'    => 'required|string',
-                'tanggal_mulai'    => 'required|date',
-                'tanggal_selesai'    => 'required|date'
+                'tahun_ajaran' => 'required|string|max:50',
+                'semester' => 'required|in:1,2,3,4,5,6,7,8,9,10,11,12',
+                'tanggal_mulai' => 'required|date',
+                'tanggal_selesai' => 'required|date|after:tanggal_mulai'
             ];
 
             $validator = Validator::make($request->all(), $rules);
