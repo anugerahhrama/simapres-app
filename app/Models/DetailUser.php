@@ -14,6 +14,7 @@ class DetailUser extends Model
 
     protected $fillable = [
         'user_id',
+        'name',
         'no_induk',
         'phone',
         'jenis_kelamin',
