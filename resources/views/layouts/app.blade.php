@@ -74,6 +74,7 @@
 
     <!-- jQuery -->
     <script src="{{ asset('adminlte/plugins/jquery/jquery.min.js') }}"></script>
+
     <!-- jQuery UI 1.11.4 -->
     <script src="{{ asset('adminlte/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
@@ -139,7 +140,6 @@
     <script src="{{ asset('adminlte/plugins/select2/js/select2.full.min.js') }}"></script>
 
     <script>
-        // Untuk mengirimkan token Laravel CSRF pada setiap request ajax
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
