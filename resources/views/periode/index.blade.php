@@ -22,7 +22,7 @@
                             <select class="form-control" id="periode_id" name="periode_id" required>
                                 <option value="">- Semua -</option>
                                 @foreach ($periodes as $item)
-                                    <option value="{{ $item->id }}">{{ $item->tahun_ajaran }} - {{ $item->semester }}</option>
+                                    <option value="{{ $item->id }}">{{ $item->tahun_ajaran }} - Semester {{ $item->semester }}</option>
                                 @endforeach
                             </select>
                         </div>

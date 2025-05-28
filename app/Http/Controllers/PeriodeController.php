@@ -26,7 +26,8 @@ class PeriodeController extends Controller
 
     public function list(Request $request)
     {
-        $periode = Periode::select('id', 'tahun_ajaran', 'semester', 'tanggal_mulai', 'tanggal_selesai');
+        $periode = Periode::select('id', 'tahun_ajaran', 'semester', 'tanggal_mulai', 'tanggal_selesai')
+        ->orderBy('semester', 'asc');
 
         if ($request->periode_id) {
             $periode->where('id', $request->periode_id);
