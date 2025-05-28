@@ -46,11 +46,17 @@
                             <i class="nav-icon fas fa-gear"></i>
                             <p>Manajemen <i class="right fas fa-angle-left"></i></p>
                         </a>
-                        <ul class="nav nav-treeview">
+                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('prestasi.index') }}" class="nav-link {{ request()->is('*prestasi*') ? 'active' : '' }}">
+                                <a href="{{ route('levels.index') }}" class="nav-link {{ request()->is('*level*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Prestasi</p>
+                                    <p>Level</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('periodes.index') }}" class="nav-link {{ request()->is('*periode*') ? 'active' : '' }}">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Periode</p>
                                 </a>
                             </li>
                         </ul>
