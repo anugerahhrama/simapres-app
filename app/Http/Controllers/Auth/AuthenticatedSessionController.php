@@ -24,7 +24,7 @@ class AuthenticatedSessionController extends Controller
         ]);
 
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+            $request->sessi ->regenerate();
             return redirect()->route('dashboard');
         }
 
