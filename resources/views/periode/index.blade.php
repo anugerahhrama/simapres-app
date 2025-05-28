@@ -4,7 +4,7 @@
     <div class="card card-outline card-primary">
         <div class="card-header">
             <div class="card-tools">
-                <button onclick="modalAction('{{ route('levels.create') }}')" class="btn btn-sm btn-primary mt-1">Tambah Ajax</button>
+                <button onclick="modalAction('{{ route('periodes.create') }}')" class="btn btn-sm btn-primary mt-1">Tambah</button>
             </div>
         </div>
         <div class="card-body">
@@ -22,7 +22,8 @@
                             <select class="form-control" id="periode_id" name="periode_id" required>
                                 <option value="">- Semua -</option>
                                 @foreach ($periodes as $item)
-                                    <option value="{{ $item->id }}">{{ $item->tahun_ajaran }} - Semester {{ $item->semester }}</option>
+                                    <option value="{{ $item->id }}">{{ $item->tahun_ajaran }} - Semester
+                                        {{ $item->semester }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -43,7 +44,8 @@
             </table>
         </div>
     </div>
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-width="75%" aria-hidden="true"></div>
 @endsection
 
 @push('css')
