@@ -54,9 +54,9 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('users.index') }}" class="nav-link {{ request()->is('*user*') ? 'active' : '' }}">
+                                <a href="{{ route('periodes.index') }}" class="nav-link {{ request()->is('*periode*') ? 'active' : '' }}">
                                     <i class="far fa-circle nav-icon"></i>
-                                    <p>Mahasiswa</p>
+                                    <p>Periode</p>
                                 </a>
                             </li>
                         </ul>
