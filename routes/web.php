@@ -3,6 +3,7 @@
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\PeriodeController;
+use App\Http\Controllers\ProgramStudiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,6 +35,13 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
   // Periode
     Route::resource('periodes', PeriodeController::class)->middleware(['auth', 'level:ADM']);
     Route::prefix('periodes')->controller(PeriodeController::class)->name('periodes.')->middleware(['auth', 'level:ADM'])->group(function () {
+        Route::post('list',  'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
+  
+  // Prodi
+    Route::resource('prodis', ProgramStudiController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('prodis')->controller(ProgramStudiController::class)->name('prodis.')->middleware(['auth', 'level:ADM'])->group(function () {
         Route::post('list',  'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });

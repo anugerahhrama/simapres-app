@@ -59,6 +59,12 @@
                                     <p>Periode</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('prodis.index') }}" class="nav-link {{ request()->is('*prodi*') ? 'active' : '' }}">
+                                    <i class="far fa-solid fa-graduation-cap nav-icon"></i>
+                                    <p>Program Studi</p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 @endif
