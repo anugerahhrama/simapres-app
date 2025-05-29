@@ -16,11 +16,15 @@ class ProgramStudiSeeder extends Seeder
         DB::table('program_studis')->insert(
             [
                 [
-                    'name'      => 'Teknik Informatika',
+                    'name'      => 'D4-Teknik Informatika',
                     'jurusan'   => 'Teknologi Informasi',
                 ],
                 [
-                    'name'      => 'Sistem Informasi Bisnis',
+                    'name'      => 'D4-Sistem Informasi Bisnis',
+                    'jurusan'   => 'Teknologi Informasi',
+                ],
+                [
+                    'name'      => 'D2-Pengembangan Piranti Lunak Situs',
                     'jurusan'   => 'Teknologi Informasi',
                 ],
             ]
