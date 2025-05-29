@@ -1,23 +1,24 @@
-<form action="{{ route('levels.store') }}" method="POST" id="form-tambah">
+<form action="{{ route('prodis.store') }}" method="POST" id="form-tambah">
     @csrf
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data level</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Tambah Data Program Studi</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Kode Level</label>
-                    <input value="" type="text" name="level_code" id="level_code" class="form-control" required>
-                    <small id="error-level_code" class="error-text form-text text-danger"></small>
+                    <label>Nama Program Studi</label>
+                    <input value="" type="text" name="name" id="name" class="form-control"
+                        required>
+                    <small id="error-name" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
-                    <label>Nama Level</label>
-                    <input value="" type="text" name="nama_level" id="nama_level" class="form-control" required>
-                    <small id="error-nama_level" class="error-text form-text text-danger"></small>
+                    <label>Jurusan</label>
+                    <input value="" type="text" name="jurusan" id="jurusan" class="form-control" required>
+                    <small id="error-jurusan" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -32,15 +33,13 @@
     $(document).ready(function() {
         $("#form-tambah").validate({
             rules: {
-                level_code: {
+                name: {
                     required: true,
-                    maxlength: 3,
-                    pattern: /^[A-Z]+$/
+                    maxlength: 255
                 },
-                nama_level: {
+                jurusan: {
                     required: true,
-                    minlength: 3,
-                    maxlength: 100,
+                    maxlength: 255
                 }
             },
             submitHandler: function(form) {
@@ -56,7 +55,7 @@
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            dataLevel.ajax.reload();
+                            dataProdi.ajax.reload();
                         } else {
                             $('.error-text').text('');
                             $.each(response.msgField, function(prefix, val) {

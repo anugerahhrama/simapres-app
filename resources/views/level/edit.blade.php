@@ -48,64 +48,62 @@
         </div>
     </form>
 
-    @push('js')
-        <script>
-            $(document).ready(function() {
-                $('#form-edit').validate({
-                    rules: {
-                        level_code: {
-                            required: true,
-                            maxlength: 10,
-                            pattern: /^[A-Z]+$/
-                        },
-                        nama_level: {
-                            required: true,
-                            minlength: 3,
-                            maxlength: 100,
-                        }
+    <script>
+        $(document).ready(function() {
+            $('#form-edit').validate({
+                rules: {
+                    level_code: {
+                        required: true,
+                        maxlength: 10,
+                        pattern: /^[A-Z]+$/
                     },
-                    submitHandler: function(form) {
-                        $.ajax({
-                            url: form.action,
-                            type: form.method,
-                            data: $(form).serialize(),
-                            success: function(response) {
-                                if (response.status) {
-                                    $('#myModal').modal('hide');
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Berhasil',
-                                        text: response.message
-                                    });
-                                    dataLevel.ajax.reload();
-                                } else {
-                                    $('.error-text').text('');
-                                    $.each(response.msgField, function(prefix, val) {
-                                        $('#error-' + prefix).text(val[0]);
-                                    });
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Terjadi Kesalahan',
-                                        text: response.message
-                                    });
-                                }
-                            }
-                        });
-                        return false;
-                    },
-                    errorElement: 'span',
-                    errorPlacement: function(error, element) {
-                        error.addClass('invalid-feedback');
-                        element.closest('.form-group').append(error);
-                    },
-                    highlight: function(element, errorClass, validClass) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function(element, errorClass, validClass) {
-                        $(element).removeClass('is-invalid');
+                    nama_level: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 100,
                     }
-                });
+                },
+                submitHandler: function(form) {
+                    $.ajax({
+                        url: form.action,
+                        type: form.method,
+                        data: $(form).serialize(),
+                        success: function(response) {
+                            if (response.status) {
+                                $('#myModal').modal('hide');
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil',
+                                    text: response.message
+                                });
+                                dataLevel.ajax.reload();
+                            } else {
+                                $('.error-text').text('');
+                                $.each(response.msgField, function(prefix, val) {
+                                    $('#error-' + prefix).text(val[0]);
+                                });
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Terjadi Kesalahan',
+                                    text: response.message
+                                });
+                            }
+                        }
+                    });
+                    return false;
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
             });
-        </script>
-    @endpush
+        });
+    </script>
 @endempty

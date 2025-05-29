@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\LevelController;
-use App\Http\Controllers\DetailUserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,23 +18,25 @@ Route::pattern('id', '[0-9]+');
 
 Route::get('/dashboard', function () {
     return view('index');
-})->name('dashboard')->middleware(['auth', 'level:ADM']);
+})->name('dashboard');
 
-Route::prefix('manajemen')->group(function () {
+Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function () {
 
     // Levels
-    Route::resource('levels', LevelController::class)->middleware(['auth', 'level:ADM']);
-    Route::prefix('levels')->controller(LevelController::class)->name('levels.')->middleware(['auth', 'level:ADM'])->group(function () {
+    Route::resource('levels', LevelController::class);
+    Route::prefix('levels')->controller(LevelController::class)->name('levels.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
+  
+  // Periode
+    Route::resource('periodes', PeriodeController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('periodes')->controller(PeriodeController::class)->name('periodes.')->middleware(['auth', 'level:ADM'])->group(function () {
         Route::post('list',  'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 
-    // Detail Users
-    Route::resource('detailusers', DetailUserController::class)->middleware(['auth', 'level:ADM']);
-    Route::prefix('detailusers')->controller(DetailUserController::class)->name('detailusers.')->middleware(['auth', 'level:ADM'])->group(function () {
-        Route::post('list', 'list')->name('list');
-        Route::get('confirm/{id}', 'confirm')->name('confirm'); 
-    });
+    // 
 });
 
 require __DIR__ . '/auth.php';
