@@ -1,4 +1,4 @@
-@empty($level)
+@empty($prodi)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,41 +12,39 @@
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
                     Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ route('levels.index') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ route('prodis.index') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
 @else
-    <form action="{{ route('levels.destroy', $level->id) }}" method="POST" id="form-delete">
+    <form action="{{ route('prodis.update', $prodi->id) }}" method="POST" id="form-edit">
         @csrf
-        @method('DELETE')
+        @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data level</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Data Program Studi</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <h5><i class="icon fas fa-ban"></i> Konfirmasi !!!</h5>
-                        Apakah Anda ingin menghapus data seperti di bawah ini?
+                    <div class="form-group">
+                        <label>Nama Program Studi</label>
+                        <input value="{{ $prodi->name }}" type="text" name="name" id="name" class="form-control"
+                            required>
+                        <small id="error-name" class="error-text form-text text-danger"></small>
                     </div>
-                    <table class="table table-sm table-bordered table-striped">
-                        <tr>
-                            <th class="text-right col-3">Kode Level:</th>
-                            <td class="col-9">{{ $level->level_code }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-right col-3">Nama Level :</th>
-                            <td class="col-9">{{ $level->nama_level }}</td>
-                        </tr>
-                    </table>
+                    <div class="form-group">
+                        <label>Jurusan</label>
+                        <input value="{{ $prodi->jurusan }}" type="text" name="jurusan" id="jurusan"
+                            class="form-control" required>
+                        <small id="error-jurusan" class="error-text form-text text-danger"></small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                    <button type="submit" class="btn btn-primary">Ya, Hapus</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </div>
         </div>
@@ -54,8 +52,17 @@
 
     <script>
         $(document).ready(function() {
-            $("#form-delete").validate({
-                rules: {},
+            $('#form-edit').validate({
+                rules: {
+                    name: {
+                        required: true,
+                        maxlength: 255
+                    },
+                    jurusan: {
+                        required: true,
+                        maxlength: 255
+                    }
+                },
                 submitHandler: function(form) {
                     $.ajax({
                         url: form.action,
@@ -69,7 +76,7 @@
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                dataLevel.ajax.reload();
+                                dataProdi.ajax.reload();
                             } else {
                                 $('.error-text').text('');
                                 $.each(response.msgField, function(prefix, val) {

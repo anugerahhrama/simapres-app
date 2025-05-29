@@ -61,6 +61,7 @@ class LevelController extends Controller
      */
     public function store(Request $request)
     {
+        // return $request;
         if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 'level_code' => 'required|string|min:3|unique:levels,level_code',
@@ -83,7 +84,7 @@ class LevelController extends Controller
                 'message' => 'Data Level berhasil disimpan'
             ]);
         }
-        redirect('/');
+        return redirect('/');
     }
 
     /**

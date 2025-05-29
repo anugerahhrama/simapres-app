@@ -1,4 +1,4 @@
-@empty($level)
+@empty($periode)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,41 +12,51 @@
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
                     Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ route('levels.index') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ route('periodes.index') }}" class="btn btn-warning">Kembali</a>
             </div>
         </div>
     </div>
 @else
-    <form action="{{ route('levels.destroy', $level->id) }}" method="POST" id="form-delete">
+    <form action="{{ route('periodes.update', $periode->id) }}" method="POST" id="form-edit">
         @csrf
-        @method('DELETE')
+        @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data level</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Edit Data Periode</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <h5><i class="icon fas fa-ban"></i> Konfirmasi !!!</h5>
-                        Apakah Anda ingin menghapus data seperti di bawah ini?
+                    <div class="form-group">
+                        <label>Tahun Ajaran</label>
+                        <input value="{{ $periode->tahun_ajaran }}" type="text" name="tahun_ajaran" id="tahun_ajaran"
+                            class="form-control" required>
+                        <small id="error-tahun_ajaran" class="error-text form-text text-danger"></small>
                     </div>
-                    <table class="table table-sm table-bordered table-striped">
-                        <tr>
-                            <th class="text-right col-3">Kode Level:</th>
-                            <td class="col-9">{{ $level->level_code }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-right col-3">Nama Level :</th>
-                            <td class="col-9">{{ $level->nama_level }}</td>
-                        </tr>
-                    </table>
+                    <div class="form-group">
+                        <label>Semester</label>
+                        <input value="{{ $periode->semester }}" type="text" name="semester" id="semester"
+                            class="form-control" required>
+                        <small id="error-semester" class="error-text form-text text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Mulai</label>
+                        <input value="{{ $periode->tanggal_mulai }}" type="date" name="tanggal_mulai" id="tanggal_mulai"
+                            class="form-control" required>
+                        <small id="error-tanggal_mulai" class="error-text form-text text-danger"></small>
+                    </div>
+                    <div class="form-group">
+                        <label>Tanggal Selesai</label>
+                        <input value="{{ $periode->tanggal_selesai }}" type="date" name="tanggal_selesai"
+                            id="tanggal_selesai" class="form-control" required>
+                        <small id="error-tanggal_selesai" class="error-text form-text text-danger"></small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                    <button type="submit" class="btn btn-primary">Ya, Hapus</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
                 </div>
             </div>
         </div>
@@ -54,8 +64,27 @@
 
     <script>
         $(document).ready(function() {
-            $("#form-delete").validate({
-                rules: {},
+            $('#form-edit').validate({
+                rules: {
+                    tahun_ajaran: {
+                        required: true,
+                        maxlength: 50
+                    },
+                    semester: {
+                        required: true,
+                        number: true,
+                        min: 1,
+                        max: 12
+                    },
+                    tanggal_mulai: {
+                        required: true,
+                        date: true
+                    },
+                    tanggal_selesai: {
+                        required: true,
+                        date: true
+                    },
+                },
                 submitHandler: function(form) {
                     $.ajax({
                         url: form.action,
@@ -69,7 +98,7 @@
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                dataLevel.ajax.reload();
+                                dataPeriode.ajax.reload();
                             } else {
                                 $('.error-text').text('');
                                 $.each(response.msgField, function(prefix, val) {

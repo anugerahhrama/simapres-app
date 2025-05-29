@@ -59,9 +59,36 @@
                             <p>Pengguna</p>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('periodes.index') }}" class="nav-link {{ request()->is('*periode*') ? 'active' : '' }}">
+                            <i class="far fa-solid fa-clock nav-icon"></i>
+                            <p>Periode</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('prodis.index') }}" class="nav-link {{ request()->is('*prodi*') ? 'active' : '' }}">
+                            <i class="far fa-solid fa-graduation-cap nav-icon"></i>
+                            <p>Program Studi</p>
+                        </a>
+                    </li>
                 </ul>
             </li>
         @endif
+
+                @if (auth()->check() && auth()->user()->level->level_code === 'MHS')
+                 <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('prestasi.index') }}" class="nav-link {{ request()->is('*prestasi*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Manajemen Prestasi</p>
+                        </a>
+                    </li>
+                @endif
 
                 <li class="bd-links-span-all my-3 border-top"></li>
 
