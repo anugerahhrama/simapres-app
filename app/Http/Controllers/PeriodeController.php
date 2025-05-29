@@ -37,10 +37,9 @@ class PeriodeController extends Controller
         return DataTables::of($periode)
             ->addIndexColumn()
             ->addColumn('aksi', function ($periode) {
-                $disabled = $periode->periode_code === 'ADM' ? 'disabled' : '';
                 $btn = '<button onclick="modalAction(\'' . route('periodes.show', $periode->id) . '\')" class="btn btn-info btn-sm mr-1">Detail</button>';
                 $btn .= '<button onclick="modalAction(\'' . route('periodes.edit', $periode->id) . '\')" class="btn btn-warning btn-sm mr-1">Edit</button>';
-                $btn .= '<button onclick="modalAction(\'' . route('periodes.confirm', $periode->id) . '\')" class="btn btn-danger btn-sm" ' . $disabled . '>Hapus</button>';
+                $btn .= '<button onclick="modalAction(\'' . route('periodes.confirm', $periode->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
             ->rawColumns(['aksi'])
