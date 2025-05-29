@@ -31,31 +31,37 @@
         </div>
 
         <!-- Sidebar Menu -->
-        <nav class="mt-2 d-flex flex-column">
-            <ul class="nav nav-pills nav-sidebar flex-column flex-grow-1" data-widget="treeview" role="menu" data-accordion="false">
-                @if (auth()->check() && auth()->user()->level->level_code === 'ADM')
-                    <li class="nav-item bg- bg-[#1A2151]">
-                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
+<nav class="mt-2 d-flex flex-column">
+    <ul class="nav nav-pills nav-sidebar flex-column flex-grow-1" data-widget="treeview" role="menu" data-accordion="false">
+        @if (auth()->check() && auth()->user()->level->level_code === 'ADM')
+            <li class="nav-item bg-[#1A2151]">
+                <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-tachometer-alt"></i>
+                    <p>Dashboard</p>
+                </a>
+            </li>
 
-                    <li class="nav-item bg- bg-[#1A2151] {{ request()->is('*manajemen*') ? 'menu-is-opening menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->is('*manajemen*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-gear"></i>
-                            <p>Manajemen <i class="right fas fa-angle-left"></i></p>
+            <li class="nav-item bg-[#1A2151] {{ request()->is('*manajemen*') ? 'menu-is-opening menu-open' : '' }}">
+                <a href="#" class="nav-link {{ request()->is('*manajemen*') ? 'active' : '' }}">
+                    <i class="nav-icon fas fa-gear"></i>
+                    <p>Manajemen <i class="right fas fa-angle-left"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ route('levels.index') }}" class="nav-link {{ request()->is('*level*') ? 'active' : '' }}">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Level</p>
                         </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('levels.index') }}" class="nav-link {{ request()->is('*level*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Level</p>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
-                @endif
+                    <li class="nav-item">
+                        <a href="{{ route('detailusers.index') }}" class="nav-link {{ request()->is('*detailusers*') ? 'active' : '' }}">
+                            <i class="fas fa-users nav-icon"></i>
+                            <p>Pengguna</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        @endif
 
                 <li class="bd-links-span-all my-3 border-top"></li>
 

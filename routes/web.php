@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\DetailUserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,7 +30,12 @@ Route::prefix('manajemen')->group(function () {
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 
-    // 
+    // Detail Users
+    Route::resource('detailusers', DetailUserController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('detailusers')->controller(DetailUserController::class)->name('detailusers.')->middleware(['auth', 'level:ADM'])->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm'); 
+    });
 });
 
 require __DIR__ . '/auth.php';
