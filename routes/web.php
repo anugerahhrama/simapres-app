@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\LevelController;
+use App\Http\Controllers\DetailUserController;
+use App\Http\Controllers\PrestasiController;
+use App\Http\Controllers\PeriodeController;
+use App\Http\Controllers\ProgramStudiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,8 +39,27 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
         Route::post('list',  'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
+  
+  // Prodi
+    Route::resource('prodis', ProgramStudiController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('prodis')->controller(ProgramStudiController::class)->name('prodis.')->middleware(['auth', 'level:ADM'])->group(function () {
+        Route::post('list',  'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
+});
 
-    // 
+    // Detail Users
+    Route::resource('detailusers', DetailUserController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('detailusers')->controller(DetailUserController::class)->name('detailusers.')->middleware(['auth', 'level:ADM'])->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm'); 
+    });
+
+// Prestasi - Resource Routes dengan nama yang sudah disesuaikan
+Route::resource('prestasi', PrestasiController::class);
+Route::prefix('prestasi')->controller(PrestasiController::class)->name('prestasi.')->group(function () {
+    Route::post('list', 'list')->name('list');
+    Route::get('confirm/{id}', 'confirm')->name('confirm');
 });
 
 require __DIR__ . '/auth.php';

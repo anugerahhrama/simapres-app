@@ -52,34 +52,23 @@
                             <i class="far fa-circle nav-icon"></i>
                             <p>Level</p>
                         </a>
-<<<<<<< HEAD
-=======
-                         <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('levels.index') }}" class="nav-link {{ request()->is('*level*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i>
-                                    <p>Level</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('periodes.index') }}" class="nav-link {{ request()->is('*periode*') ? 'active' : '' }}">
-                                    <i class="far fa-solid fa-clock nav-icon"></i>
-                                    <p>Periode</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('prodis.index') }}" class="nav-link {{ request()->is('*prodi*') ? 'active' : '' }}">
-                                    <i class="far fa-solid fa-graduation-cap nav-icon"></i>
-                                    <p>Program Studi</p>
-                                </a>
-                            </li>
-                        </ul>
->>>>>>> main
                     </li>
                     <li class="nav-item">
                         <a href="{{ route('detailusers.index') }}" class="nav-link {{ request()->is('*detailusers*') ? 'active' : '' }}">
                             <i class="fas fa-users nav-icon"></i>
                             <p>Pengguna</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('periodes.index') }}" class="nav-link {{ request()->is('*periode*') ? 'active' : '' }}">
+                            <i class="far fa-solid fa-clock nav-icon"></i>
+                            <p>Periode</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('prodis.index') }}" class="nav-link {{ request()->is('*prodi*') ? 'active' : '' }}">
+                            <i class="far fa-solid fa-graduation-cap nav-icon"></i>
+                            <p>Program Studi</p>
                         </a>
                     </li>
                 </ul>
