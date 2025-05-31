@@ -3,6 +3,7 @@
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\PeriodeController;
+use App\Http\Controllers\MinatController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,5 +46,9 @@ Route::prefix('prestasi')->controller(PrestasiController::class)->name('prestasi
     Route::post('list', 'list')->name('list');
     Route::get('confirm/{id}', 'confirm')->name('confirm');
 });
+
+Route::resource('minats', MinatController::class);
+Route::get('minats/list', [MinatController::class, 'list'])->name('minats.list');
+Route::get('minats/{minat}/confirm', [MinatController::class, 'confirm'])->name('minats.confirm');
 
 require __DIR__ . '/auth.php';

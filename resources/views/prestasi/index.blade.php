@@ -3,9 +3,7 @@
 @section('content')
     <div class="card card-outline card-primary">
         <div class="card-header">
-            <div class="card-tools">
-                <button onclick="modalAction('{{ route('prestasi.create') }}')" class="btn btn-sm btn-primary mt-1">Tambah Prestasi</button>
-            </div>
+           
         </div>
         <div class="card-body">
             @if (session('success'))
@@ -29,25 +27,23 @@
                                 @endforeach --}}
                             </select>
                         </div>
-                        <label class="col-1 control-label col-form-label">Filter Status</label>
-                        <div class="col-3">
-                            <select class="form-control" id="status_filter" name="status_filter">
-                                <option value="">- Semua Status -</option>
-                                <option value="pending">Pending</option>
-                                <option value="approved">Disetujui</option>
-                                <option value="rejected">Ditolak</option>
-                            </select>
-                        </div>
                     </div>
                 </div>
             </div>
+            <div class="row mb-3">
+                 <div class="col-md-12 d-flex justify-content-end bs-success">
+                        <button onclick="modalAction('{{ route('prestasi.create') }}')" class="btn btn-sm btn-success mt-1">Tambah Prestasi</button>
+                    </div>
+                </div>
             <table class="table table-bordered table-striped table-hover table-sm" id="table_prestasi">
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Mahasiswa</th> <th>Judul Lomba</th>
+                        {{-- <th>Mahasiswa</th>  --}}
+                        <th>Judul Lomba</th>
                         <th>Penyelenggara</th> <th>Kategori</th>
-                        <th>Pencapaian</th> <th>Status</th>
+                        <th>Deskripsi</th>
+                        <th>Pencapaian</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -89,12 +85,12 @@
                         orderable: false,
                         searchable: false
                     },
-                    {
-                        data: "mahasiswa", // Kolom nama mahasiswa
-                        className: "",
-                        orderable: true,
-                        searchable: true
-                    },
+                    // {
+                    //     data: "mahasiswa", // Kolom nama mahasiswa
+                    //     className: "",
+                    //     orderable: true,
+                    //     searchable: true
+                    // },
                     {
                         data: "judul_lomba", // Sesuaikan dengan nama kolom dari controller
                         className: "",
@@ -114,13 +110,13 @@
                         searchable: true
                     },
                     {
-                        data: "pencapaian", // Sesuaikan dengan nama kolom dari controller. Asumsi ini bukan deskripsi
+                        data: "deskripsi", // Sesuaikan dengan nama kolom dari controller
                         className: "",
                         orderable: true,
                         searchable: true
                     },
                     {
-                        data: "status",
+                        data: "pencapaian", // Sesuaikan dengan nama kolom dari controller. Asumsi ini bukan deskripsi
                         className: "",
                         orderable: true,
                         searchable: true

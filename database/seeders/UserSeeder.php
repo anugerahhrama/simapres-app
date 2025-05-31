@@ -19,5 +19,55 @@ class UserSeeder extends Seeder
             'password' => Hash::make('pass12345'),
             'level_id' => '3',
         ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa1@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa2@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa3@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa4@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa5@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa6@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa7@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa8@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa9@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
+        DB::table('users')->insert([
+            'email' => 'mahasiswa10@simapres.com',
+            'password' => Hash::make('pass12345'),
+            'level_id' => '3',
+        ]);
     }
 }

@@ -72,10 +72,16 @@
                     </li>
                     <li class="nav-item bg- bg-[#1A2151]">
                         <a href="{{ route('prestasi.index') }}" class="nav-link {{ request()->is('*prestasi*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-tachometer-alt"></i>
-                            <p>Manajemen Prestasi</p>
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Prestasi Mahasiswa</p>
                         </a>
                     </li>
+                    {{-- <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('lomba.index') }}" class="nav-link {{ request()->is('*lomba*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Lomba</p> 
+                        </a>
+                    </li> --}}
                 @endif
 
                 <li class="bd-links-span-all my-3 border-top"></li>

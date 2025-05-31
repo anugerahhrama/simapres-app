@@ -46,8 +46,7 @@ class PrestasiController extends Controller
             'breadcrumb' => $breadcrumb,
             'page' => $page,
             'activeMenu' => $activeMenu,
-            // 'kategoris' => $kategoris, // Uncomment jika Anda melewatkan daftar kategori dari DB
-            'prestasis' => $prestasis->get() // Dapatkan koleksi untuk ditampilkan jika tidak menggunakan DataTable di view ini
+            'prestasis' => $prestasis->get() 
         ]);
     }
 
@@ -57,8 +56,8 @@ class PrestasiController extends Controller
      */
     public function list(Request $request)
     {
-        $prestasis = Prestasi::select('id', 'mahasiswa_id', 'lomba_id', 'nama_kegiatan', 'kategori', 'pencapaian', 'status_verifikasi', 'tanggal')
-                            ->with(['lomba:id,judul,penyelenggara', 'user:id,name']);
+        $prestasis = Prestasi::select('id', 'mahasiswa_id', 'lomba_id', 'nama_kegiatan', 'kategori', 'pencapaian', 'deskripsi', 'tanggal')
+                            ->with(['lomba:id,judul,penyelenggara', 'user:id,email']);
 
         // Filter berdasarkan kategori_filter jika ada (sesuaikan dengan nama di AJAX data)
         if ($request->filled('kategori_filter')) {
@@ -77,12 +76,13 @@ class PrestasiController extends Controller
                 $q->where('nama_kegiatan', 'like', $searchTerm)
                   ->orWhere('kategori', 'like', $searchTerm)
                   ->orWhere('pencapaian', 'like', $searchTerm)
+                  ->orWhere('deskripsi', 'like', $searchTerm)
                   ->orWhereHas('lomba', function ($qLomba) use ($searchTerm) {
                       $qLomba->where('judul', 'like', $searchTerm)
                              ->orWhere('penyelenggara', 'like', $searchTerm);
                   })
                   ->orWhereHas('user', function ($qUser) use ($searchTerm) {
-                      $qUser->where('name', 'like', $searchTerm);
+                      $qUser->where('email', 'like', $searchTerm);
                   });
             });
         }
@@ -90,9 +90,9 @@ class PrestasiController extends Controller
 
         return DataTables::of($prestasis)
             ->addIndexColumn()
-            ->addColumn('mahasiswa_nama', function ($prestasi) { // Tambah kolom mahasiswa
-                return $prestasi->user ? $prestasi->user->email : '-';
-            })
+            // ->addColumn('email', function ($prestasi) { // Tambah kolom mahasiswa
+            //     return $prestasi->user ? $prestasi->user->email : '-';
+            // })
             ->addColumn('judul_lomba', function ($prestasi) {
                 return $prestasi->lomba ? $prestasi->lomba->judul : '-';
             })
@@ -100,7 +100,7 @@ class PrestasiController extends Controller
                 return $prestasi->lomba ? $prestasi->lomba->penyelenggara : '-';
             })
             // Kolom 'kategori' sudah ada di select
-            ->addColumn('pencapaian', function ($prestasi) { // Asumsi ini adalah kolom yang ingin ditampilkan
+            ->addColumn('pres', function ($prestasi) { // Asumsi ini adalah kolom yang ingin ditampilkan
                 return $prestasi->pencapaian;
             })
             ->addColumn('status', function ($prestasi) {
@@ -113,11 +113,9 @@ class PrestasiController extends Controller
                 }
             })
             ->addColumn('aksi', function ($prestasi) {
-                $btn = '<button onclick="modalAction(\'' . route('prestasi.show_ajax', $prestasi->id) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . route('prestasi.edit_ajax', $prestasi->id) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
-                // Untuk tombol hapus, biasanya lebih baik menggunakan form atau konfirmasi JS
-                // Daripada langsung tombol yang memanggil modal delete
-                $btn .= '<button onclick="modalAction(\'' . route('prestasi.delete_ajax', $prestasi->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
+                $btn = '<button onclick="modalAction(\'' . route('prestasi.show', $prestasi->id) . '\')" class="btn btn-info btn-sm">Detail</button> ';
+                $btn .= '<button onclick="modalAction(\'' . route('prestasi.edit', $prestasi->id) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+                $btn .= '<button onclick="modalAction(\'' . route('prestasi.confirm', $prestasi->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
             ->rawColumns(['status', 'aksi'])
@@ -130,9 +128,9 @@ class PrestasiController extends Controller
     public function create()
     {
         $lombas = Lomba::all();
-        $mahasiswas = User::where('role', 'mahasiswa')->get();
+        $mahasiswas = User::where('level_id', 'mahasiswa')->get();
 
-        return view('prestasi.create_ajax', compact('lombas', 'mahasiswas'));
+        return view('prestasi.create', compact('lombas', 'mahasiswas'));
     }
 
     /**
@@ -182,7 +180,7 @@ class PrestasiController extends Controller
         $prestasi = Prestasi::with(['lomba', 'user'])->find($id);
 
         if ($prestasi) {
-            return view('prestasi.show_ajax', compact('prestasi'));
+            return view('prestasi.show', compact('prestasi'));
         } else {
             return response()->json([
                 'status' => false,
@@ -198,10 +196,10 @@ class PrestasiController extends Controller
     {
         $prestasi = Prestasi::find($id);
         $lombas = Lomba::all();
-        $mahasiswas = User::where('role', 'mahasiswa')->get();
+        $mahasiswas = User::where('level_id', 'mahasiswa')->get();
 
         if ($prestasi) {
-            return view('prestasi.edit_ajax', compact('prestasi', 'lombas', 'mahasiswas'));
+            return view('prestasi.edit', compact('prestasi', 'lombas', 'mahasiswas'));
         } else {
             return response()->json([
                 'status' => false,
@@ -264,7 +262,7 @@ class PrestasiController extends Controller
         $prestasi = Prestasi::with(['lomba', 'user'])->find($id);
 
         if ($prestasi) {
-            return view('prestasi.delete_ajax', compact('prestasi'));
+            return view('prestasi.delete', compact('prestasi'));
         } else {
             return response()->json([
                 'status' => false,
