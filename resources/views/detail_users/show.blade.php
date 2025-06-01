@@ -9,29 +9,46 @@
         </div>
 
         <div class="modal-body">
-            <dl class="row">
-                <dt class="col-sm-4">No Induk</dt>
-                <dd class="col-sm-8">{{ $detailUser->no_induk ?? '-' }}</dd>
-
-                <dt class="col-sm-4">Nama Lengkap</dt>
-                <dd class="col-sm-8">{{ $detailUser->nama_lengkap ?? $detailUser->detailUser->id ?? '-' }}</dd>
-
-                <dt class="col-sm-4">Email</dt>
-                <dd class="col-sm-8">{{ $detailUser->email ?? $detailUser->detailUser->email ?? '-' }}</dd>
-
-                <dt class="col-sm-4">Program Studi</dt>
-                <dd class="col-sm-8">{{ $detailUser->prodi->name ?? '-' }}</dd>
-
-                <dt class="col-sm-4">Tanggal Dibuat</dt>
-                <dd class="col-sm-8">{{ $detailUser->created_at->format('d M Y H:i') }}</dd>
-
-                <dt class="col-sm-4">Terakhir Diubah</dt>
-                <dd class="col-sm-8">{{ $detailUser->updated_at->format('d M Y H:i') }}</dd>
-            </dl>
-        </div>
-
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th class="text-right col-4">No Induk :</th>
+                    <td class="col-8">{{ $detailUser->no_induk ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right">Nama Lengkap :</th>
+                    <td>{{ $detailUser->name ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right">Email :</th>
+                    <td>{{ $detailUser->detailUser->email ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right">Program Studi :</th>
+                    <td>{{ $detailUser->prodi->name ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right">Level :</th>
+                    <td>{{ $detailUser->detailUser->level->nama_level ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right">Jenis Kelamin :</th>
+                    <td>
+                        {{ $detailUser->jenis_kelamin == 'L' ? 'Laki-laki' : ($detailUser->jenis_kelamin == 'P' ? 'Perempuan' : '-') }}
+                    </td>
+                </tr>
+                <tr>
+                    <th class="text-right">No Telepon :</th>
+                    <td>{{ $detailUser->phone ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right">Tanggal Dibuat :</th>
+                    <td>{{ $detailUser->created_at->format('d M Y H:i') }}</td>
+                </tr>
+                <tr>
+                    <th class="text-right">Terakhir Diubah :</th>
+                    <td>{{ $detailUser->updated_at->format('d M Y H:i') }}</td>
+                </tr>
+            </table>
         </div>
     </div>
 </div>

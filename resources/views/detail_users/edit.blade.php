@@ -12,18 +12,32 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label>No Induk</label>
-                    <input type="text" name="no_induk" value="{{ $detailUser->no_induk }}" class="form-control" required>
-                    <small class="form-text text-danger error-text" id="error-no_induk"></small>
+                    <input type="text" name="no_induk" id="no_induk" value="{{ $detailUser->no_induk }}" class="form-control" required>
+                    <small id="error-no_induk" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Nama Lengkap</label>
-                    <input type="text" name="nama_lengkap" value="{{ $detailUser->nama_lengkap }}" class="form-control" required>
-                    <small class="form-text text-danger error-text" id="error-nama_lengkap"></small>
+                    <input type="text" name="name" id="name" value="{{ $detailUser->name }}" class="form-control" required>
+                    <small id="error-name" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" name="email" value="{{ $detailUser->email }}" class="form-control" required>
                     <small class="form-text text-danger error-text" id="error-email"></small>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" name="phone" value="{{ $detailUser->phone }}" class="form-control" required>
+                    <small class="form-text text-danger error-text" id="error-phone"></small>
+                </div>
+                <div class="form-group">
+                    <label>Jenis Kelamin</label>
+                    <select name="jenis_kelamin" class="form-control" required>
+                        <option value="">-- Pilih Jenis Kelamin --</option>
+                        <option value="L" {{ $detailUser->jenis_kelamin == 'L' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="P" {{ $detailUser->jenis_kelamin == 'P' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                    <small class="form-text text-danger error-text" id="error-jenis_kelamin"></small>
                 </div>
                 <div class="form-group">
                     <label>Prodi</label>
@@ -37,24 +51,41 @@
                     </select>
                     <small class="form-text text-danger error-text" id="error-prodi_id"></small>
                 </div>
+                 <div class="form-group">
+                    <label>Level</label>
+                    <select name="level_id" id="level_id" class="form-control" required>
+                        <option value="">-- Pilih Level --</option>
+                        @foreach ($levels as $level)
+                            <option value="{{ $level->id }}">{{ $level->nama_level }}</option>
+                        @endforeach
+                    </select>
+                    <small id="error-level_id" class="error-text form-text text-danger"></small>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" id="password" class="form-control" required>
+                    <small id="error-password" class="error-text form-text text-danger"></small>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-secondary">Batal</button>
+                <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
                 <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
             </div>
         </div>
     </div>
 </form>
 
-@push('js')
 <script>
     $(document).ready(function () {
         $('#form-edit').validate({
             rules: {
-                no_induk: { required: true },
-                nama_lengkap: { required: true },
+                no_induk: { required: true, maxlength: 50 },
+                nama_lengkap: { required: true, maxlength: 100 },
                 email: { required: true, email: true },
-                prodi_id: { required: true }
+                phone: { required: true, maxlength: 15 },
+                jenis_kelamin: { required: true },
+                prodi_id: { required: true },
+                level_id: { required: true }
             },
             submitHandler: function (form) {
                 $.ajax({
@@ -65,7 +96,9 @@
                         if (response.status) {
                             $('#myModal').modal('hide');
                             Swal.fire('Berhasil', response.message, 'success');
-                            dataTable.ajax.reload();
+                            if (typeof dataTable !== 'undefined') {
+                                dataTable.ajax.reload();
+                            }
                         } else {
                             $('.error-text').text('');
                             $.each(response.msgField, function (prefix, val) {
@@ -73,6 +106,9 @@
                             });
                             Swal.fire('Gagal', response.message, 'error');
                         }
+                    },
+                    error: function () {
+                        Swal.fire('Error', 'Terjadi kesalahan pada server.', 'error');
                     }
                 });
                 return false;
@@ -91,4 +127,3 @@
         });
     });
 </script>
-@endpush

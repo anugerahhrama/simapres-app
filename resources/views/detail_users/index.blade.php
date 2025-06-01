@@ -38,6 +38,7 @@
                         <th>No Induk</th>
                         <th>Nama Lengkap</th>
                         <th>Prodi</th>
+                        <th>Level</th>
                         <th>Email</th>
                         <th>Aksi</th>
                     </tr>
@@ -78,8 +79,9 @@
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
                     { data: 'no_induk', name: 'no_induk' },
-                    { data: 'nama_lengkap', name: 'nama_lengkap' },
+                    { data: 'name', name: 'name' },
                     { data: 'prodi', name: 'prodi' },
+                    { data: 'level', name: 'level' },
                     { data: 'email', name: 'email' },
                     { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
                 ]

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\DetailUser;
 use App\Models\ProgramStudi;
+use App\Models\User;
+use App\Models\Level;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
@@ -20,13 +22,15 @@ class DetailUserController extends Controller
             'list'  => ['Home', 'Detail User']
         ];
 
-        $prodis = ProgramStudi::all(); // Ambil semua data prodi dari database
-        return view('detail_users.index', compact('breadcrumb', 'prodis'));
+        $prodis = ProgramStudi::all();
+        $levels = Level::all();
+
+        return view('detail_users.index', compact('breadcrumb', 'prodis', 'levels'));
     }
 
     public function list(Request $request)
     {
-        $data = DetailUser::with('detailUser', 'prodi');
+        $data = DetailUser::with(['detailUser.level', 'prodi']);
 
         if ($request->prodi_id) {
             $data->where('prodi_id', $request->prodi_id);
@@ -34,9 +38,18 @@ class DetailUserController extends Controller
 
         return DataTables::of($data)
             ->addIndexColumn()
-            ->addColumn('nama_lengkap', fn($row) => $row->detailUser?->id ?? '-')
-            ->addColumn('email', fn($row) => $row->detailUser->email ?? '-')
-            ->addColumn('prodi', fn($row) => $row->prodi->id ?? '-')
+            ->addColumn('name', function ($row) {
+                return ($row->name && $row->name !== '') ? $row->name : '-';
+            })
+            ->addColumn('email', function ($row) {
+                return $row->detailUser->email ?? '-';
+            })
+            ->addColumn('level', function ($row) {
+                return $row->detailUser->level->nama_level ?? '-';
+            })
+            ->addColumn('prodi', function ($row) {
+                return $row->prodi->name ?? '-';
+            })
             ->addColumn('aksi', function ($row) {
                 $btn = '<button onclick="modalAction(\'' . route('detailusers.show', $row->id) . '\')" class="btn btn-info btn-sm mr-1">Detail</button>';
                 $btn .= '<button onclick="modalAction(\'' . route('detailusers.edit', $row->id) . '\')" class="btn btn-warning btn-sm mr-1">Edit</button>';
@@ -48,37 +61,66 @@ class DetailUserController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display a listing of the resource.
      */
     public function create()
     {
         $prodis = ProgramStudi::all();
-        $users = detailUser::all();
-        return view('detail_users.create', compact('prodis', 'users'));
+        $levels = Level::all();
+
+        return view('detail_users.create', compact('prodis', 'levels'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Display a listing of the resource.
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
-            'no_induk' => 'required|string|max:20|unique:detail_users,no_induk',
-            'prodi_id' => 'required|exists:program_studis,id',
-        ]);
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|min:6',
+                'no_induk' => 'required|string|max:20|unique:detail_users,no_induk',
+                'name' => 'required|string|max:255',
+                'prodi_id' => 'required|exists:program_studis,id',
+                'level_id' => 'required|exists:levels,id',
+                'phone' => 'nullable|string|max:20',
+                'jenis_kelamin' => 'nullable|in:L,P',
+            ];
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            $user = User::create([
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'level_id' => $request->level_id
+            ]);
+
+            DetailUser::create([
+                'user_id' => $user->id,
+                'no_induk' => $request->no_induk,
+                'name' => $request->name,
+                'prodi_id' => $request->prodi_id
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data Detail User berhasil disimpan'
+            ]);
         }
-
-        DetailUser::create($request->all());
-
-        return redirect()->route('detailusers.index')->with('success', 'Detail user berhasil ditambahkan.');
+        redirect('/');
     }
 
     /**
-     * Display the specified resource.
+     * Display a listing of the resource.
      */
     public function show(string $id)
     {
@@ -87,53 +129,109 @@ class DetailUserController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Display a listing of the resource.
      */
     public function edit(string $id)
     {
-        $detailUser = DetailUser::findOrFail($id);
+        $detailUser = DetailUser::with('detailUser')->findOrFail($id);
         $prodis = ProgramStudi::all();
-        return view('detail_users.edit', compact('detailUser', 'prodis'));
+        $levels = Level::all();
+
+        return view('detail_users.edit', compact('detailUser', 'prodis', 'levels'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display a listing of the resource.
      */
     public function update(Request $request, string $id)
     {
-        $detailUser = DetailUser::findOrFail($id);
+        if ($request->ajax() || $request->wantsJson()) {
+            $detailUser = DetailUser::with('detailUser')->findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'no_induk' => 'required|string|max:20|unique:detail_users,no_induk,' . $id,
-            'prodi_id' => 'required|exists:program_studis,id',
-        ]);
+            $rules = [
+                'email' => 'required|email|unique:users,email,' . $detailUser->user_id,
+                'no_induk' => 'required|string|max:20|unique:detail_users,no_induk,' . $id,
+                'name' => 'required|string|max:255',
+                'prodi_id' => 'required|exists:program_studis,id',
+                'level_id' => 'required|exists:levels,id',
+                'phone' => 'nullable|string|max:20',
+                'jenis_kelamin' => 'nullable|in:L,P',
+            ];
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            $user = $detailUser->detailUser;
+            if ($user) {
+                $user->update([
+                    'email' => $request->email,
+                    'level_id' => $request->level_id,
+                ]);
+            }
+
+            $detailUser->update([
+                'no_induk' => $request->no_induk,
+                'name' => $request->name,
+                'prodi_id' => $request->prodi_id,
+                'phone' => $request->phone,
+                'jenis_kelamin' => $request->jenis_kelamin,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Data Detail User berhasil diperbarui',
+            ]);
         }
 
-        $detailUser->update($request->all());
-
-        return redirect()->route('detailusers.index')->with('success', 'Detail user berhasil diperbarui.');
+        return redirect()->route('detailusers.index')->with('error', 'Permintaan tidak valid');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display a listing of the resource.
      */
     public function confirm(string $id)
     {
-        $detailUser = DetailUser::with('detailUser', 'prodi')->findOrFail($id);
+        $detailUser = DetailUser::with(['detailUser', 'prodi'])->findOrFail($id);
+        $prodis = ProgramStudi::all();
+        $user = user::all();
+        
         return view('detail_users.confirm', compact('detailUser'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Display a listing of the resource.
      */
-    public function destroy(string $id, Request $request)
+    public function destroy(string $id)
     {
-     $detailUser = DetailUser::findOrFail($id);
-        $detailUser->delete();
+        $detailUser = DetailUser::with(['detailUser', 'prodi'])->findOrFail($id);
 
-        return redirect()->route('detailusers.index')->with('success', 'Detail user berhasil dihapus.');   
+        $deletedData = [
+            'name' => $detailUser->name ?? '-',
+            'no_induk' => $detailUser->no_induk?? '-',
+            'email' => $detailUser->detailUser->email ?? '-',
+            'prodi' => $detailUser->prodi->name ?? '-',
+            'level' => $detailUser->detailUser->level->nama_level ?? '-',
+            'jenis_kelamin' => $detailUser->jenis_kelamin == 'L' ? 'Laki-laki' : ($detailUser->jenis_kelamin == 'P' ? 'Perempuan' : '-'),
+            'phone' => $detailUser->phone ?? '-',
+        ];
+
+        $user = $detailUser->detailUser;
+        $detailUser->delete();
+        if ($user) {
+            $user->delete();
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Detail user berhasil dihapus.',
+            'deleted_data' => $deletedData
+        ]);
     }
 }
