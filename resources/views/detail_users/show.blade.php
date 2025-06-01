@@ -40,14 +40,6 @@
                     <th class="text-right">No Telepon :</th>
                     <td>{{ $detailUser->phone ?? '-' }}</td>
                 </tr>
-                <tr>
-                    <th class="text-right">Tanggal Dibuat :</th>
-                    <td>{{ $detailUser->created_at->format('d M Y H:i') }}</td>
-                </tr>
-                <tr>
-                    <th class="text-right">Terakhir Diubah :</th>
-                    <td>{{ $detailUser->updated_at->format('d M Y H:i') }}</td>
-                </tr>
             </table>
         </div>
     </div>

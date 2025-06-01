@@ -5,7 +5,10 @@
 
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
-                <a href="" class="h1"><b>Simapres</a>
+                <a href="" class="h1 d-flex align-items-center justify-content-center">
+                    <img src="{{ asset('assets/img/logo/logo1.png') }}" alt="Logo Simapres" style="max-height: 40px; margin-right: 10px;">
+                    <span style="font-size: 40px; font-weight: bold; color: #1a2151;">Simapres</span>
+                </a>
             </div>
             <div class="card-body">
                 <p class="login-box-msg">Sign in to start your session</p>
@@ -45,7 +48,7 @@
                         </div>
 
                         <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                            <button type="submit" class="btn btn-block" style="background-color: #1a2151; color: white;">Sign In</button>
                         </div>
                     </div>
                 </form>

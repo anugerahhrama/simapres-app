@@ -5,9 +5,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Laravel</title>
+    <title>{{ $breadcrumb->title ?? 'Dashboard' }} | SIMAPRES</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo/logo1.png') }}">
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -41,6 +44,192 @@
 
     <script src="https://kit.fontawesome.com/7170f40af1.js" crossorigin="anonymous"></script>
 
+    <style>
+        /* Custom Styles for Door2Day-like Interface */
+        .main-sidebar {
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
+        }
+
+        .brand-link {
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        .user-panel {
+            padding: 20px !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+        }
+
+        .user-panel .image img {
+            width: 40px !important;
+            height: 40px !important;
+        }
+
+        .nav-sidebar .nav-item .nav-link {
+            padding: 12px 20px !important;
+            border-left: 3px solid transparent !important;
+            margin-bottom: 4px !important;
+            transition: all 0.2s !important;
+        }
+
+        .nav-sidebar .nav-item .nav-link:hover {
+            background: #f7fafc !important;
+            color: #2b6cb0 !important;
+            border-left-color: #4473ed !important;
+        }
+
+        .nav-sidebar .nav-item .nav-link.active {
+            background: #ebf8ff !important;
+            color: #2b6cb0 !important;
+            border-left-color: #4473ed !important;
+            font-weight: 600 !important;
+        }
+
+        .content-wrapper {
+            background: #f8fafc !important;
+        }
+
+        .content-header {
+            background: white !important;
+            padding: 20px 30px !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .content-header h1 {
+            font-size: 24px !important;
+            font-weight: 700 !important;
+            color: #2d3748 !important;
+            margin: 0 !important;
+        }
+
+        .card {
+            border-radius: 12px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            border: none !important;
+        }
+
+        .btn-primary {
+            background: #4473ed !important;
+            border-color: #4473ed !important;
+            font-weight: 600 !important;
+            transition: all 0.2s !important;
+        }
+
+        .btn-primary:hover {
+            background: #2f55e1   !important;
+            border-color: #2f55e1   !important;
+            box-shadow: 0 4px 12px rgba(68, 115, 237, 0.3) !important;
+        }
+
+        .table {
+            border-radius: 12px !important;
+            overflow: hidden !important;
+        }
+
+        .table thead th {
+            background: #f7fafc !important;
+            border-top: none !important;
+            border-bottom: none !important;
+            font-weight: 600 !important;
+            color: #4a5568 !important;
+        }
+
+        .table tbody tr:hover {
+            background: #f7fafc !important;
+        }
+
+        .alert {
+            border-radius: 8px !important;
+            border: none !important;
+        }
+
+        .form-control {
+            border-radius: 6px !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        .form-control:focus {
+            border-color: #2b6cb0 !important;
+            box-shadow: 0 0 0 0.2rem rgba(43, 108, 176, 0.25) !important;
+        }
+
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-title {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .stat-change.negative {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .stat-subtitle {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        /* Custom DataTable Styling */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            color: #4a5568 !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 6px !important;
+            margin: 0 2px !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #2b6cb0 !important;
+            border-color: #2b6cb0 !important;
+            color: white !important;
+        }
+    </style>
+
     @stack('css')
 </head>
 
@@ -56,7 +245,28 @@
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
-            <x-breadcumb :breadcrumb="$breadcrumb ?? ''"></x-breadcumb>
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>{{ $breadcrumb->title ?? 'Dashboard' }}</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                @if(isset($breadcrumb))
+                                    @foreach($breadcrumb->list as $key => $value)
+                                        @if($key == count($breadcrumb->list) - 1)
+                                            <li class="breadcrumb-item active">{{ $value }}</li>
+                                        @else
+                                            <li class="breadcrumb-item"><a href="#">{{ $value }}</a></li>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- /.content-header -->
 
             <!-- Main content -->

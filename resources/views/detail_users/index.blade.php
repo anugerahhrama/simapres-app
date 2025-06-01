@@ -1,93 +1,149 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="card card-outline card-primary">
-        <div class="card-header">
-            <div class="card-tools">
-                <button onclick="modalAction('{{ route('detailusers.create') }}')" class="btn btn-sm btn-primary mt-1">Tambah Ajax</button>
-            </div>
-        </div>
-        <div class="card-body">
-            @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            @if (session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
-            @endif
+    <!-- Main Data Table Card -->
+    <div class="card mt-4">
+        <div class="card-header" style="background: white; border-bottom: 1px solid #e2e8f0; padding: 15px 20px;">
+            <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                <div class="form-group mb-0 mr-3">
+                    <select class="form-control" id="prodi_id" name="prodi_id" style="min-width: 180px;">
+                        <option value="">- Semua Prodi -</option>
+                        @foreach ($prodis as $prodi)
+                            <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
 
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <div class="form-group-row">
-                        <label class="col-1 control-label col-form-label">Filter:</label>
-                        <div class="col-3">
-                            <select class="form-control" id="prodi_id" name="prodi_id">
-                                <option value="">- Semua -</option>
-                                @foreach ($prodis as $prodi)
-                                    <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
-                                @endforeach
-                            </select>
+                <div>
+                    <button onclick="modalAction('{{ route('detailusers.create') }}')" class="btn btn-primary"
+                        style="white-space: nowrap;">
+                        <i class="fas fa-plus mr-1"></i>
+                        Tambah
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding: 0;">
+                @if (session('success'))
+                    <div class="alert alert-success mx-2 mt-2" style="border-radius: 6px;">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger mx-2 mt-2" style="border-radius: 6px;">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                <div class="tab-content p-2">
+                    <div class="tab-pane fade show active" id="all">
+                        <div class="table-responsive" style="margin: 0 -1px;">
+                            <table class="table table-hover" id="table_detailuser">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>No Induk</th>
+                                        <th>Nama Lengkap</th>
+                                        <th>Prodi</th>
+                                        <th>Level</th>
+                                        <th>Email</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <table class="table table-bordered table-striped table-hover table-sm" id="table_detailuser">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>No Induk</th>
-                        <th>Nama Lengkap</th>
-                        <th>Prodi</th>
-                        <th>Level</th>
-                        <th>Email</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-            </table>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-width="100%" aria-hidden="true"></div>
 @endsection
-
-@push('css')
-    {{-- DataTables CSS jika belum dimuat di layout --}}
-@endpush
 
 @push('js')
     <script>
         function modalAction(url = '') {
-            $('#myModal').load(url, function () {
+            $('#myModal').load(url, function() {
                 $('#myModal').modal('show');
             });
         }
 
         var dataTable;
-        $(document).ready(function () {
+        $(document).ready(function() {
             dataTable = $('#table_detailuser').DataTable({
-                processing: true,
                 serverSide: true,
+                scrollX: false,
+                scrollCollapse: true,
+                autoWidth: false,
                 ajax: {
-                    url: "{{ route('detailusers.list') }}",
-                    type: "POST",
-                    data: function (d) {
+                    "url": "{{ route('detailusers.list') }}",
+                    "dataType": "json",
+                    "type": "POST",
+                    "data": function(d) {
                         d.prodi_id = $('#prodi_id').val();
                         d._token = '{{ csrf_token() }}';
                     }
                 },
-                columns: [
-                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                    { data: 'no_induk', name: 'no_induk' },
-                    { data: 'name', name: 'name' },
-                    { data: 'prodi', name: 'prodi' },
-                    { data: 'level', name: 'level' },
-                    { data: 'email', name: 'email' },
-                    { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
+                columns: [{
+                        data: "DT_RowIndex",
+                        className: "text-center",
+                        orderable: false,
+                        searchable: false,
+                        width: "5%"
+                    },
+                    {
+                        data: "no_induk",
+                        className: "",
+                        orderable: true,
+                        searchable: true,
+                        width: "15%"
+                    },
+                    {
+                        data: "name",
+                        className: "",
+                        orderable: true,
+                        searchable: true,
+                        width: "20%"
+                    },
+                    {
+                        data: "prodi",
+                        className: "",
+                        orderable: true,
+                        searchable: true,
+                        width: "20%"
+                    },
+                    {
+                        data: "level",
+                        className: "",
+                        orderable: true,
+                        searchable: true,
+                        width: "10%"
+                    },
+                    {
+                        data: "email",
+                        className: "",
+                        orderable: true,
+                        searchable: true,
+                        width: "15%"
+                    },
+                    {
+                        data: "aksi",
+                        className: "",
+                        orderable: false,
+                        searchable: false,
+                        width: "15%"
+                    }
                 ]
             });
 
-            $('#prodi_id').on('change', function () {
+            $('#prodi_id').on('change', function() {
                 dataTable.ajax.reload();
             });
         });
