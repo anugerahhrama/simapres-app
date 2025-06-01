@@ -1,37 +1,68 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="card card-outline card-primary">
-        <div class="card-header">
-            <div class="card-tools">
-                <button onclick="modalAction('{{ route('prodis.create') }}')" class="btn btn-sm btn-primary mt-1">Tambah</button>
+    <!-- Main Data Table Card -->
+    <div class="card mt-4">
+        <div class="card-header" style="background: white; border-bottom: 1px solid #e2e8f0; padding: 15px 20px;">
+            <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                <div class="form-group mb-0 mr-3">
+                    <select class="form-control" id="prodi_id" name="prodi_id" style="min-width: 180px;">
+                        <option value="">- Semua Prodi -</option>
+                        @foreach ($prodi as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <button onclick="modalAction('{{ route('prodis.create') }}')" class="btn btn-primary"
+                        style="white-space: nowrap;">
+                        <i class="fas fa-plus mr-1"></i>
+                        Tambah
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding: 0;">
+                @if (session('success'))
+                    <div class="alert alert-success mx-2 mt-2" style="border-radius: 6px;">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger mx-2 mt-2" style="border-radius: 6px;">
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
+
+                <div class="tab-content p-2">
+                    <div class="tab-pane fade show active" id="all">
+                        <div class="table-responsive" style="margin: 0 -1px;">
+                            <table class="table table-hover" id="table_prodi">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Program Studi</th>
+                                        <th>Jurusan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="card-body">
-            @if (session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-            @if (session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
-            @endif
-            <table class="table table-bordered table-striped table-hover table-sm" id="table_prodi">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nama Program Studi</th>
-                        <th>Jurusan</th>
-                        <th>aksi</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
     </div>
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
-        data-keyboard="false" data-width="75%" aria-hidden="true"></div>
-@endsection
 
-@push('css')
-@endpush
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-width="100%" aria-hidden="true"></div>
+@endsection
 
 @push('js')
     <script>
@@ -45,6 +76,9 @@
         $(document).ready(function() {
             dataProdi = $('#table_prodi').DataTable({
                 serverSide: true,
+                scrollX: false,
+                scrollCollapse: true,
+                autoWidth: false,
                 ajax: {
                     "url": "{{ route('prodis.list') }}",
                     "dataType": "json",
@@ -57,25 +91,29 @@
                         data: "DT_RowIndex",
                         className: "text-center",
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: "5%"
                     },
                     {
                         data: "name",
                         className: "",
                         orderable: true,
-                        searchable: true
+                        searchable: true,
+                        width: "40%"
                     },
                     {
                         data: "jurusan",
                         className: "",
                         orderable: true,
-                        searchable: true
+                        searchable: true,
+                        width: "35%"
                     },
                     {
                         data: "aksi",
                         className: "",
                         orderable: false,
-                        searchable: false
+                        searchable: false,
+                        width: "20%"
                     }
                 ]
             });

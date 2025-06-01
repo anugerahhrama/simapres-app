@@ -3,7 +3,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Tambah Data Detail User</h5>
+                <h5 class="modal-title">Tambah Data Pengguna</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -23,9 +23,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Prodi</label>
+                    <label>Program Studi</label>
                     <select name="prodi_id" id="prodi_id" class="form-control" required>
-                        <option value="">-- Pilih Prodi --</option>
+                        <option value="">-- Pilih Program Studi --</option>
                         @foreach ($prodis as $prodi)
                             <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
                         @endforeach
@@ -71,6 +71,12 @@
                     <input type="password" name="password" id="password" class="form-control" required>
                     <small id="error-password" class="error-text form-text text-danger"></small>
                 </div>
+
+                <div class="form-group">
+                    <label>Konfirmasi Password</label>
+                    <input type="password" name="confirmpassword" id="confirmpassword" class="form-control" required>
+                    <small id="error-confirmpassword" class="error-text form-text text-danger"></small>
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -106,6 +112,10 @@
                 password: {
                     required: true,
                     minlength: 6
+                },
+                confirmpassword: {
+                    required: true,
+                    equalTo: "#password"
                 },
                 phone: {
                     maxlength: 20

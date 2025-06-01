@@ -22,7 +22,7 @@
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" value="{{ $detailUser->email }}" class="form-control" required>
+                    <input type="email" name="email" value="{{ $detailUser->detailUser->email }}" class="form-control" required>
                     <small class="form-text text-danger error-text" id="error-email"></small>
                 </div>
                 <div class="form-group">
@@ -56,7 +56,9 @@
                     <select name="level_id" id="level_id" class="form-control" required>
                         <option value="">-- Pilih Level --</option>
                         @foreach ($levels as $level)
-                            <option value="{{ $level->id }}">{{ $level->nama_level }}</option>
+                            <option value="{{ $level->id }}" {{ $level->id == $detailUser->detailUser->level_id ? 'selected' : '' }}>
+                                {{ $level->nama_level }}
+                            </option>
                         @endforeach
                     </select>
                     <small id="error-level_id" class="error-text form-text text-danger"></small>
@@ -65,6 +67,11 @@
                     <label>Password</label>
                     <input type="password" name="password" id="password" class="form-control" required>
                     <small id="error-password" class="error-text form-text text-danger"></small>
+                </div>
+                <div class="form-group">
+                    <label>Konfirmasi Password</label>
+                    <input type="password" name="confirmpassword" id="confirmpassword" class="form-control" required>
+                    <small id="error-confirmpassword" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -85,7 +92,9 @@
                 phone: { required: true, maxlength: 15 },
                 jenis_kelamin: { required: true },
                 prodi_id: { required: true },
-                level_id: { required: true }
+                level_id: { required: true },
+                password: { required: true, minlength: 6 },
+                confirmpassword: { required: true, equalTo: "#password" }
             },
             submitHandler: function (form) {
                 $.ajax({
