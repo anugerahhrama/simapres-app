@@ -15,7 +15,8 @@ class Prestasi extends Model
 
     protected $fillable = [
         'mahasiswa_id',
-        'nama_kegiatan',
+        'nama_lomba',
+        'penyelenggara',
         'deskripsi',
         'tanggal',
         'kategori',
