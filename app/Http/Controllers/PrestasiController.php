@@ -114,7 +114,7 @@ class PrestasiController extends Controller
             })
             ->addColumn('aksi', function ($prestasi) {
                 $btn = '<button onclick="modalAction(\'' . route('prestasi.show', $prestasi->id) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-                $btn .= '<button onclick="modalAction(\'' . route('prestasi.edit', $prestasi->id) . '\')" class="btn btn-warning btn-sm">Edit</button> ';
+               $btn .= '<a href="'.url('prestasi/' .$prestasi->id. '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
                 $btn .= '<button onclick="modalAction(\'' . route('prestasi.confirm', $prestasi->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
@@ -127,9 +127,21 @@ class PrestasiController extends Controller
      */
     public function create()
     {
+         $breadcrumb = (object) [
+            'title' => 'Prestasi',
+            'list'  => ['Home', 'Prestasi']
+        ];
+
+        $page = (object) [
+            'title' => 'Prestasi',
+            'subtitle' => 'Daftar Prestasi',
+        ];
+
+        $activeMenu = 'prestasi';
+        
         $lombas = Lomba::all();
 
-        return view('prestasi.create', compact('lombas'));
+        return view('prestasi.create', compact('lombas', 'breadcrumb', 'page', 'activeMenu'));
     }
 
     /**
@@ -137,7 +149,6 @@ class PrestasiController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 'mahasiswa_id' => 'required|exists:users,id',
                 'lomba_id' => 'required|exists:lombas,id',
@@ -148,27 +159,35 @@ class PrestasiController extends Controller
                 'pencapaian' => 'required|string|max:255',
                 'evaluasi_diri' => 'nullable|string',
                 'status_verifikasi' => 'required|in:pending,approved,rejected',
+                'bukti' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ];
 
             $validator = Validator::make($request->all(), $rules);
 
             if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi Gagal',
-                    'msgField' => $validator->errors()
-                ]);
+                return redirect()->back()->withInput()->with('errors', $validator->errors());
             }
 
             Prestasi::create($request->all());
 
-            return response()->json([
+            if ($request->hasFile('bukti')) {
+            $file = $request->file('bukti');
+            $fileName = time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('public/bukti_prestasi', $fileName);  // Menggunakan 'storeAs' untuk menyimpan file
+            $prestasi = Prestasi::latest()->first();
+            $prestasi->bukti()->create([
+                'prestasi_id' => $prestasi->id,  // Menggunakan ID prestasi terkait
+                'jenis_dokumen' => 'bukti_prestasi', // Misalnya 'bukti_prestasi', sesuaikan dengan jenis dokumen Anda
+                'nama_file' => $fileName,
+                'path_file' => $path,  // Menyimpan path lengkap file (disarankan menggunakan path yang relatif terhadap storage)
+                'tanggal_upload' => now(),  // Menyimpan tanggal upload
+                ]);
+            }
+
+            return redirect()->route('prestasi.index')->with([
                 'status' => true,
                 'message' => 'Data prestasi berhasil disimpan'
-            ]);
-        }
-
-        return redirect('/'); // Fallback jika bukan AJAX
+            ]); 
     }
 
     /**
@@ -212,7 +231,6 @@ class PrestasiController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
             $rules = [
                 'mahasiswa_id' => 'required|exists:users,id',
                 'lomba_id' => 'required|exists:lombas,id',
@@ -223,22 +241,20 @@ class PrestasiController extends Controller
                 'pencapaian' => 'required|string|max:255',
                 'evaluasi_diri' => 'nullable|string',
                 'status_verifikasi' => 'required|in:pending,approved,rejected',
+                'bukti' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ];
 
             $validator = Validator::make($request->all(), $rules);
 
             if ($validator->fails()) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Validasi Gagal',
-                    'msgField' => $validator->errors()
-                ]);
+                return redirect()->back()->withInput()->with
+                ('errors', $validator->errors());
             }
 
             $prestasi = Prestasi::find($id);
             if ($prestasi) {
                 $prestasi->update($request->all());
-                return response()->json([
+                return redirect()->route('prestasi.index')->with([
                     'status' => true,
                     'message' => 'Data prestasi berhasil diupdate'
                 ]);
@@ -248,9 +264,6 @@ class PrestasiController extends Controller
                     'message' => 'Data tidak ditemukan'
                 ]);
             }
-        }
-
-        return redirect('/');
     }
 
     public function confirm(string $id)

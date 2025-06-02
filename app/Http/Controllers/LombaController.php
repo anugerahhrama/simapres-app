@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lomba;
-use App\Models\TingkatanLomba; // Asumsi model ini ada
-use App\Models\Keahlian;       // Asumsi model ini ada
-use App\Models\Minat;          // Asumsi model ini ada
+use App\Models\TingkatanLomba; 
+use App\Models\Keahlian;       
+use App\Models\Minat;          
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // Untuk mendapatkan ID pengguna yang login
-use Illuminate\Support\Facades\Validator; // Untuk validasi manual
-use Yajra\DataTables\Facades\DataTables; // Untuk DataTables
+use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Validator; 
+use Yajra\DataTables\Facades\DataTables; 
 
 class LombaController extends Controller
 {
@@ -35,10 +35,8 @@ class LombaController extends Controller
     /**
      * Mengambil data lomba untuk DataTables via AJAX.
      */
-    public function list(Request $request)
-    {
-        // Eager load relasi untuk menghindari N+1 problem di DataTables
-        $lomba = Lomba::select(
+     public function list(Request $request){
+        $query = Lomba::select(
             'id',
             'judul',
             'kategori',
@@ -49,68 +47,87 @@ class LombaController extends Controller
             'tingkatan_lomba_id',
             'bidang_keahlian_id',
             'minat_id'
-        )->with(['tingkatanLomba:id,nama_tingkatan', 'keahlian:id,nama_keahlian', 'minat:id,nama_minat']);
+        )->with([
+            'tingkatanLomba:id,nama_tingkatan', // Ambil hanya id dan nama_tingkatan
+            'keahlian:id,nama_keahlian',         // Ambil hanya id dan nama_keahlian
+            'minat:id,nama_minat'                // Ambil hanya id dan nama_minat
+        ]);
 
         // Filter berdasarkan kategori
         if ($request->filled('kategori_filter')) {
-            $lomba->where('kategori', $request->kategori_filter);
+            $query->where('kategori', $request->kategori_filter);
         }
 
         // Filter berdasarkan tingkatan_lomba_id
         if ($request->filled('tingkatan_filter')) {
-            $lomba->where('tingkatan_lomba_id', $request->tingkatan_filter);
+            $query->where('tingkatan_lomba_id', $request->tingkatan_filter);
         }
 
         // Filter berdasarkan status_verifikasi
         if ($request->filled('status_filter')) {
-            $lomba->where('status_verifikasi', $request->status_filter);
+            $query->where('status_verifikasi', $request->status_filter);
         }
 
-        // Search umum (sesuai dengan kolom yang ditampilkan di DataTables)
-        if ($request->filled('search') && $request->search['value'] != '') {
-            $searchTerm = '%' . $request->search['value'] . '%';
-            $lomba->where(function ($query) use ($searchTerm) {
-                $query->where('judul', 'like', $searchTerm)
-                      ->orWhere('kategori', 'like', $searchTerm)
-                      ->orWhere('penyelenggara', 'like', $searchTerm)
-                      ->orWhere('status_verifikasi', 'like', $searchTerm)
-                      ->orWhereHas('tingkatanLomba', function ($q) use ($searchTerm) {
-                          $q->where('nama_tingkatan', 'like', $searchTerm);
-                      })
-                      ->orWhereHas('keahlian', function ($q) use ($searchTerm) {
-                          $q->where('nama_keahlian', 'like', $searchTerm);
-                      })
-                      ->orWhereHas('minat', function ($q) use ($searchTerm) {
-                          $q->where('nama_minat', 'like', $searchTerm);
-                      });
+        // Search umum (sesuai dengan input pencarian dari frontend)
+        // Frontend sekarang mengirim 'search' langsung, bukan 'search[value]'
+        if ($request->filled('search')) {
+            $searchTerm = '%' . $request->search . '%'; // Ambil nilai search langsung
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('judul', 'like', $searchTerm)
+                  ->orWhere('penyelenggara', 'like', $searchTerm)
+                  ->orWhere('kategori', 'like', $searchTerm)
+                  ->orWhere('status_verifikasi', 'like', $searchTerm)
+                  ->orWhereHas('tingkatanLomba', function ($qRel) use ($searchTerm) {
+                      $qRel->where('nama_tingkatan', 'like', $searchTerm);
+                  })
+                  ->orWhereHas('keahlian', function ($qRel) use ($searchTerm) {
+                      $qRel->where('nama_keahlian', 'like', $searchTerm);
+                  })
+                  ->orWhereHas('minat', function ($qRel) use ($searchTerm) {
+                      $qRel->where('nama_minat', 'like', $searchTerm);
+                  });
             });
         }
 
+        // Ambil data dengan pagination Laravel
+        // Default per page bisa disesuaikan, atau diambil dari request jika ada
+        $perPage = $request->input('per_page', 10); // Ambil per_page dari request, default 10
+        $lombas = $query->paginate($perPage);
 
-        return DataTables::of($lomba)
-            ->addIndexColumn() // Menambahkan kolom nomor urut
-            ->addColumn('tingkatan_nama', function ($lomba) {
-                return $lomba->tingkatanLomba ? $lomba->tingkatanLomba->nama_tingkatan : '-';
-            })
-            ->addColumn('keahlian_nama', function ($lomba) {
-                return $lomba->keahlian ? $lomba->keahlian->nama_keahlian : '-';
-            })
-            ->addColumn('minat_nama', function ($lomba) {
-                return $lomba->minat ? $lomba->minat->nama_minat : '-';
-            })
-            ->addColumn('aksi', function ($lomba) {
-                // Contoh: Anda bisa menonaktifkan tombol hapus jika lomba sudah disetujui
-                // $disabled = $lomba->status_verifikasi === 'approved' ? 'disabled' : '';
-                $disabled = ''; // Untuk saat ini tidak ada logika disabled khusus seperti LevelController
+        // Format data agar sesuai dengan kebutuhan frontend (untuk tampilan kartu)
+        $formattedLombas = $lombas->map(function($lomba) {
+            return [
+                'id' => $lomba->id,
+                'judul' => $lomba->judul,
+                'kategori' => $lomba->kategori,
+                'penyelenggara' => $lomba->penyelenggara,
+                'awal_registrasi' => $lomba->awal_registrasi,
+                'akhir_registrasi' => $lomba->akhir_registrasi,
+                'status_verifikasi' => $lomba->status_verifikasi,
+                // Tambahkan nama relasi langsung ke dalam array data
+                'tingkatan_nama' => $lomba->tingkatanLomba->nama_tingkatan ?? 'N/A',
+                'keahlian_nama' => $lomba->keahlian->nama_keahlian ?? 'N/A',
+                'minat_nama' => $lomba->minat->nama_minat ?? 'N/A',
+            ];
+        });
 
-                $btn = '<button onclick="modalAction(\'' . route('lombas.show', $lomba->id) . '\')" class="btn btn-info btn-sm mr-1">Detail</button>';
-                $btn .= '<button onclick="modalAction(\'' . route('lombas.edit', $lomba->id) . '\')" class="btn btn-warning btn-sm mr-1">Edit</button>';
-                $btn .= '<button onclick="modalAction(\'' . route('lombas.confirm', $lomba->id) . '\')" class="btn btn-danger btn-sm" ' . $disabled . '>Hapus</button>';
-                return $btn;
-            })
-            ->rawColumns(['aksi']) // Izinkan HTML di kolom 'aksi'
-            ->make(true);
+        // Kembalikan respons JSON dengan data dan metadata pagination
+        return response()->json([
+            'data' => $formattedLombas,
+            'meta' => [
+                'current_page' => $lombas->currentPage(),
+                'from' => $lombas->firstItem(),
+                'last_page' => $lombas->lastPage(),
+                'path' => $lombas->path(),
+                'per_page' => $lombas->perPage(),
+                'to' => $lombas->lastItem(),
+                'total' => $lombas->total(),
+            ],
+            // 'links' => $lombas->linkCollection(), // Opsional: jika Anda ingin menyertakan link pagination lengkap
+        ]);
     }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -181,7 +198,7 @@ class LombaController extends Controller
      */
     public function show(string $id)
     {
-        $lomba = Lomba::with(['tingkatanLomba', 'keahlian', 'minat', 'pendaftaranLomba', 'rekomendasiLomba', 'prestasi'])->find($id);
+        $lomba = Lomba::with(['tingkatanLomba', 'keahlian', 'minat', 'pendaftaranLomba'])->find($id);
 
         if ($lomba) {
             return view('lombas.show', compact('lomba'));

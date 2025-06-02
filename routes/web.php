@@ -6,6 +6,7 @@ use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\MinatController;
 use App\Http\Controllers\ProgramStudiController;
+use App\Http\Controllers\LombaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -66,5 +67,9 @@ Route::prefix('prestasi')->controller(PrestasiController::class)->name('prestasi
 Route::resource('minats', MinatController::class);
 Route::get('minats/list', [MinatController::class, 'list'])->name('minats.list');
 Route::get('minats/{minat}/confirm', [MinatController::class, 'confirm'])->name('minats.confirm');
+
+Route::resource('lombas', LombaController::class);
+Route::get('lombas/list', [LombaController::class, 'list'])->name('lombas.list');
+Route::get('confirm/{lomba}', [LombaController::class, 'confirm'])->name('lombas.confirm');
 
 require __DIR__ . '/auth.php';

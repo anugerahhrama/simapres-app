@@ -1,15 +1,14 @@
-<div class="modal-header"> {{-- Tambahkan header modal di sini --}}
+{{-- <div class="modal-header">
     <h5 class="modal-title" id="editModalLabel">Edit Data Prestasi</h5>
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
-</div>
-
-{{-- Pastikan ini adalah form AJAX, jadi aksi submit akan ditangani oleh JS --}}
-<form action="{{ route('prestasi.update', $prestasi->id) }}" method="POST" id="form-edit-prestasi-modal">
+</div> --}}
+@extends('layouts.app')
+@section('content')
+    <form action="{{ route('prestasi.update', $prestasi->id) }}" method="POST" id="form-edit-prestasi-modal" enctype="multipart/form-data">
     @csrf
-    @method('PUT') {{-- Penting: Menggunakan metode PUT untuk update --}}
-
+    @method('PUT')
     <div class="modal-body"> 
         <input type="hidden" name="mahasiswa_id" value="{{ $prestasi->mahasiswa_id }}">
         <div class="form-group row">
@@ -107,6 +106,7 @@
                 <small class="text-danger error-text" id="error-status_verifikasi"></small>
             </div>
         </div>
+        
     </div> {{-- Penutup modal-body --}}
 
     <div class="modal-footer"> {{-- Tambahkan footer modal --}}
@@ -115,7 +115,9 @@
     </div>
 </form>
 
-<script>
+@endsection
+
+{{-- <script>
         $(document).ready(function() {
             $('#form-edit-prestasi-modal').validate({
                 rules: {
@@ -218,4 +220,4 @@
                 }
             });
         });
-    </script>
+    </script> --}}

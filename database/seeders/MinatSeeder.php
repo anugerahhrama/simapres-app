@@ -14,7 +14,22 @@ class MinatSeeder extends Seeder
     public function run(): void
     {
         DB::table('minats')->insert([
-            'nama_minat' => 'Teknologi',
+            'nama_minat' => 'Web Dev',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('minats')->insert([
+            'nama_minat' => 'Game Dev',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('minats')->insert([
+            'nama_minat' => 'UI/UX',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('minats')->insert([
+            'nama_minat' => 'Desain Grafis',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

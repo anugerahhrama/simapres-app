@@ -18,7 +18,7 @@ class KeahlianSeeder extends Seeder
             ['nama_keahlian' => 'WEB Dev'],
             ['nama_keahlian' => 'UI/UX'],
             ['nama_keahlian' => 'Desain Grafis'],
-            ['nama_keahlian' => ''],
+            ['nama_keahlian' => 'Frontend Dev'],
         ]);
     }
 }
