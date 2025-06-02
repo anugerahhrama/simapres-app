@@ -17,7 +17,7 @@ class PrestasiController extends Controller
     public function index(Request $request)
     {
         // Eager load relasi 'lomba' dan 'user'
-        $prestasis = Prestasi::with(['lomba', 'user']);
+        $prestasis = Prestasi::with(['user']);
 
         // Jika Anda ingin filter di tampilan awal index, tambahkan logika ini
         if ($request->filled('kategori_filter')) {
@@ -46,7 +46,6 @@ class PrestasiController extends Controller
             'breadcrumb' => $breadcrumb,
             'page' => $page,
             'activeMenu' => $activeMenu,
-            'prestasis' => $prestasis->get() 
         ]);
     }
 
@@ -56,8 +55,8 @@ class PrestasiController extends Controller
      */
     public function list(Request $request)
     {
-        $prestasis = Prestasi::select('id', 'mahasiswa_id', 'lomba_id', 'nama_kegiatan', 'kategori', 'pencapaian', 'deskripsi', 'tanggal')
-                            ->with(['lomba:id,judul,penyelenggara', 'user:id,email']);
+        $prestasis = Prestasi::select('id', 'mahasiswa_id', 'nama_kegiatan', 'kategori', 'pencapaian', 'deskripsi', 'tanggal')
+                            ->with(['user:id,email']);
 
         // Filter berdasarkan kategori_filter jika ada (sesuaikan dengan nama di AJAX data)
         if ($request->filled('kategori_filter')) {
@@ -77,10 +76,6 @@ class PrestasiController extends Controller
                   ->orWhere('kategori', 'like', $searchTerm)
                   ->orWhere('pencapaian', 'like', $searchTerm)
                   ->orWhere('deskripsi', 'like', $searchTerm)
-                  ->orWhereHas('lomba', function ($qLomba) use ($searchTerm) {
-                      $qLomba->where('judul', 'like', $searchTerm)
-                             ->orWhere('penyelenggara', 'like', $searchTerm);
-                  })
                   ->orWhereHas('user', function ($qUser) use ($searchTerm) {
                       $qUser->where('email', 'like', $searchTerm);
                   });
@@ -94,7 +89,7 @@ class PrestasiController extends Controller
             //     return $prestasi->user ? $prestasi->user->email : '-';
             // })
             ->addColumn('judul_lomba', function ($prestasi) {
-                return $prestasi->lomba ? $prestasi->lomba->judul : '-';
+                return $prestasi->lomba ? $prestasi->nama_kegiatan : '-';
             })
             ->addColumn('penyelenggara', function ($prestasi) {
                 return $prestasi->lomba ? $prestasi->lomba->penyelenggara : '-';
@@ -151,7 +146,6 @@ class PrestasiController extends Controller
     {
             $rules = [
                 'mahasiswa_id' => 'required|exists:users,id',
-                'lomba_id' => 'required|exists:lombas,id',
                 'nama_kegiatan' => 'required|string|max:255',
                 'deskripsi' => 'nullable|string',
                 'tanggal' => 'required|date',
@@ -233,7 +227,6 @@ class PrestasiController extends Controller
     {
             $rules = [
                 'mahasiswa_id' => 'required|exists:users,id',
-                'lomba_id' => 'required|exists:lombas,id',
                 'nama_kegiatan' => 'required|string|max:255',
                 'deskripsi' => 'nullable|string',
                 'tanggal' => 'required|date',
