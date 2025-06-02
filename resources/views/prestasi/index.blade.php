@@ -66,8 +66,8 @@
 
         var dataPrestasi; // Ubah nama variabel agar lebih spesifik
         $(document).ready(function() {
-            dataPrestasi = $('#table_prestasi').DataTable({ // Pastikan ID ini sesuai dengan ID tabel di HTML
-                processing: true, // Tambahkan ini untuk indikator loading
+            dataPrestasi = $('#table_prestasi').DataTable({ 
+                processing: true,
                 serverSide: true,
                 ajax: {
                     "url": "{{ route('prestasi.list') }}",
@@ -76,7 +76,6 @@
                     "data": function(d) {
                         // Sesuaikan nama parameter filter dengan yang ada di controller
                         d.kategori_filter = $('#kategori_filter').val();
-                        d.status_filter = $('#status_filter').val();
                     }
                 },
                 columns: [{
@@ -85,12 +84,6 @@
                         orderable: false,
                         searchable: false
                     },
-                    // {
-                    //     data: "mahasiswa", // Kolom nama mahasiswa
-                    //     className: "",
-                    //     orderable: true,
-                    //     searchable: true
-                    // },
                     {
                         data: "judul_lomba", // Sesuaikan dengan nama kolom dari controller
                         className: "",

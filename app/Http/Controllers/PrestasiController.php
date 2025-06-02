@@ -128,9 +128,8 @@ class PrestasiController extends Controller
     public function create()
     {
         $lombas = Lomba::all();
-        $mahasiswas = User::where('level_id', 'mahasiswa')->get();
 
-        return view('prestasi.create', compact('lombas', 'mahasiswas'));
+        return view('prestasi.create', compact('lombas'));
     }
 
     /**
@@ -251,12 +250,9 @@ class PrestasiController extends Controller
             }
         }
 
-        return redirect('/'); // Fallback jika bukan AJAX
+        return redirect('/');
     }
 
-    /**
-     * Show the form for deleting the specified resource via AJAX.
-     */
     public function confirm(string $id)
     {
         $prestasi = Prestasi::with(['lomba', 'user'])->find($id);

@@ -1,4 +1,4 @@
-@empty($level)
+@empty($prestasi)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -17,88 +17,47 @@
         </div>
     </div>
 @else
-    <form action="{{ route('prestasi.destroy', $level->id) }}" method="POST" id="form-delete">
+    <form action="{{ route('prestasi.destroy', $prestasi->id) }}" method="POST" id="form-confirm-prestasi-modal"> 
         @csrf
-        @method('DELETE')
-        <div id="modal-master" class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data level</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <h5><i class="icon fas fa-ban"></i> Konfirmasi !!!</h5>
-                        Apakah Anda ingin menghapus data seperti di bawah ini?
-                    </div>
-                    <table class="table table-sm table-bordered table-striped">
-                        <tr>
-                            <th class="text-right col-3">Kode Level:</th>
-                            <td class="col-9">{{ $level->level_code }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-right col-3">Nama Level :</th>
-                            <td class="col-9">{{ $level->nama_level }}</td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                    <button type="submit" class="btn btn-primary">Ya, Hapus</button>
-                </div>
+        @method('DELETE') {{-- Jika ini untuk hapus, method DELETE diperlukan --}}
+        
+        <div class="modal-header"> {{-- Hapus ID modal-master jika tidak perlu di sini --}}
+            <h5 class="modal-title" id="exampleModalLabel">Hapus Data Prestasi</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-warning">
+                <h5><i class="icon fas fa-ban"></i> Konfirmasi !!!</h5>
+                Apakah Anda ingin menghapus data ini?
             </div>
+            <table class="table table-sm table-bordered table-striped">
+                <tr>
+                    <th class="text-right col-3">Judul Lomba:</th>
+                    <td class="col-9">{{ $prestasi->judul_lomba }}</td> {{-- Sesuaikan dengan field prestasi --}}
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Penyelenggara:</th>
+                    <td class="col-9">{{ $prestasi->penyelenggara }}</td> {{-- Sesuaikan dengan field prestasi --}}
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Kategori :</th>
+                    <td class="col-9">{{ $prestasi->kategori }}</td> {{-- Sesuaikan dengan field prestasi --}}
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Deskripsi:</th>
+                    <td class="col-9">{{ $prestasi->deskripsi }}</td> {{-- Sesuaikan dengan field prestasi --}}
+                </tr>
+                <tr>
+                    <th class="text-right col-3">Pencapaian:</th>
+                    <td class="col-9">{{ $prestasi->pencapaian }}</td> {{-- Sesuaikan dengan field prestasi --}}
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
+            <button type="submit" class="btn btn-primary">Ya, Hapus</button>
         </div>
     </form>
-
-    @push('js')
-        <script>
-            $(document).ready(function() {
-                $("#form-delete").validate({
-                    rules: {},
-                    submitHandler: function(form) {
-                        $.ajax({
-                            url: form.action,
-                            type: form.method,
-                            data: $(form).serialize(),
-                            success: function(response) {
-                                if (response.status) {
-                                    $('#myModal').modal('hide');
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Berhasil',
-                                        text: response.message
-                                    });
-                                    dataLevel.ajax.reload();
-                                } else {
-                                    $('.error-text').text('');
-                                    $.each(response.msgField, function(prefix, val) {
-                                        $('#error-' + prefix).text(val[0]);
-                                    });
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Terjadi Kesalahan',
-                                        text: response.message
-                                    });
-                                }
-                            }
-                        });
-                        return false;
-                    },
-                    errorElement: 'span',
-                    errorPlacement: function(error, element) {
-                        error.addClass('invalid-feedback');
-                        element.closest('.form-group').append(error);
-                    },
-                    highlight: function(element, errorClass, validClass) {
-                        $(element).addClass('is-invalid');
-                    },
-                    unhighlight: function(element, errorClass, validClass) {
-                        $(element).removeClass('is-invalid');
-                    }
-                });
-            });
-        </script>
-    @endpush
 @endempty

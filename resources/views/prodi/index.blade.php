@@ -6,16 +6,16 @@
         <div class="card-header" style="background: white; border-bottom: 1px solid #e2e8f0; padding: 15px 20px;">
             <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
                 <div class="form-group mb-0 mr-3">
-                    <select class="form-control" id="level_id" name="level_id" style="min-width: 180px;">
-                        <option value="">- Semua Level -</option>
-                        @foreach ($levels as $item)
-                            <option value="{{ $item->id }}">{{ $item->nama_level }}</option>
+                    <select class="form-control" id="prodi_id" name="prodi_id" style="min-width: 180px;">
+                        <option value="">- Semua Prodi -</option>
+                        @foreach ($prodi as $item)
+                            <option value="{{ $item->id }}">{{ $item->name }}</option>
                         @endforeach
                     </select>
                 </div>
 
                 <div>
-                    <button onclick="modalAction('{{ route('levels.create') }}')" class="btn btn-primary"
+                    <button onclick="modalAction('{{ route('prodis.create') }}')" class="btn btn-primary"
                         style="white-space: nowrap;">
                         <i class="fas fa-plus mr-1"></i>
                         Tambah
@@ -41,12 +41,12 @@
                 <div class="tab-content p-2">
                     <div class="tab-pane fade show active" id="all">
                         <div class="table-responsive" style="margin: 0 -1px;">
-                            <table class="table table-hover" id="table_level">
+                            <table class="table table-hover" id="table_prodi">
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Level Kode</th>
-                                        <th>Level Nama</th>
+                                        <th>Nama Program Studi</th>
+                                        <th>Jurusan</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -72,19 +72,19 @@
             });
         }
 
-        var dataLevel;
+        var dataProdi;
         $(document).ready(function() {
-            dataLevel = $('#table_level').DataTable({
+            dataProdi = $('#table_prodi').DataTable({
                 serverSide: true,
                 scrollX: false,
                 scrollCollapse: true,
                 autoWidth: false,
                 ajax: {
-                    "url": "{{ route('levels.list') }}",
+                    "url": "{{ route('prodis.list') }}",
                     "dataType": "json",
                     "type": "POST",
                     "data": function(d) {
-                        d.level_id = $('#level_id').val();
+                        d.prodi_id = $('#prodi_id').val();
                     }
                 },
                 columns: [{
@@ -95,18 +95,18 @@
                         width: "5%"
                     },
                     {
-                        data: "level_code",
+                        data: "name",
                         className: "",
                         orderable: true,
                         searchable: true,
-                        width: "25%"
+                        width: "40%"
                     },
                     {
-                        data: "nama_level",
+                        data: "jurusan",
                         className: "",
                         orderable: true,
                         searchable: true,
-                        width: "50%"
+                        width: "35%"
                     },
                     {
                         data: "aksi",
@@ -118,8 +118,8 @@
                 ]
             });
 
-            $('#level_id').on('change', function() {
-                dataLevel.ajax.reload();
+            $('#prodi_id').on('change', function() {
+                dataProdi.ajax.reload();
             });
         });
     </script>
