@@ -85,12 +85,12 @@ class Lomba extends Model
     }
 
     /**
-     * Get all of the prestasi for the Lomba
+     * Get all of the pendamping for the Lomba
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function prestasi(): HasMany
+    public function pendamping(): HasMany
     {
-        return $this->hasMany(Prestasi::class, 'lomba_id');
+        return $this->hasMany(Pendamping::class, 'lomba_id');
     }
 }
