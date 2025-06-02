@@ -146,5 +146,13 @@ class User extends Authenticatable
         return $this->hasMany(Prestasi::class, 'mahasiswa_id');
     }
 
-    
+    /**
+     * Get all of the pendamping for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pendamping(): HasMany
+    {
+        return $this->hasMany(Pendamping::class, 'dosen_id');
+    }
 }

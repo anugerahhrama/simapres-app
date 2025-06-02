@@ -24,7 +24,7 @@ Route::pattern('id', '[0-9]+');
 
 Route::get('/dashboard', function () {
     return view('index');
-})->name('dashboard');
+})->name('dashboard')->middleware('auth');
 
 Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function () {
 
