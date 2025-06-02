@@ -11,18 +11,7 @@
     <div class="modal-body">
         <input type="text" name="mahasiswa_id" id="user_id" value="{{ Auth::user()->id }}" hidden class="form-control">
         <div class="form-group">
-            <label>Lomba</label>
-            <select name="lomba_id" id="lomba_id" class="form-control" required>
-                <option value="">Pilih Lomba</option>
-                @foreach($lombas as $lomba)
-                    <option value="{{ $lomba->id }}">{{ $lomba->judul }} ({{ $lomba->penyelenggara }})</option>
-                @endforeach
-            </select>
-            <small id="error-lomba_id" class="error-text form-text text-danger"></small>
-        </div>
-
-        <div class="form-group">
-            <label>Nama Kegiatan</label>
+            <label>Nama Lomba</label>
             <input type="text" name="nama_kegiatan" id="nama_kegiatan" class="form-control" required>
             <small id="error-nama_kegiatan" class="error-text form-text text-danger"></small>
         </div>

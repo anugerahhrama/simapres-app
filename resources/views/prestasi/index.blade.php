@@ -39,7 +39,6 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            {{-- <th>Mahasiswa</th>  --}}
                             <th>Judul Lomba</th>
                             <th>Penyelenggara</th> <th>Kategori</th>
                             <th>Deskripsi</th>
