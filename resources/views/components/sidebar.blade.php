@@ -94,6 +94,12 @@
                             <p>Manajemen Prestasi</p>
                         </a>
                     </li>
+                    <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('lombas.index') }}" class="nav-link {{ request()->is('*lomba*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Lomba</p> 
+                        </a>
+                    </li>
                 @endif
         </nav>
 
