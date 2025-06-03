@@ -58,6 +58,13 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
+
+    // Lomba
+    Route::resource('lomba', LombaController::class);
+    Route::prefix('lomba')->controller(LombaController::class)->name('lomba.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
 });
 
 // Prestasi - Resource Routes dengan nama yang sudah disesuaikan
@@ -74,5 +81,6 @@ Route::get('minats/{minat}/confirm', [MinatController::class, 'confirm'])->name(
 Route::resource('lombas', LombaController::class);
 Route::get('lombas/list', [LombaController::class, 'list'])->name('lombas.list');
 Route::get('confirm/{lomba}', [LombaController::class, 'confirm'])->name('lombas.confirm');
+
 
 require __DIR__ . '/auth.php';

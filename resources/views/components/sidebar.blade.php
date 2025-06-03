@@ -77,6 +77,13 @@
                                     <p>Program Studi</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                        <a href="{{ route('lomba.index') }}"
+                            class="nav-link {{ request()->is('*lomba*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-medal"></i>
+                            <p>Lomba</p>
+                        </a>
+                    </li>
                         </ul>
                     </li>
                 @endif
