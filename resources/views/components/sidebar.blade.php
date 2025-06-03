@@ -11,11 +11,11 @@
         <!-- Sidebar user panel -->
         <div class="user-panel pb-3 mb-3 d-flex justify-items-start align-items-center">
             <div class="image">
-                <img class="img-circle elevation-2" src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->email) }}&background=667eea&color=fff" alt="user photo" style="width: 40px; height: 40px;">
+                <img class="img-circle elevation-2" src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->detailUser->name) }}&background=667eea&color=fff" alt="user photo" style="width: 40px; height: 40px;">
             </div>
             <div class="info">
-                <a href="#" class="d-block" style="color: #2d3748; font-weight: 600; text-decoration: none;">
-                    {{ auth()->user()->name ?? 'Alexander Pierce' }}
+                <a href="{{ route('profile.index') }}" class="d-block" style="color: #2d3748; font-weight: 600; text-decoration: none;">
+                    {{ auth()->user()->detailUser->name ?? 'not found' }}
                 </a>
                 <small style="color: #718096;">{{ auth()->user()->level->nama_level ?? 'No Role' }}</small>
             </div>

@@ -7,6 +7,7 @@ use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\MinatController;
 use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\LombaController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +26,8 @@ Route::pattern('id', '[0-9]+');
 Route::get('/dashboard', function () {
     return view('index');
 })->name('dashboard')->middleware('auth');
+
+Route::resource('profile', ProfileController::class);
 
 Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function () {
 

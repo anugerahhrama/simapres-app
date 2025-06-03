@@ -15,8 +15,7 @@
                 </div>
 
                 <div>
-                    <button onclick="modalAction('{{ route('levels.create') }}')" class="btn btn-primary"
-                        style="white-space: nowrap;">
+                    <button onclick="modalAction('{{ route('levels.create') }}')" class="btn btn-primary" style="white-space: nowrap;">
                         <i class="fas fa-plus mr-1"></i>
                         Tambah
                     </button>
@@ -60,8 +59,7 @@
         </div>
     </div>
 
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
-        data-keyboard="false" data-width="100%" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="100%" aria-hidden="true"></div>
 @endsection
 
 @push('js')

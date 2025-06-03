@@ -87,11 +87,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all of the comments for the User
+     * Get all of the keahlian for the User
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function comments(): HasMany
+    public function keahlian(): HasMany
     {
         return $this->hasMany(UserKeahlian::class, 'user_id');
     }
