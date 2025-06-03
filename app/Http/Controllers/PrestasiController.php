@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
+ use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PrestasiController extends Controller
 {
@@ -55,7 +57,7 @@ class PrestasiController extends Controller
      */
     public function list(Request $request)
     {
-        $prestasis = Prestasi::select('id', 'mahasiswa_id', 'nama_kegiatan', 'kategori', 'pencapaian', 'deskripsi', 'tanggal')
+        $prestasis = Prestasi::select('id', 'mahasiswa_id', 'nama_lomba', 'penyelenggara', 'kategori', 'pencapaian', 'deskripsi', 'tanggal')
                             ->with(['user:id,email']);
 
         // Filter berdasarkan kategori_filter jika ada (sesuaikan dengan nama di AJAX data)
@@ -72,7 +74,7 @@ class PrestasiController extends Controller
         if ($request->filled('search')) {
             $searchTerm = '%' . $request->search['value'] . '%'; // Ambil nilai search dari DataTables
             $prestasis->where(function ($q) use ($searchTerm) {
-                $q->where('nama_kegiatan', 'like', $searchTerm)
+                $q->where('nama_lomba', 'like', $searchTerm)
                   ->orWhere('kategori', 'like', $searchTerm)
                   ->orWhere('pencapaian', 'like', $searchTerm)
                   ->orWhere('deskripsi', 'like', $searchTerm)
@@ -88,11 +90,11 @@ class PrestasiController extends Controller
             // ->addColumn('email', function ($prestasi) { // Tambah kolom mahasiswa
             //     return $prestasi->user ? $prestasi->user->email : '-';
             // })
-            ->addColumn('judul_lomba', function ($prestasi) {
-                return $prestasi->lomba ? $prestasi->nama_kegiatan : '-';
+            ->addColumn('nama_lomba', function ($prestasi) {
+                return $prestasi->nama_lomba;
             })
             ->addColumn('penyelenggara', function ($prestasi) {
-                return $prestasi->lomba ? $prestasi->lomba->penyelenggara : '-';
+                return $prestasi->penyelenggara;
             })
             // Kolom 'kategori' sudah ada di select
             ->addColumn('pres', function ($prestasi) { // Asumsi ini adalah kolom yang ingin ditampilkan
@@ -108,9 +110,15 @@ class PrestasiController extends Controller
                 }
             })
             ->addColumn('aksi', function ($prestasi) {
-                $btn = '<button onclick="modalAction(\'' . route('prestasi.show', $prestasi->id) . '\')" class="btn btn-info btn-sm">Detail</button> ';
-               $btn .= '<a href="'.url('prestasi/' .$prestasi->id. '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
-                $btn .= '<button onclick="modalAction(\'' . route('prestasi.confirm', $prestasi->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
+                $btn = '<div class="d-flex justify-content-start">';
+                $btn .= '<a href="'.url('prestasi/' .$prestasi->id).'" class="btn btn-info btn-sm">Detail</a> ';
+                $btn .= '<a href="'.url('prestasi/' .$prestasi->id. '/edit').'" class="btn btn-warning btn-sm">Edit</a> ';
+                $btn .= '<form class="inline-block" action="' . url('prestasi/' . $prestasi->id) . '" method="POST">'
+                        . csrf_field() 
+                        . method_field('DELETE') 
+                        . '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Apakah Anda yakin ingin menghapus prestasi ini?\')">Hapus</button>'
+                        . '</form>';
+                $btn .= '</div>';
                 return $btn;
             })
             ->rawColumns(['status', 'aksi'])
@@ -142,54 +150,92 @@ class PrestasiController extends Controller
     /**
      * Store a newly created resource via AJAX.
      */
-    public function store(Request $request)
+
+   public function store(Request $request)
     {
-            $rules = [
-                'mahasiswa_id' => 'required|exists:users,id',
-                'nama_kegiatan' => 'required|string|max:255',
-                'deskripsi' => 'nullable|string',
-                'tanggal' => 'required|date',
-                'kategori' => 'required|string|max:255',
-                'pencapaian' => 'required|string|max:255',
-                'evaluasi_diri' => 'nullable|string',
-                'status_verifikasi' => 'required|in:pending,approved,rejected',
-                'bukti' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            ];
+    // Definisikan aturan validasi
+    $rules = [
+        'mahasiswa_id' => 'required|exists:users,id',
+        'nama_lomba' => 'required|string|max:255',
+        'penyelenggara' => 'required|string|max:255',
+        'deskripsi' => 'nullable|string',
+        'tanggal' => 'required|date',
+        'kategori' => 'required|string|max:255',
+        'pencapaian' => 'required|string|max:255',
+        'evaluasi_diri' => 'nullable|string',
+        'status_verifikasi' => 'required|in:pending,approved,rejected',
+        'bukti' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ];
 
-            $validator = Validator::make($request->all(), $rules);
+    // Validasi request
+    $validator = Validator::make($request->all(), $rules);
 
-            if ($validator->fails()) {
-                return redirect()->back()->withInput()->with('errors', $validator->errors());
-            }
+    // Jika validasi gagal
+    if ($validator->fails()) {
+        Log::warning('Validasi gagal pada input prestasi.', [
+            'errors' => $validator->errors(),
+            'input' => $request->all()
+        ]);
+        return redirect()->back()->withInput()->with('errors', $validator->errors());
+    }
 
-            Prestasi::create($request->all());
+    DB::beginTransaction(); // Mulai transaksi DB
 
-            if ($request->hasFile('bukti')) {
+    try {
+        // Simpan data prestasi
+        Log::info('Menyimpan data prestasi.', ['data' => $request->all()]);
+        $prestasi = Prestasi::create($request->all());
+
+        // Cek apakah ada file bukti yang diunggah
+        if ($request->hasFile('bukti')) {
+            Log::info('File bukti ditemukan. Mengunggah file...', ['file' => $request->file('bukti')->getClientOriginalName()]);
             $file = $request->file('bukti');
             $fileName = time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('public/bukti_prestasi', $fileName);  // Menggunakan 'storeAs' untuk menyimpan file
-            $prestasi = Prestasi::latest()->first();
-            $prestasi->bukti()->create([
-                'prestasi_id' => $prestasi->id,  // Menggunakan ID prestasi terkait
-                'jenis_dokumen' => 'bukti_prestasi', // Misalnya 'bukti_prestasi', sesuaikan dengan jenis dokumen Anda
-                'nama_file' => $fileName,
-                'path_file' => $path,  // Menyimpan path lengkap file (disarankan menggunakan path yang relatif terhadap storage)
-                'tanggal_upload' => now(),  // Menyimpan tanggal upload
-                ]);
-            }
 
-            return redirect()->route('prestasi.index')->with([
-                'status' => true,
-                'message' => 'Data prestasi berhasil disimpan'
-            ]); 
+            // Menyimpan data bukti ke tabel bukti terkait prestasi
+            $prestasi->bukti()->create([
+                'prestasi_id' => $prestasi->id,
+                'jenis_dokumen' => 'bukti_prestasi', // Sesuaikan jenis dokumen
+                'nama_file' => $fileName,
+                'path_file' => $path,
+                'tanggal_upload' => now(),
+            ]);
+            Log::info('File bukti berhasil diunggah dan disimpan.', ['file_name' => $fileName, 'path' => $path]);
+        }
+
+        DB::commit(); // Jika semua berhasil, commit perubahan ke DB
+
+        Log::info('Data prestasi berhasil disimpan.', ['prestasi_id' => $prestasi->id]);
+
+        return redirect()->route('prestasi.index')->with([
+            'status' => true,
+            'message' => 'Data prestasi berhasil disimpan',
+        ]);
+    } catch (\Exception $e) {
+        DB::rollBack(); // Jika terjadi error, rollback transaksi
+
+        Log::error('Terjadi kesalahan saat menyimpan data prestasi.', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTrace(),
+            'request_data' => $request->all(),
+        ]);
+
+        // Mengembalikan error ke view
+        return redirect()->back()->withInput()->with([
+            'status' => false,
+            'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+        ]);
     }
+}
+
 
     /**
      * Display the specified resource via AJAX.
      */
     public function show(string $id)
     {
-        $prestasi = Prestasi::with(['lomba', 'user'])->find($id);
+        $prestasi = Prestasi::with(['user'])->find($id);
 
         if ($prestasi) {
             return view('prestasi.show', compact('prestasi'));
@@ -227,7 +273,8 @@ class PrestasiController extends Controller
     {
             $rules = [
                 'mahasiswa_id' => 'required|exists:users,id',
-                'nama_kegiatan' => 'required|string|max:255',
+                'nama_lomba' => 'required|string|max:255',
+                'penyelenggara' => 'required|string|max:255',
                 'deskripsi' => 'nullable|string',
                 'tanggal' => 'required|date',
                 'kategori' => 'required|string|max:255',
@@ -261,7 +308,7 @@ class PrestasiController extends Controller
 
     public function confirm(string $id)
     {
-        $prestasi = Prestasi::with(['lomba', 'user'])->find($id);
+        $prestasi = Prestasi::with([ 'user'])->find($id);
 
         if ($prestasi) {
             return view('prestasi.delete', compact('prestasi'));
@@ -276,25 +323,34 @@ class PrestasiController extends Controller
     /**
      * Remove the specified resource via AJAX.
      */
-    public function destroy(string $id)
+  public function destroy(string $id)
     {
-        if (request()->ajax()) {
-            $prestasi = Prestasi::find($id);
+    // Jika permintaan adalah AJAX
+    if (request()->ajax()) {
+        $prestasi = Prestasi::find($id);
 
-            if ($prestasi) {
-                $prestasi->delete();
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data prestasi berhasil dihapus'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
-            }
+        if ($prestasi) {
+            $prestasi->delete();  // Menghapus data prestasi
+
+            // Mengembalikan respons JSON sukses jika data ditemukan dan dihapus
+            return response()->json([
+                'status' => true,
+                'message' => 'Data prestasi berhasil dihapus'
+            ]);
+        } else {
+            // Jika data tidak ditemukan
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan'
+            ]);
         }
+    }
 
-        return redirect('/'); // Fallback jika bukan AJAX
+    // Jika permintaan bukan AJAX, alihkan ke halaman index atau rute yang sesuai
+    $prestasi = Prestasi::findOrFail($id);  // Jika Anda ingin melemparkan pengecualian jika data tidak ditemukan
+    $prestasi->delete();  // Menghapus data
+
+    // Redirect ke halaman index atau halaman lain yang sesuai
+    return redirect()->route('prestasi.index')->with('success', 'Prestasi berhasil dihapus');
     }
 }

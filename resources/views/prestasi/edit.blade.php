@@ -23,26 +23,19 @@
 
         {{-- Lomba (Dropdown) --}}
         <div class="form-group row">
-            <label for="lomba_id" class="col-sm-2 col-form-label">Lomba</label>
+            <label for="lomba_id" class="col-sm-2 col-form-label">Nama Lomba</label>
             <div class="col-sm-10">
-                <select class="form-control @error('lomba_id') is-invalid @enderror" id="lomba_id" name="lomba_id" required>
-                    <option value="">- Pilih Lomba -</option>
-                    @foreach($lombas as $lomba)
-                        <option value="{{ $lomba->id }}" {{ (old('lomba_id', $prestasi->lomba_id) == $lomba->id) ? 'selected' : '' }}>
-                            {{ $lomba->judul }} - {{ $lomba->penyelenggara }}
-                        </option>
-                    @endforeach
-                </select>
+                <input type="text" name="nama_lomba" id="nama_lomba" class="form-control" value="{{ old('nama_lomba', $prestasi->nama_lomba) }}" required>
                 <small class="text-danger error-text" id="error-lomba_id"></small>
             </div>
         </div>
 
         {{-- Nama Kegiatan --}}
         <div class="form-group row">
-            <label for="nama_kegiatan" class="col-sm-2 col-form-label">Nama Kegiatan</label>
+            <label for="penyelenggara" class="col-sm-2 col-form-label">Penyelenggara</label>
             <div class="col-sm-10">
-                <input type="text" class="form-control" id="nama_kegiatan" name="nama_kegiatan" value="{{ old('nama_kegiatan', $prestasi->nama_kegiatan) }}" required>
-                <small class="text-danger error-text" id="error-nama_kegiatan"></small>
+                <input type="text" class="form-control" id="penyelenggara" name="penyelenggara" value="{{ old('penyelenggara', $prestasi->penyelenggara) }}" required>
+                <small class="text-danger error-text" id="error-penyelenggara"></small>
             </div>
         </div>
 
@@ -111,7 +104,7 @@
 
     <div class="modal-footer"> {{-- Tambahkan footer modal --}}
         <button type="submit" class="btn btn-primary btn-sm" >Simpan Perubahan</button>
-        <button type="button" class="btn btn-secondary btn-sm">Batal</button>
+        <a href="{{ route('prestasi.index') }}" class="btn btn-secondary btn-sm">Batal</a>
     </div>
 </form>
 
@@ -125,7 +118,7 @@
                         required: true,
                         maxlength: 50
                     },
-                    nama_kegiatan: {
+                    penyelenggara: {
                         required: true,
                         maxlength: 70
                     },
@@ -154,7 +147,7 @@
                     lomba_id: {
                         required: "Silakan pilih lomba."
                     },
-                    nama_kegiatan: {
+                    penyelenggara: {
                         required: "Nama kegiatan wajib diisi.",
                         maxlength: "Nama kegiatan tidak boleh lebih dari 70 karakter."
                     },

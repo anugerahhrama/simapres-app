@@ -12,13 +12,23 @@
         <input type="text" name="mahasiswa_id" id="user_id" value="{{ Auth::user()->id }}" hidden class="form-control">
         <div class="form-group">
             <label>Nama Lomba</label>
-            <input type="text" name="nama_kegiatan" id="nama_kegiatan" class="form-control" required>
+            <input type="text" name="nama_lomba" id="nama_lomba" class="form-control" required>
             <small id="error-nama_kegiatan" class="error-text form-text text-danger"></small>
         </div>
-
+        <div class="form-group">
+            <label for="">Penyelenggara</label>
+            <input type="text" name="penyelenggara" id="penyelenggara" class="form-control" required>
+            <small id="error-penyelenggara" class="error-text form-text text-danger"></small>
+        </div>
         <div class="form-group">
             <label>Kategori</label>
-            <input type="text" name="kategori" id="kategori" class="form-control" required>
+            <select name="kategori" id="kategori" class="form-control">
+                <option value="" disabled selected>-Pilih Kategori-</option>
+                <option value="Regional">Regional</option>
+                <option value="Provinsi">Provinsi</option>
+                <option value="Nasional">Nasional</option>
+                <option value="Internasional">Internasional</option>
+            </select>
             <small id="error-kategori" class="error-text form-text text-danger"></small>
         </div>
 
