@@ -15,8 +15,8 @@ class Prestasi extends Model
 
     protected $fillable = [
         'mahasiswa_id',
-        'lomba_id',
-        'nama_kegiatan',
+        'nama_lomba',
+        'penyelenggara',
         'deskripsi',
         'tanggal',
         'kategori',
@@ -33,16 +33,6 @@ class Prestasi extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'mahasiswa_id', 'id');
-    }
-
-    /**
-     * Get the lomba that owns the Prestasi
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function lomba(): BelongsTo
-    {
-        return $this->belongsTo(Lomba::class, 'lomba_id', 'id');
     }
 
     /**

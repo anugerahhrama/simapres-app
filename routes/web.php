@@ -4,8 +4,10 @@ use App\Http\Controllers\LevelController;
 use App\Http\Controllers\DetailUserController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\PeriodeController;
+use App\Http\Controllers\MinatController;
 use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\LombaController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,7 +25,9 @@ Route::pattern('id', '[0-9]+');
 
 Route::get('/dashboard', function () {
     return view('index');
-})->name('dashboard');
+})->name('dashboard')->middleware('auth');
+
+Route::resource('profile', ProfileController::class);
 
 Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function () {
 
@@ -69,6 +73,14 @@ Route::prefix('prestasi')->controller(PrestasiController::class)->name('prestasi
     Route::post('list', 'list')->name('list');
     Route::get('confirm/{id}', 'confirm')->name('confirm');
 });
+
+Route::resource('minats', MinatController::class);
+Route::get('minats/list', [MinatController::class, 'list'])->name('minats.list');
+Route::get('minats/{minat}/confirm', [MinatController::class, 'confirm'])->name('minats.confirm');
+
+Route::resource('lombas', LombaController::class);
+Route::get('lombas/list', [LombaController::class, 'list'])->name('lombas.list');
+Route::get('confirm/{lomba}', [LombaController::class, 'confirm'])->name('lombas.confirm');
 
 
 require __DIR__ . '/auth.php';

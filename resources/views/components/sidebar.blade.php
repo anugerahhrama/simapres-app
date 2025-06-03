@@ -2,23 +2,20 @@
 <aside class="main-sidebar sidebar-light-white elevation-4">
     <!-- Brand Logo -->
     <a href="/" class="brand-link">
-        <img src="{{ asset('assets/img/logo/logo1.png') }}" alt="Simapres Logo" class="brand-image w-auto h-4"
-            style="opacity: .8">
+        <img src="{{ asset('assets/img/logo/logo1.png') }}" alt="Simapres Logo" class="brand-image w-auto h-4" style="opacity: .8">
         <span class="brand-text font-weight-bold" style="color: #1a2151;">SIMAPRES</span>
     </a>
 
     <!-- Sidebar -->
     <div class="sidebar">
         <!-- Sidebar user panel -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="user-panel pb-3 mb-3 d-flex justify-items-start align-items-center">
             <div class="image">
-                <img class="img-circle elevation-2"
-                    src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->email) }}&background=667eea&color=fff"
-                    alt="user photo" style="width: 40px; height: 40px;">
+                <img class="img-circle elevation-2" src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->detailUser->name) }}&background=667eea&color=fff" alt="user photo" style="width: 40px; height: 40px;">
             </div>
             <div class="info">
-                <a href="#" class="d-block" style="color: #2d3748; font-weight: 600; text-decoration: none;">
-                    {{ auth()->user()->name ?? 'Alexander Pierce' }}
+                <a href="{{ route('profile.index') }}" class="d-block" style="color: #2d3748; font-weight: 600; text-decoration: none;">
+                    {{ auth()->user()->detailUser->name ?? 'not found' }}
                 </a>
                 <small style="color: #718096;">{{ auth()->user()->level->nama_level ?? 'No Role' }}</small>
             </div>
@@ -27,8 +24,7 @@
         <!-- SidebarSearch Form -->
         <div class="form-inline mb-3">
             <div class="input-group" data-widget="sidebar-search">
-                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search"
-                    style="border-radius: 6px; border: 1px solid #e2e8f0;">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search" style="border-radius: 6px; border: 1px solid #e2e8f0;">
                 <div class="input-group-append">
                     <button class="btn btn-sidebar" style="border-radius: 0 6px 6px 0;">
                         <i class="fas fa-search fa-fw"></i>
@@ -39,12 +35,10 @@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 @if (auth()->check() && auth()->user()->level->level_code === 'ADM')
                     <li class="nav-item">
-                        <a href="{{ route('dashboard') }}"
-                            class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
@@ -60,33 +54,25 @@
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
-                                <a href="{{ route('levels.index') }}"
-                                    class="nav-link {{ request()->is('*level*') ? 'active' : '' }}"
-                                    style="padding-left: 35px;">
+                                <a href="{{ route('levels.index') }}" class="nav-link {{ request()->is('*level*') ? 'active' : '' }}" style="padding-left: 35px;">
                                     <i class="far fa-solid fa-user-gear nav-icon"></i>
                                     <p>Level</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('detailusers.index') }}"
-                                    class="nav-link {{ request()->is('*detailusers*') ? 'active' : '' }}"
-                                    style="padding-left: 35px;">
+                                <a href="{{ route('detailusers.index') }}" class="nav-link {{ request()->is('*detailusers*') ? 'active' : '' }}" style="padding-left: 35px;">
                                     <i class="fas fa-users nav-icon"></i>
                                     <p>Pengguna</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('periodes.index') }}"
-                                    class="nav-link {{ request()->is('*periode*') ? 'active' : '' }}"
-                                    style="padding-left: 35px;">
+                                <a href="{{ route('periodes.index') }}" class="nav-link {{ request()->is('*periode*') ? 'active' : '' }}" style="padding-left: 35px;">
                                     <i class="far fa-solid fa-clock nav-icon"></i>
                                     <p>Periode</p>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('prodis.index') }}"
-                                    class="nav-link {{ request()->is('*prodi*') ? 'active' : '' }}"
-                                    style="padding-left: 35px;">
+                                <a href="{{ route('prodis.index') }}" class="nav-link {{ request()->is('*prodi*') ? 'active' : '' }}" style="padding-left: 35px;">
                                     <i class="fas fa-graduation-cap nav-icon"></i>
                                     <p>Program Studi</p>
                                 </a>
@@ -104,17 +90,21 @@
 
                 @if (auth()->check() && auth()->user()->level->level_code === 'MHS')
                     <li class="nav-item">
-                        <a href="{{ route('dashboard') }}"
-                            class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
+                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('prestasi.index') }}"
-                            class="nav-link {{ request()->is('*prestasi*') ? 'active' : '' }}">
+                        <a href="{{ route('prestasi.index') }}" class="nav-link {{ request()->is('*prestasi*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-trophy"></i>
                             <p>Manajemen Prestasi</p>
+                        </a>
+                    </li>
+                    <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('lombas.index') }}" class="nav-link {{ request()->is('*lomba*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Lomba</p> 
                         </a>
                     </li>
                 @endif
@@ -124,8 +114,7 @@
         <div style="position: absolute; bottom: 20px; left: 20px; right: 20px;">
             <form action="{{ route('logout') }}" method="POST" style="width: 100%;">
                 @csrf
-                <button type="submit" class="btn btn-outline-danger btn-block"
-                    style="border-radius: 8px; padding: 12px; font-weight: 600; transition: all 0.2s;">
+                <button type="submit" class="btn btn-outline-danger btn-block" style="border-radius: 8px; padding: 12px; font-weight: 600; transition: all 0.2s;">
                     <i class="fas fa-sign-out-alt mr-2"></i>
                     <span class="collapse-sidebar">Logout</span>
                 </button>

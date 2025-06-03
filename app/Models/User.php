@@ -87,11 +87,11 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all of the comments for the User
+     * Get all of the keahlian for the User
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function comments(): HasMany
+    public function keahlian(): HasMany
     {
         return $this->hasMany(UserKeahlian::class, 'user_id');
     }
@@ -146,5 +146,13 @@ class User extends Authenticatable
         return $this->hasMany(Prestasi::class, 'mahasiswa_id');
     }
 
-    
+    /**
+     * Get all of the pendamping for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function pendamping(): HasMany
+    {
+        return $this->hasMany(Pendamping::class, 'dosen_id');
+    }
 }
