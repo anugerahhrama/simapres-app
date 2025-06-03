@@ -114,6 +114,33 @@
                         </a>
                     </li>
                 @endif
+
+                @if (auth()->check() && auth()->user()->level->level_code === 'DSN')
+                    <li class="nav-item">
+                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('*dashboard*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-tachometer-alt"></i>
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('bimbingan.index') }}" class="nav-link {{ request()->is('*bimbingan*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-trophy"></i>
+                            <p>Mahasiswa bimbingan</p>
+                        </a>
+                    </li>
+                    <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('lombas.index') }}" class="nav-link {{ request()->is('*lomba*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Lomba</p>
+                        </a>
+                    </li>
+                    <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('monitoring.index') }}" class="nav-link {{ request()->is('*monitoring*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Monitoring</p>
+                        </a>
+                    </li>
+                @endif
         </nav>
 
         <!-- Logout Section -->
