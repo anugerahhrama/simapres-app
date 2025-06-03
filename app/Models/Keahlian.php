@@ -17,11 +17,11 @@ class Keahlian extends Model
     ];
 
     /**
-     * Get all of the comments for the Keahlian
+     * Get all of the keahlian for the Keahlian
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function comments(): HasMany
+    public function keahlian(): HasMany
     {
         return $this->hasMany(UserKeahlian::class, 'keahlian_id');
     }
