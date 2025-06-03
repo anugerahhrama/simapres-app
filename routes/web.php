@@ -8,6 +8,7 @@ use App\Http\Controllers\MinatController;
 use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\LombaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MonitoringController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -82,5 +83,5 @@ Route::resource('lombas', LombaController::class);
 Route::get('lombas/list', [LombaController::class, 'list'])->name('lombas.list');
 Route::get('confirm/{lomba}', [LombaController::class, 'confirm'])->name('lombas.confirm');
 
-
+Route::resource('monitoring', MonitoringController::class)->middleware(['auth', 'level:MHS']);
 require __DIR__ . '/auth.php';
