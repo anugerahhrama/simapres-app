@@ -5,6 +5,7 @@ use App\Http\Controllers\DetailUserController;
 use App\Http\Controllers\PrestasiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\ProgramStudiController;
+use App\Http\Controllers\LombaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,6 +54,13 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
+
+    // Lomba
+    Route::resource('lomba', LombaController::class);
+    Route::prefix('lomba')->controller(LombaController::class)->name('lomba.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
 });
 
 // Prestasi - Resource Routes dengan nama yang sudah disesuaikan
@@ -61,5 +69,6 @@ Route::prefix('prestasi')->controller(PrestasiController::class)->name('prestasi
     Route::post('list', 'list')->name('list');
     Route::get('confirm/{id}', 'confirm')->name('confirm');
 });
+
 
 require __DIR__ . '/auth.php';
