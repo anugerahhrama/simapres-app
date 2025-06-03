@@ -104,7 +104,13 @@
                     <li class="nav-item bg- bg-[#1A2151]">
                         <a href="{{ route('lombas.index') }}" class="nav-link {{ request()->is('*lomba*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-book"></i>
-                            <p>Lomba</p> 
+                            <p>Lomba</p>
+                        </a>
+                    </li>
+                    <li class="nav-item bg- bg-[#1A2151]">
+                        <a href="{{ route('monitoring.index') }}" class="nav-link {{ request()->is('*monitoring*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <p>Monitoring</p>
                         </a>
                     </li>
                 @endif
