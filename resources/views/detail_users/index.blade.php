@@ -1,17 +1,70 @@
 @extends('layouts.app')
 
 @section('content')
+    <!-- Stats Cards Row -->
+    <div class="row mt-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Pengguna</span>
+                </div>
+                <div class="stat-value">{{ $totalUsers ?? '0' }}</div>
+                <div class="stat-subtitle">Total pengguna terdaftar</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Admin</span>
+                </div>
+                <div class="stat-value">{{ $totalAdmin ?? '0' }}</div>
+                <div class="stat-subtitle">Total admin terdaftar</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Mahasiswa</span>
+                </div>
+                <div class="stat-value">{{ $totalMahasiswa ?? '0' }}</div> 
+                <div class="stat-subtitle">Total mahasiswa terdaftar</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Dosen</span>
+                </div>
+                <div class="stat-value">{{ $totalDosen ?? '0' }}</div>
+                <div class="stat-subtitle">Total dosen terdaftar</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Data Table Card -->
     <div class="card mt-4">
         <div class="card-header" style="background: white; border-bottom: 1px solid #e2e8f0; padding: 15px 20px;">
             <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
-                <div class="form-group mb-0 mr-3">
-                    <select class="form-control" id="prodi_id" name="prodi_id" style="min-width: 180px;">
-                        <option value="">- Semua Prodi -</option>
-                        @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
-                        @endforeach
-                    </select>
+                <div class="d-flex" style="gap: 1rem;">
+                    <div class="form-group mb-0">
+                        <select class="form-control" id="prodi_id" name="prodi_id" style="min-width: 160px;">
+                            <option value="">- Semua Program Studi -</option>
+                            @foreach ($prodis as $prodi)
+                                <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group mb-0">
+                        <select class="form-control" id="level_id" name="level_id" style="min-width: 160px;">
+                            <option value="">- Semua Level -</option>
+                            @foreach ($levels as $level)
+                                <option value="{{ $level->id }}">{{ $level->nama_level }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
 
                 <div>
@@ -47,9 +100,9 @@
                                         <th>No</th>
                                         <th>No Induk</th>
                                         <th>Nama Lengkap</th>
+                                        <th>Email</th>
                                         <th>Prodi</th>
                                         <th>Level</th>
-                                        <th>Email</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -88,6 +141,7 @@
                     "type": "POST",
                     "data": function(d) {
                         d.prodi_id = $('#prodi_id').val();
+                        d.level_id = $('#level_id').val();
                         d._token = '{{ csrf_token() }}';
                     }
                 },
@@ -113,6 +167,13 @@
                         width: "20%"
                     },
                     {
+                        data: "email",
+                        className: "",
+                        orderable: true,
+                        searchable: true,
+                        width: "15%"
+                    },
+                    {
                         data: "prodi",
                         className: "",
                         orderable: true,
@@ -127,13 +188,6 @@
                         width: "10%"
                     },
                     {
-                        data: "email",
-                        className: "",
-                        orderable: true,
-                        searchable: true,
-                        width: "15%"
-                    },
-                    {
                         data: "aksi",
                         className: "",
                         orderable: false,
@@ -143,7 +197,7 @@
                 ]
             });
 
-            $('#prodi_id').on('change', function() {
+            $('#prodi_id, #level_id').on('change', function() {
                 dataTable.ajax.reload();
             });
         });
