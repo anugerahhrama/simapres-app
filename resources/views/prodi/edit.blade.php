@@ -1,18 +1,22 @@
 @empty($prodi)
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Kesalahan</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    <i class="fas fa-exclamation-circle mr-2"></i>Kesalahan
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-danger">
+                <div class="alert alert-danger border-0 shadow-sm">
                     <h5><i class="icon fas fa-ban"></i> Kesalahan!!!</h5>
                     Data yang anda cari tidak ditemukan
                 </div>
-                <a href="{{ route('prodis.index') }}" class="btn btn-warning">Kembali</a>
+                <a href="{{ route('prodis.index') }}" class="btn btn-warning btn-lg btn-block shadow-sm">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                </a>
             </div>
         </div>
     </div>
@@ -21,30 +25,53 @@
         @csrf
         @method('PUT')
         <div id="modal-master" class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Edit Data Program Studi</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 10px;">
+                <div class="modal-header text-dark bg-warning" style="border-radius: 8px 8px 0 0;">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        <i class="fas fa-edit mr-2"></i>Edit Data Program Studi
+                    </h5>
+                    <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <div class="form-group">
-                        <label>Nama Program Studi</label>
-                        <input value="{{ $prodi->name }}" type="text" name="name" id="name" class="form-control"
-                            required>
+                        <label class="font-weight-bold">Nama Program Studi</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </span>
+                            </div>
+                            <input value="{{ $prodi->name }}" type="text" name="name" id="name" class="form-control border-left-0"
+                                style="border: none ; border-radius: 0 4px 4px 0 !important;"
+                                placeholder="Masukkan nama program studi" required>
+                        </div>
                         <small id="error-name" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">
-                        <label>Jurusan</label>
-                        <input value="{{ $prodi->jurusan }}" type="text" name="jurusan" id="jurusan"
-                            class="form-control" required>
+                        <label class="font-weight-bold">Jurusan</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-university"></i>
+                                </span>
+                            </div>
+                            <input value="{{ $prodi->jurusan }}" type="text" name="jurusan" id="jurusan"
+                                class="form-control border-left-0"
+                                style="border: none ; border-radius: 0 4px 4px 0 !important;"
+                                placeholder="Masukkan nama jurusan" required>
+                        </div>
                         <small id="error-jurusan" class="error-text form-text text-danger"></small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" data-dismiss="modal" class="btn btn-light border shadow-sm">
+                        <i class="fas fa-times mr-2"></i>Batal
+                    </button>
+                    <button type="submit" class="btn btn-warning shadow-sm">
+                        <i class="fas fa-save mr-2"></i>Simpan
+                    </button>
                 </div>
             </div>
         </div>

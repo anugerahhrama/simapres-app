@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
@@ -15,7 +18,7 @@
                     </tr>
                     <tr>
                         <th>Judul Lomba</th>
-                        <td>{{ $prestasi->judul_lomba }}</td>
+                        <td>{{ $prestasi->nama_lomba }}</td>
                     </tr>
                     <tr>
                         <th>Penyelenggara</th>
@@ -55,7 +58,8 @@
             @endif
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            <a href="{{ route('prestasi.index') }}" class="btn btn-secondary">Kembali</a>
         </div>
     </div>
 </div>
+@endsection

@@ -56,8 +56,8 @@
             </table>
         </div>
         <div class="modal-footer">
-            <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-            <button type="submit" class="btn btn-primary">Ya, Hapus</button>
+            <a href="{{ route('prestasi.index') }}" class="btn btn-secondary">Batal</a>
+            <button type="submit" class="btn btn-primary" >Ya, Hapus</button>
         </div>
     </form>
 @endempty
