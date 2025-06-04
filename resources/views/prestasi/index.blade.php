@@ -20,15 +20,17 @@
                                 {{-- Perhatikan bahwa $kategoris harus dilewatkan dari controller --}}
                                 <select class="form-control" id="kategori_filter" name="kategori_filter">
                                     <option value="">- Semua Kategori -</option>
-                                    <option value="Akademik">Akademik</option>
-                                    <option value="Non Akademik">Non Akademik</option>
+                                    <option value="Regional">Regional</option>
+                                    <option value="Provinsi">Provinsi</option>
+                                    <option value="Nasional">Nasional</option>
+                                    <option value="Internasional">Internasional</option>
                                     {{-- @foreach ($kategoris as $kategori)
                                         <option value="{{ $kategori }}">{{ $kategori }}</option>
                                     @endforeach --}}
                                 </select>
                             </div>
                         </div>
-                    </div>
+                    </div> 
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-12 d-flex justify-content-end bs-success">
@@ -39,7 +41,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Judul Lomba</th>
+                            <th>Nama Lomba</th>
                             <th>Penyelenggara</th> <th>Kategori</th>
                             <th>Deskripsi</th>
                             <th>Pencapaian</th>
@@ -84,7 +86,7 @@
                             searchable: false
                         },
                         {
-                            data: "judul_lomba", // Sesuaikan dengan nama kolom dari controller
+                            data: "nama_lomba", // Sesuaikan dengan nama kolom dari controller
                             className: "",
                             orderable: true,
                             searchable: true
