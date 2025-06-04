@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Bimbingan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class BimbinganController extends Controller
 {
@@ -12,8 +14,60 @@ class BimbinganController extends Controller
      */
     public function index()
     {
-        return view('bimbingan.index');
-        
+        $breadcrumb = (object) [
+            'title' => 'Daftar Bimbingan',
+            'list'  => ['Home', 'Bimbingan']
+        ];
+
+        return view('bimbingan.index', compact('breadcrumb'));
+    }
+
+    public function list(Request $request)
+    {
+        $dosenId = Auth::id();
+
+        // Tambahkan eager loading mahasiswa.detailUser
+        $query = \App\Models\Bimbingan::with(['dosen', 'mahasiswa.detailUser'])
+            ->where('dosen_id', $dosenId);
+
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        return \Yajra\DataTables\Facades\DataTables::of($query)
+            ->addIndexColumn()
+            ->addColumn('mahasiswa', function ($bimbingan) {
+                // Ambil nama dari detail user mahasiswa
+                return $bimbingan->mahasiswa && $bimbingan->mahasiswa->detailUser
+                    ? $bimbingan->mahasiswa->detailUser->name
+                    : '-';
+            })
+            ->addColumn('tanggal_mulai', function ($bimbingan) {
+                return $bimbingan->tanggal_mulai ? date('d-m-Y', strtotime($bimbingan->tanggal_mulai)) : '-';
+            })
+            ->addColumn('tanggal_selesai', function ($bimbingan) {
+                return $bimbingan->tanggal_selesai ? date('d-m-Y', strtotime($bimbingan->tanggal_selesai)) : '-';
+            })
+            ->addColumn('status', function ($bimbingan) {
+                return $bimbingan->status;
+            })
+            ->addColumn('aksi', function ($bimbingan) {
+                return '
+                    <div class="btn-group" role="group">
+                        <button onclick="modalAction(\''.route('bimbingan.show', $bimbingan->id).'\')" class="btn btn-info btn-sm" title="Detail">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button onclick="modalAction(\''.route('bimbingan.edit', $bimbingan->id).'\')" class="btn btn-warning btn-sm" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="modalAction(\''.route('bimbingan.confirm', $bimbingan->id).'\')" class="btn btn-danger btn-sm" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                ';
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
     }
 
     /**
@@ -21,7 +75,14 @@ class BimbinganController extends Controller
      */
     public function create()
     {
-        //
+        // Ambil semua user yang level-nya mahasiswa (misal level_code = 'MHS')
+        $mahasiswa = \App\Models\User::whereHas('detailUser')
+            ->whereHas('level', function($q) {
+                $q->where('level_code', 'MHS');
+            })
+            ->with('detailUser')
+            ->get();
+        return view('bimbingan.create', compact('mahasiswa'));
     }
 
     /**
@@ -29,38 +90,156 @@ class BimbinganController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'mahasiswa_id' => 'required|exists:users,id',
+                'tanggal_mulai' => 'required|date',
+                'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+                'catatan_bimbingan' => 'nullable|string|max:255',
+                'status' => 'required|in:1,2,3'
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => false,
+                    'message'  => 'Validasi Gagal',
+                    'msgField' => $validator->errors(),
+                ]);
+            }
+
+            $dosenId = Auth::id();
+            $mahasiswaId = $request->mahasiswa_id;
+
+            // Cek duplikasi bimbingan untuk dosen dan mahasiswa yang sama
+            $exists = \App\Models\Bimbingan::where('dosen_id', $dosenId)
+                ->where('mahasiswa_id', $mahasiswaId)
+                ->exists();
+
+            if ($exists) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Mahasiswa tersebut sudah memiliki bimbingan dengan Anda.',
+                    'msgField' => ['mahasiswa_id' => ['Mahasiswa sudah terdaftar pada bimbingan Anda.']]
+                ]);
+            }
+
+            $data = $request->all();
+            $data['dosen_id'] = $dosenId;
+
+            Bimbingan::create($data);
+            return response()->json([
+                'status' => true,
+                'message' => 'Data Bimbingan berhasil disimpan'
+            ]);
+        }
+        return redirect('/');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Bimbingan $bimbingan)
+    public function show($id)
     {
-        //
+        // Tambahkan eager loading mahasiswa.detailUser
+        $bimbingan = Bimbingan::with(['dosen', 'mahasiswa.detailUser'])->findOrFail($id);
+        return view('bimbingan.show', compact('bimbingan'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Bimbingan $bimbingan)
+    public function edit($id)
     {
-        //
+        $bimbingan = Bimbingan::with(['mahasiswa.detailUser'])->findOrFail($id);
+        // Ambil semua user yang level-nya mahasiswa (misal level_code = 'MHS')
+        $mahasiswa = \App\Models\User::whereHas('detailUser')
+            ->whereHas('level', function($q) {
+                $q->where('level_code', 'MHS');
+            })
+            ->with('detailUser')
+            ->get();
+        return view('bimbingan.edit', compact('bimbingan', 'mahasiswa'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Bimbingan $bimbingan)
+    public function update(Request $request, $id)
     {
-        //
+        if ($request->ajax() || $request->wantsJson()) {
+            $rules = [
+                'mahasiswa_id' => 'required|exists:users,id',
+                'tanggal_mulai' => 'required|date',
+                'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+                'catatan_bimbingan' => 'nullable|string|max:255',
+                'status' => 'required|in:1,2,3'
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'   => false,
+                    'message'  => 'Validasi gagal.',
+                    'msgField' => $validator->errors()
+                ]);
+            }
+
+            $bimbingan = Bimbingan::find($id);
+            if ($bimbingan) {
+                $data = $request->all();
+                $data['dosen_id'] = Auth::id(); // Set dosen_id dari user login
+                $bimbingan->update($data);
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Data berhasil diupdate'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Bimbingan $bimbingan)
+    public function confirm($id)
     {
-        //
+        $bimbingan = Bimbingan::with(['dosen', 'mahasiswa'])->findOrFail($id);
+        return view('bimbingan.confirm', compact('bimbingan'));
+    }
+
+    public function destroy($id, Request $request)
+    {
+        if ($request->ajax() || $request->wantsJson()) {
+            $bimbingan = Bimbingan::find($id);
+
+            if ($bimbingan) {
+                try {
+                    $bimbingan->delete();
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Data berhasil dihapus'
+                    ]);
+                } catch (\Illuminate\Database\QueryException) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Data tidak dapat dihapus karena masih terdapat tabel lain yang terkait dengan data ini'
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+        }
+        return redirect('/');
     }
 }

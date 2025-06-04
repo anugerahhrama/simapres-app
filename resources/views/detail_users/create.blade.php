@@ -23,25 +23,27 @@
                 </div>
 
                 <div class="form-group">
+                    <label>Level</label>
+                    <select name="level_id" id="level_id" class="form-control" required>
+                        <option value="">-- Pilih Level --</option>
+                        @foreach ($levels as $level)
+                            <option value="{{ $level->id }}" data-level-code="{{ $level->level_code }}">
+                                {{ $level->nama_level }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small id="error-level_id" class="error-text form-text text-danger"></small>
+                </div>
+
+                <div class="form-group" id="prodi-group">
                     <label>Program Studi</label>
-                    <select name="prodi_id" id="prodi_id" class="form-control" required>
+                    <select name="prodi_id" id="prodi_id" class="form-control">
                         <option value="">-- Pilih Program Studi --</option>
                         @foreach ($prodis as $prodi)
                             <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
                         @endforeach
                     </select>
                     <small id="error-prodi_id" class="error-text form-text text-danger"></small>
-                </div>
-
-                <div class="form-group">
-                    <label>Level</label>
-                    <select name="level_id" id="level_id" class="form-control" required>
-                        <option value="">-- Pilih Level --</option>
-                        @foreach ($levels as $level)
-                            <option value="{{ $level->id }}">{{ $level->nama_level }}</option>
-                        @endforeach
-                    </select>
-                    <small id="error-level_id" class="error-text form-text text-danger"></small>
                 </div>
 
                 <div class="form-group">
@@ -89,37 +91,37 @@
 
 <script>
     $(document).ready(function () {
-        $("#form-tambah").validate({
+        function toggleProdi() {
+            var selected = $('#level_id option:selected');
+            var levelCode = selected.data('level-code');
+            if (levelCode === 'MHS') {
+                $('#prodi-group').show();
+                $('#prodi_id').prop('required', true);
+            } else {
+                $('#prodi-group').hide();
+                $('#prodi_id').prop('required', false).val('');
+                $('#error-prodi_id').text('');
+            }
+        }
+        toggleProdi();
+        $('#level_id').on('change', toggleProdi);
+
+        // Validasi jQuery Validate
+        $("#form-tambah, #form-edit").validate({
             rules: {
-                no_induk: {
-                    required: true,
-                    maxlength: 20
-                },
-                name: {
-                    required: true,
-                    minlength: 3
-                },
+                no_induk: { required: true, maxlength: 20 },
+                name: { required: true, minlength: 3 },
+                level_id: { required: true },
                 prodi_id: {
-                    required: true
+                    required: function() {
+                        var selected = $('#level_id option:selected');
+                        return selected.data('level-code') === 'MHS';
+                    }
                 },
-                level_id: {
-                    required: true
-                },
-                email: {
-                    required: true,
-                    email: true
-                },
-                password: {
-                    required: true,
-                    minlength: 6
-                },
-                confirmpassword: {
-                    required: true,
-                    equalTo: "#password"
-                },
-                phone: {
-                    maxlength: 20
-                }
+                email: { required: true, email: true },
+                password: { required: "#form-tambah".length > 0, minlength: 6 },
+                confirmpassword: { required: "#form-tambah".length > 0, equalTo: "#password" },
+                phone: { maxlength: 20 }
             },
             submitHandler: function (form) {
                 $.ajax({
@@ -134,7 +136,9 @@
                                 title: 'Berhasil',
                                 text: response.message
                             });
-                            dataTable.ajax.reload();
+                            if (typeof dataTable !== 'undefined') {
+                                dataTable.ajax.reload();
+                            }
                         } else {
                             $('.error-text').text('');
                             $.each(response.msgField, function (prefix, val) {
@@ -155,10 +159,10 @@
                 error.addClass('invalid-feedback');
                 element.closest('.form-group').append(error);
             },
-            highlight: function (element, errorClass, validClass) {
+            highlight: function (element) {
                 $(element).addClass('is-invalid');
             },
-            unhighlight: function (element, errorClass, validClass) {
+            unhighlight: function (element) {
                 $(element).removeClass('is-invalid');
             }
         });

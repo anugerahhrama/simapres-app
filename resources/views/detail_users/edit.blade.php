@@ -22,7 +22,7 @@
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" name="email" value="{{ $detailUser->detailUser->email }}" class="form-control" required>
+                    <input type="email" name="email" value="{{ $detailUser->user->email }}" class="form-control" required>
                     <small class="form-text text-danger error-text" id="error-email"></small>
                 </div>
                 <div class="form-group">
@@ -40,28 +40,26 @@
                     <small class="form-text text-danger error-text" id="error-jenis_kelamin"></small>
                 </div>
                 <div class="form-group">
-                    <label>Prodi</label>
-                    <select name="prodi_id" class="form-control" required>
-                        <option value="">-- Pilih Prodi --</option>
-                        @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}" {{ $prodi->id == $detailUser->prodi_id ? 'selected' : '' }}>
-                                {{ $prodi->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <small class="form-text text-danger error-text" id="error-prodi_id"></small>
-                </div>
-                 <div class="form-group">
                     <label>Level</label>
                     <select name="level_id" id="level_id" class="form-control" required>
                         <option value="">-- Pilih Level --</option>
                         @foreach ($levels as $level)
-                            <option value="{{ $level->id }}" {{ $level->id == $detailUser->detailUser->level_id ? 'selected' : '' }}>
+                            <option value="{{ $level->id }}" data-level-code="{{ $level->level_code }}">
                                 {{ $level->nama_level }}
                             </option>
                         @endforeach
                     </select>
                     <small id="error-level_id" class="error-text form-text text-danger"></small>
+                </div>
+                <div class="form-group" id="prodi-group">
+                    <label>Program Studi</label>
+                    <select name="prodi_id" id="prodi_id" class="form-control">
+                        <option value="">-- Pilih Program Studi --</option>
+                        @foreach ($prodis as $prodi)
+                            <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
+                        @endforeach
+                    </select>
+                    <small id="error-prodi_id" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -84,6 +82,21 @@
 
 <script>
     $(document).ready(function () {
+        function toggleProdi() {
+            var selected = $('#level_id option:selected');
+            var levelCode = selected.data('level-code');
+            if (levelCode === 'MHS') {
+                $('#prodi-group').show();
+                $('#prodi_id').prop('required', true);
+            } else {
+                $('#prodi-group').hide();
+                $('#prodi_id').prop('required', false).val('');
+                $('#error-prodi_id').text('');
+            }
+        }
+        toggleProdi();
+        $('#level_id').on('change', toggleProdi);
+
         $('#form-edit').validate({
             rules: {
                 no_induk: { required: true, maxlength: 50 },

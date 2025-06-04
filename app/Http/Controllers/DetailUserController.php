@@ -30,7 +30,7 @@ class DetailUserController extends Controller
 
     public function list(Request $request)
     {
-        $data = DetailUser::with(['detailUser.level', 'prodi']);
+        $data = DetailUser::with(['user.level', 'prodi']); // Ganti detailUser.level jadi user.level
 
         if ($request->prodi_id) {
             $data->where('prodi_id', $request->prodi_id);
@@ -42,10 +42,10 @@ class DetailUserController extends Controller
                 return ($row->name && $row->name !== '') ? $row->name : '-';
             })
             ->addColumn('email', function ($row) {
-                return $row->detailUser->email ?? '-';
+                return $row->user->email ?? '-';
             })
             ->addColumn('level', function ($row) {
-                return $row->detailUser->level->nama_level ?? '-';
+                return $row->user->level->nama_level ?? '-';
             })
             ->addColumn('prodi', function ($row) {
                 return $row->prodi->name ?? '-';
@@ -77,17 +77,20 @@ class DetailUserController extends Controller
     public function store(Request $request)
     {
         if ($request->ajax() || $request->wantsJson()) {
+            $level = Level::find($request->level_id);
             $rules = [
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|min:6',
                 'confirmpassword' => 'required|same:password',
                 'no_induk' => 'required|string|max:20|unique:detail_users,no_induk',
                 'name' => 'required|string|max:255',
-                'prodi_id' => 'required|exists:program_studis,id',
                 'level_id' => 'required|exists:levels,id',
                 'phone' => 'nullable|string|max:20',
                 'jenis_kelamin' => 'nullable|in:L,P',
             ];
+            if ($level && $level->level_code === 'MHS') {
+                $rules['prodi_id'] = 'required|exists:program_studis,id';
+            }
 
             $validator = Validator::make($request->all(), $rules);
 
@@ -111,7 +114,7 @@ class DetailUserController extends Controller
                 'name' => $request->name,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'phone' => $request->phone,
-                'prodi_id' => $request->prodi_id
+                'prodi_id' => $level && $level->level_code === 'MHS' ? $request->prodi_id : null
             ]);
 
             return response()->json([
@@ -127,7 +130,7 @@ class DetailUserController extends Controller
      */
     public function show(string $id)
     {
-        $detailUser = DetailUser::with('detailUser', 'prodi')->findOrFail($id);
+        $detailUser = DetailUser::with(['user.level', 'prodi'])->findOrFail($id);
         return view('detail_users.show', compact('detailUser'));
     }
 
@@ -136,7 +139,7 @@ class DetailUserController extends Controller
      */
     public function edit(string $id)
     {
-        $detailUser = DetailUser::with('detailUser')->findOrFail($id);
+        $detailUser = DetailUser::with(['user.level'])->findOrFail($id);
         $prodis = ProgramStudi::all();
         $levels = Level::all();
 
@@ -149,19 +152,22 @@ class DetailUserController extends Controller
     public function update(Request $request, string $id)
     {
         if ($request->ajax() || $request->wantsJson()) {
-            $detailUser = DetailUser::with('detailUser')->findOrFail($id);
+            $detailUser = DetailUser::with(['user'])->findOrFail($id);
+            $level = Level::find($request->level_id);
 
             $rules = [
                 'email' => 'required|email|unique:users,email,' . $detailUser->user_id,
                 'no_induk' => 'required|string|max:20|unique:detail_users,no_induk,' . $id,
                 'name' => 'required|string|max:255',
-                'prodi_id' => 'required|exists:program_studis,id',
                 'level_id' => 'required|exists:levels,id',
                 'phone' => 'nullable|string|max:20',
                 'jenis_kelamin' => 'nullable|in:L,P',
                 'password' => 'nullable|min:6',
                 'confirmpassword' => 'nullable|same:password',
             ];
+            if ($level && $level->level_code === 'MHS') {
+                $rules['prodi_id'] = 'required|exists:program_studis,id';
+            }
 
             $validator = Validator::make($request->all(), $rules);
 
@@ -173,13 +179,12 @@ class DetailUserController extends Controller
                 ]);
             }
 
-            $user = $detailUser->detailUser;
+            $user = $detailUser->user;
             if ($user) {
                 $user->update([
                     'email' => $request->email,
                     'level_id' => $request->level_id,
                 ]);
-
                 if ($request->password) {
                     $user->update([
                         'password' => bcrypt($request->password)
@@ -190,7 +195,7 @@ class DetailUserController extends Controller
             $detailUser->update([
                 'no_induk' => $request->no_induk,
                 'name' => $request->name,
-                'prodi_id' => $request->prodi_id,
+                'prodi_id' => $level && $level->level_code === 'MHS' ? $request->prodi_id : null,
                 'phone' => $request->phone,
                 'jenis_kelamin' => $request->jenis_kelamin,
             ]);
@@ -209,9 +214,9 @@ class DetailUserController extends Controller
      */
     public function confirm(string $id)
     {
-        $detailUser = DetailUser::with(['detailUser', 'prodi'])->findOrFail($id);
+        $detailUser = DetailUser::with(['user.level', 'prodi'])->findOrFail($id);
         $prodis = ProgramStudi::all();
-        $user = user::all();
+        $user = User::all();
 
         return view('detail_users.confirm', compact('detailUser'));
     }
@@ -221,19 +226,19 @@ class DetailUserController extends Controller
      */
     public function destroy(string $id)
     {
-        $detailUser = DetailUser::with(['detailUser', 'prodi'])->findOrFail($id);
+        $detailUser = DetailUser::with(['user.level', 'prodi'])->findOrFail($id);
 
         $deletedData = [
             'name' => $detailUser->name ?? '-',
             'no_induk' => $detailUser->no_induk ?? '-',
-            'email' => $detailUser->detailUser->email ?? '-',
+            'email' => $detailUser->user->email ?? '-',
             'prodi' => $detailUser->prodi->name ?? '-',
-            'level' => $detailUser->detailUser->level->nama_level ?? '-',
+            'level' => $detailUser->user->level->nama_level ?? '-',
             'jenis_kelamin' => $detailUser->jenis_kelamin == 'L' ? 'Laki-laki' : ($detailUser->jenis_kelamin == 'P' ? 'Perempuan' : '-'),
             'phone' => $detailUser->phone ?? '-',
         ];
 
-        $user = $detailUser->detailUser;
+        $user = $detailUser->user;
         $detailUser->delete();
         if ($user) {
             $user->delete();
