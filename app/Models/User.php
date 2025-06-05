@@ -61,16 +61,6 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function detailUser(): HasOne
-    {
-        return $this->hasOne(DetailUser::class, 'user_id');
-    }
-
-    /**
-     * Get all of the comments for the User
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function periode(): HasMany
     {
         return $this->hasMany(RiwayatPeriode::class, 'user_id');
@@ -154,5 +144,15 @@ class User extends Authenticatable
     public function pendamping(): HasMany
     {
         return $this->hasMany(Pendamping::class, 'dosen_id');
+    }
+
+    /**
+     * Get the detail user associated with the user.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function detailUser(): HasOne
+    {
+        return $this->hasOne(DetailUser::class, 'user_id', 'id');
     }
 }

@@ -22,7 +22,7 @@ class DetailUser extends Model
         'photo_file',
     ];
 
-    public function detailUser(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }

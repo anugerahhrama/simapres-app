@@ -9,6 +9,7 @@ use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\LombaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MonitoringController;
+use App\Http\Controllers\BimbinganController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -61,14 +62,14 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
     });
 
     // Lomba
-    Route::resource('lomba', LombaController::class);
-    Route::prefix('lomba')->controller(LombaController::class)->name('lomba.')->group(function () {
+    Route::resource('lombas', LombaController::class);
+    Route::prefix('lombas')->controller(LombaController::class)->name('lombas.')->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 });
 
-// Prestasi - Resource Routes dengan nama yang sudah disesuaikan
+// Prestasi
 Route::resource('prestasi', PrestasiController::class);
 Route::prefix('prestasi')->controller(PrestasiController::class)->name('prestasi.')->group(function () {
     Route::post('list', 'list')->name('list');
@@ -79,9 +80,14 @@ Route::resource('minats', MinatController::class);
 Route::get('minats/list', [MinatController::class, 'list'])->name('minats.list');
 Route::get('minats/{minat}/confirm', [MinatController::class, 'confirm'])->name('minats.confirm');
 
-Route::resource('lombas', LombaController::class);
-Route::get('lombas/list', [LombaController::class, 'list'])->name('lombas.list');
-Route::get('confirm/{lomba}', [LombaController::class, 'confirm'])->name('lombas.confirm');
 
+// Bimbingan
+Route::resource('bimbingan', BimbinganController::class);
+Route::prefix('bimbingan')->controller(BimbinganController::class)->name('bimbingan.')->group(function () {
+    Route::post('list', 'list')->name('list');
+    Route::get('confirm/{id}', 'confirm')->name('confirm');
+});
+//Route untuk fitur monitoring
 Route::resource('monitoring', MonitoringController::class)->middleware(['auth', 'level:MHS']);
+
 require __DIR__ . '/auth.php';

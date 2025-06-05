@@ -50,7 +50,7 @@
                         </tr>
                         <tr>
                             <th class="text-right col-3">Email:</th>
-                            <td class="col-9">{{ $detailUser->detailUser->email ?? '-' }}</td>
+                            <td class="col-9">{{ $detailUser->user->email }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Program Studi:</th>
@@ -58,7 +58,7 @@
                         </tr>
                         <tr>
                             <th class="text-right col-3">Level:</th>
-                            <td class="col-9">{{ $detailUser->detailUser->level->nama_level ?? '-' }}</td>
+                            <td class="col-9">{{ $detailUser->user->level->nama_level }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Jenis Kelamin:</th>
