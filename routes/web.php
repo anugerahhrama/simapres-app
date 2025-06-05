@@ -10,6 +10,7 @@ use App\Http\Controllers\LombaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\BimbinganController;
+use App\Http\Controllers\RekomendasiLombaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,7 +30,14 @@ Route::get('/dashboard', function () {
     return view('index');
 })->name('dashboard')->middleware('auth');
 
-Route::resource('profile', ProfileController::class);
+// Route::resource('profile', ProfileController::class);
+Route::prefix('profile')->controller(ProfileController::class)->name('profile.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('edit/{id}', 'edit')->name('edit');
+    Route::put('update/{id}', 'update')->name('update');
+    Route::get('photo/{id}', 'editPhoto')->name('photo.edit');
+    Route::put('photo/update/{id}', 'updatePhoto')->name('photo.update');
+});
 
 Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function () {
 
@@ -62,12 +70,14 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
     });
 
     // Lomba
-    Route::resource('lombas', LombaController::class);
-    Route::prefix('lombas')->controller(LombaController::class)->name('lombas.')->group(function () {
+    Route::resource('lomba', LombaController::class);
+    Route::prefix('lomba')->controller(LombaController::class)->name('lomba.')->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 });
+
+Route::get('rekomendasi-lomba', [RekomendasiLombaController::class, 'index'])->middleware(['auth', 'level:MHS'])->name('rekomendasi.lomba');
 
 // Prestasi
 Route::resource('prestasi', PrestasiController::class);

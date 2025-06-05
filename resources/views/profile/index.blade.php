@@ -7,15 +7,15 @@
             <div class="card-body box-profile">
                 <div class="position-relative mx-auto" style="width: 128px; height: 128px;">
                     @if ($user->detailUser?->photo_file)
-                        <img src="{{ asset('storage/' . $user->detailUser->photo_file) }}" class="rounded-circle border border-white shadow-sm w-100 h-100 object-fit-cover" alt="User profile picture">
+                        <img src="{{ asset('storage/' . $user->detailUser->photo_file) }}" class="rounded-circle border border-white shadow-sm w-100 h-100" style="object-fit: cover; object-position: center" alt="User profile picture">
                     @else
                         <img src="https://ui-avatars.com/api/?name={{ urlencode($user->detailUser?->name ?? $user->name) }}&background=667eea&color=fff" class="rounded-circle border border-white shadow-sm w-100 h-100 object-fit-cover" alt="Default avatar">
                     @endif
 
                     <!-- Pencil icon -->
-                    <div class="position-absolute bg-white border rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="bottom: 0; right: 0; width: 32px; height: 32px; cursor: pointer;" title="Edit photo">
+                    <button type="button" onclick="modalAction('{{ route('profile.photo.edit', $user->id) }}')" class="position-absolute bg-white border rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="bottom: 0; right: 0; width: 32px; height: 32px; cursor: pointer;" title="Edit photo">
                         <i class="fas fa-pencil-alt text-secondary small"></i>
-                    </div>
+                    </button>
                 </div>
 
 

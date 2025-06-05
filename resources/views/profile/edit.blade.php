@@ -88,15 +88,59 @@
         $(document).ready(function() {
             $('#form-edit').validate({
                 rules: {
-                    level_code: {
-                        required: true,
-                        maxlength: 10,
-                        pattern: /^[A-Z]+$/
-                    },
-                    nama_level: {
+                    name: {
                         required: true,
                         minlength: 3,
-                        maxlength: 100,
+                        maxlength: 100
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    no_induk: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 20
+                    },
+                    phone: {
+                        required: true,
+                        minlength: 8,
+                        maxlength: 15,
+                        digits: true
+                    },
+                    jenis_kelamin: {
+                        required: true
+                    },
+                    prodi: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Nama wajib diisi.",
+                        minlength: "Nama minimal 3 karakter.",
+                        maxlength: "Nama maksimal 100 karakter."
+                    },
+                    email: {
+                        required: "Email wajib diisi.",
+                        email: "Format email tidak valid."
+                    },
+                    no_induk: {
+                        required: "No Induk wajib diisi.",
+                        minlength: "No Induk minimal 3 karakter.",
+                        maxlength: "No Induk maksimal 20 karakter."
+                    },
+                    phone: {
+                        required: "Nomor telepon wajib diisi.",
+                        minlength: "Nomor telepon terlalu pendek.",
+                        maxlength: "Nomor telepon terlalu panjang.",
+                        digits: "Hanya angka yang diperbolehkan."
+                    },
+                    jenis_kelamin: {
+                        required: "Silakan pilih jenis kelamin."
+                    },
+                    prodi: {
+                        required: "Silakan pilih program studi."
                     }
                 },
                 submitHandler: function(form) {
@@ -111,6 +155,8 @@
                                     icon: 'success',
                                     title: 'Berhasil',
                                     text: response.message
+                                }).then(() => {
+                                    location.reload();
                                 });
                             } else {
                                 $('.error-text').text('');
@@ -127,15 +173,19 @@
                     });
                     return false;
                 },
-                errorElement: 'span',
+                errorElement: 'small',
+                errorClass: 'form-text text-danger error-text',
                 errorPlacement: function(error, element) {
-                    error.addClass('invalid-feedback');
-                    element.closest('.form-group').append(error);
+                    if (element.attr("type") === "radio") {
+                        element.closest('.form-group').append(error);
+                    } else {
+                        error.insertAfter(element);
+                    }
                 },
-                highlight: function(element, errorClass, validClass) {
+                highlight: function(element) {
                     $(element).addClass('is-invalid');
                 },
-                unhighlight: function(element, errorClass, validClass) {
+                unhighlight: function(element) {
                     $(element).removeClass('is-invalid');
                 }
             });
