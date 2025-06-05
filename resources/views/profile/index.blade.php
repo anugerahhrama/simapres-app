@@ -24,19 +24,19 @@
                 </h3>
 
                 <p class="text-muted text-center">
-                    {{ $user->detailUser->prodi->name }}
+                    {{ $user->detailUser?->prodi?->name }}
                 </p>
 
                 <table class="table table-md table-borderless">
                     <tr>
                         <th class="text-left col-3">No Induk</th>
                         <td>:</td>
-                        <td class="col-9">{{ $user->detailUser->no_induk }}</td>
+                        <td class="col-9">{{ $user->detailUser?->no_induk }}</td>
                     </tr>
                     <tr>
                         <th class="text-left col-3">Phone</th>
                         <td>:</td>
-                        <td class="col-9">{{ $user->detailUser->phone }}</td>
+                        <td class="col-9">{{ $user->detailUser?->phone }}</td>
                     </tr>
                 </table>
 

@@ -93,4 +93,15 @@ class Lomba extends Model
     {
         return $this->hasMany(Pendamping::class, 'lomba_id');
     }
+
+    /**
+     * Get the user who created the Lomba
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
 }
