@@ -3,135 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lomba;
-use App\Models\TingkatanLomba; 
-use App\Models\Keahlian;       
-use App\Models\Minat;          
+use App\Models\DetailUser;
+use App\Models\User;
+use App\Models\TingkatanLomba;
+use App\Models\Keahlian;
+use App\Models\Minat;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; 
-use Illuminate\Support\Facades\Validator; 
-use Yajra\DataTables\Facades\DataTables; 
+use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\Facades\DataTables;
 
 class LombaController extends Controller
 {
     /**
      * Display a listing of the resource.
-     * Menampilkan halaman utama daftar lomba.
      */
     public function index()
     {
-        // Data untuk filter dropdown (jika ada)
-        // Contoh: Ambil semua kategori unik dari lomba yang sudah ada
-        $kategoris = Lomba::select('kategori')->distinct()->pluck('kategori');
-        $tingkatanLombas = TingkatanLomba::all(); // Untuk filter tingkatan
-
         $breadcrumb = (object) [
-            'title' => 'Daftar Lomba',
-            'list'  => ['Home', 'Lomba']
-        ];
+        'title' => 'Daftar Lomba',
+        'list'  => ['Home', 'Lomba']
+    ];
+    $tingkatanLomba = TingkatanLomba::all();
 
-        return view('lombas.index', compact('breadcrumb', 'kategoris', 'tingkatanLombas'));
+    return view('lomba.index', compact('breadcrumb', 'tingkatanLomba'));
     }
 
-    /**
-     * Mengambil data lomba untuk DataTables via AJAX.
-     */
-     public function list(Request $request){
-        $query = Lomba::select(
-            'id',
-            'judul',
-            'kategori',
-            'penyelenggara',
-            'awal_registrasi',
-            'akhir_registrasi',
-            'status_verifikasi',
-            'tingkatan_lomba_id',
-            'bidang_keahlian_id',
-            'minat_id'
-        )->with([
-            'tingkatanLomba:id,nama_tingkatan', // Ambil hanya id dan nama_tingkatan
-            'keahlian:id,nama_keahlian',         // Ambil hanya id dan nama_keahlian
-            'minat:id,nama_minat'                // Ambil hanya id dan nama_minat
-        ]);
-
-        // Filter berdasarkan kategori
-        if ($request->filled('kategori_filter')) {
-            $query->where('kategori', $request->kategori_filter);
-        }
-
-        // Filter berdasarkan tingkatan_lomba_id
-        if ($request->filled('tingkatan_filter')) {
-            $query->where('tingkatan_lomba_id', $request->tingkatan_filter);
-        }
-
-        // Filter berdasarkan status_verifikasi
-        if ($request->filled('status_filter')) {
-            $query->where('status_verifikasi', $request->status_filter);
-        }
-
-        // Search umum (sesuai dengan input pencarian dari frontend)
-        // Frontend sekarang mengirim 'search' langsung, bukan 'search[value]'
-        if ($request->filled('search')) {
-            $searchTerm = '%' . $request->search . '%'; // Ambil nilai search langsung
-            $query->where(function ($q) use ($searchTerm) {
-                $q->where('judul', 'like', $searchTerm)
-                  ->orWhere('penyelenggara', 'like', $searchTerm)
-                  ->orWhere('kategori', 'like', $searchTerm)
-                  ->orWhere('status_verifikasi', 'like', $searchTerm)
-                  ->orWhereHas('tingkatanLomba', function ($qRel) use ($searchTerm) {
-                      $qRel->where('nama_tingkatan', 'like', $searchTerm);
-                  })
-                  ->orWhereHas('keahlian', function ($qRel) use ($searchTerm) {
-                      $qRel->where('nama_keahlian', 'like', $searchTerm);
-                  })
-                  ->orWhereHas('minat', function ($qRel) use ($searchTerm) {
-                      $qRel->where('nama_minat', 'like', $searchTerm);
-                  });
+    public function list(Request $request)
+    {
+       $data = Lomba::with(['tingkatanLomba']) 
+        ->when($request->tingkatan, function ($query) use ($request) {
+            $query->whereHas('tingkatanLomba', function ($q) use ($request) {
+                $q->where('nama', 'like', '%' . $request->tingkatan . '%');
             });
-        }
-
-        // Ambil data dengan pagination Laravel
-        // Default per page bisa disesuaikan, atau diambil dari request jika ada
-        $perPage = $request->input('per_page', 10); // Ambil per_page dari request, default 10
-        $lombas = $query->paginate($perPage);
-
-        // Format data agar sesuai dengan kebutuhan frontend (untuk tampilan kartu)
-        $formattedLombas = $lombas->map(function($lomba) {
-            return [
-                'id' => $lomba->id,
-                'judul' => $lomba->judul,
-                'kategori' => $lomba->kategori,
-                'penyelenggara' => $lomba->penyelenggara,
-                'awal_registrasi' => $lomba->awal_registrasi,
-                'akhir_registrasi' => $lomba->akhir_registrasi,
-                'status_verifikasi' => $lomba->status_verifikasi,
-                // Tambahkan nama relasi langsung ke dalam array data
-                'tingkatan_nama' => $lomba->tingkatanLomba->nama_tingkatan ?? 'N/A',
-                'keahlian_nama' => $lomba->keahlian->nama_keahlian ?? 'N/A',
-                'minat_nama' => $lomba->minat->nama_minat ?? 'N/A',
-            ];
         });
 
-        // Kembalikan respons JSON dengan data dan metadata pagination
-        return response()->json([
-            'data' => $formattedLombas,
-            'meta' => [
-                'current_page' => $lombas->currentPage(),
-                'from' => $lombas->firstItem(),
-                'last_page' => $lombas->lastPage(),
-                'path' => $lombas->path(),
-                'per_page' => $lombas->perPage(),
-                'to' => $lombas->lastItem(),
-                'total' => $lombas->total(),
-            ],
-            // 'links' => $lombas->linkCollection(), // Opsional: jika Anda ingin menyertakan link pagination lengkap
-        ]);
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('judul_lomba', function ($row) {
+                return $row->judul;
+            })
+            ->addColumn('kategori', function ($row) {
+                return $row->kategori ?? '-';
+            })
+            ->addColumn('tingkatan', function ($row) {
+                return $row->tingkatanLomba->nama ?? '-';
+            })
+            ->addColumn('penyelenggara', function ($row) {
+                return $row->penyelenggara ?? '-';
+            })
+            ->addColumn('aksi', function ($row) {
+                $btn = '<div class="d-flex justify-content-center align-items-center" style="gap: 5px;">';
+                $btn .= '<button onclick="modalAction(\'' . route('lomba.show', $row->id) . '\')" class="btn btn-info btn-sm">Detail</button>';
+                $btn .= '<a href="' . route('lomba.edit', $row->id) . '" class="btn btn-warning btn-sm mr-1" style="text-decoration: none;">Edit</a>';
+                $btn .= '<button onclick="modalAction(\'' . route('lomba.confirm', $row->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
+                return $btn;
+            })
+            ->rawColumns(['aksi'])
+            ->make(true);
     }
-
 
 
     /**
      * Show the form for creating a new resource.
-     * Menampilkan formulir untuk membuat lomba baru (via modal AJAX).
      */
     public function create()
     {
@@ -139,198 +72,180 @@ class LombaController extends Controller
         $keahlians = Keahlian::all();
         $minats = Minat::all();
 
-        return view('lombas.create', compact('tingkatanLombas', 'keahlians', 'minats'));
+        $breadcrumb = (object) [
+            'title' => 'Tambah Lomba',
+            'list'  => ['Home', 'Lomba', 'Edit']
+        ];
+
+        return view('lomba.create', compact('tingkatanLombas', 'keahlians', 'minats', 'breadcrumb'));
     }
 
     /**
      * Store a newly created resource in storage.
-     * Menyimpan lomba baru ke database (via AJAX).
      */
     public function store(Request $request)
     {
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                'judul' => 'required|string|max:255',
-                'kategori' => 'required|string|in:Akademik,Non Akademik',
-                'deskripsi' => 'required|string',
-                'penyelenggara' => 'required|string|max:255',
-                'link_registrasi' => 'nullable|url|max:255',
-                'awal_registrasi' => 'required|date',
-                'akhir_registrasi' => 'required|date|after_or_equal:awal_registrasi',
-                'tingkatan_lomba_id' => 'required|exists:tingkatan_lombas,id',
-                'bidang_keahlian_id' => 'required|exists:keahlians,id',
-                'minat_id' => 'required|exists:minats,id',
-                'status_verifikasi' => 'required|string|in:pending,approved,rejected',
-                'jenis_pendaftaran' => 'required|string|in:Online,Offline',
-                'harga_pendaftaran' => 'required|numeric|min:0',
-                'perkiraan_hadiah' => 'nullable|string|max:255',
-                'mendapatkan_uang' => 'boolean',
-                'mendapatkan_sertifikat' => 'boolean',
-                'nilai_benefit' => 'required|integer|min:0|max:100',
-            ];
+        $request->validate([
+            'judul' => 'required|max:255',
+            'kategori' => 'required',
+            'tingkatan_lomba_id' => 'required|exists:tingkatan_lombas,id',
+            'penyelenggara' => 'nullable|max:100',
+            'deskripsi' => 'nullable|max:255',
+            'link_registrasi' => 'nullable|url',
+            'awal_registrasi' => 'nullable|date',
+            'akhir_registrasi' => 'nullable|date|after_or_equal:awal_registrasi',
+            'bidang_keahlian_id' => 'nullable|exists:keahlians,id',
+            'minat_id' => 'nullable|exists:minats,id',
+            'jenis_pendaftaran' => 'nullable|string|max:100',
+            'harga_pendaftaran' => 'nullable|numeric|min:0',
+            'perkiraan_hadiah' => 'nullable|string|max:255',
+            'mendapatkan_uang' => 'nullable|boolean',
+            'mendapatkan_sertifikat' => 'nullable|boolean',
+            'nilai_benefit' => 'nullable|numeric|min:0',
+            'status_verifikasi' => 'nullable|in:pending,disetujui,ditolak',
+        ]);
 
-            $validator = Validator::make($request->all(), $rules);
+        $lomba = new Lomba();
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status'   => false,
-                    'message'  => 'Validasi Gagal',
-                    'msgField' => $validator->errors(),
-                ]);
-            }
+        $lomba->fill([
+            'judul' => $request->judul,
+            'kategori' => $request->kategori,
+            'tingkatan_lomba_id' => $request->tingkatan_lomba_id,
+            'penyelenggara' => $request->penyelenggara,
+            'deskripsi' => $request->deskripsi,
+            'link_registrasi' => $request->link_registrasi,
+            'awal_registrasi' => $request->awal_registrasi,
+            'akhir_registrasi' => $request->akhir_registrasi,
+            'bidang_keahlian_id' => $request->bidang_keahlian_id,
+            'minat_id' => $request->minat_id,
+            'jenis_pendaftaran' => $request->jenis_pendaftaran,
+            'harga_pendaftaran' => $request->harga_pendaftaran,
+            'perkiraan_hadiah' => $request->perkiraan_hadiah,
+            'mendapatkan_uang' => $request->mendapatkan_uang ?? 0,
+            'mendapatkan_sertifikat' => $request->mendapatkan_sertifikat ?? 0,
+            'nilai_benefit' => $request->nilai_benefit,
+            'status_verifikasi' => $request->status_verifikasi ?? 'pending',
+            'created_by' => auth()->user()->id,
+        ]);
 
-            $validatedData = $request->all();
-            $validatedData['created_by'] = Auth::id(); // Tambahkan created_by dari user yang sedang login
+        $lomba->save();
 
-            Lomba::create($validatedData);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'Data Lomba berhasil disimpan'
-            ]);
-        }
-        return redirect('/'); 
+        return redirect()->route('lomba.index')->with('success', 'Lomba berhasil ditambahkan!');
     }
+
+
 
     /**
      * Display the specified resource.
-     * Menampilkan detail lomba tertentu (via modal AJAX).
      */
-    public function show(string $id)
+    public function show(Lomba $lomba)
     {
-        $lomba = Lomba::with(['tingkatanLomba', 'keahlian', 'minat', 'pendaftaranLomba'])->find($id);
-
-        if ($lomba) {
-            return view('lombas.show', compact('lomba'));
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
-        }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     * Menampilkan formulir untuk mengedit lomba tertentu (via modal AJAX).
-     */
-    public function edit(string $id)
-    {
-        $lomba = Lomba::find($id);
+        $lomba->load(['tingkatanLomba', 'keahlian', 'minat', 'createdBy']);
+        $detailUser = DetailUser::all();
+        $users = User::with('detailUser')->get();
         $tingkatanLombas = TingkatanLomba::all();
         $keahlians = Keahlian::all();
         $minats = Minat::all();
 
-        if ($lomba) {
-            return view('lombas.edit', compact('lomba', 'tingkatanLombas', 'keahlians', 'minats'));
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
-        }
+        return view('lomba.show', compact('lomba', 'tingkatanLombas', 'keahlians', 'minats', 'detailUser', 'users'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Lomba $lomba)
+    {
+        $keahlians = Keahlian::all();
+        $minats = Minat::all();
+
+        $breadcrumb = (object) [
+            'title' => 'Edit Lomba',
+            'list'  => ['Home', 'Lomba', 'Edit']
+        ];
+
+        return view('lomba.edit', compact('lomba', 'keahlians', 'minats', 'breadcrumb'));
     }
 
     /**
      * Update the specified resource in storage.
-     * Memperbarui lomba tertentu di database (via AJAX).
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Lomba $lomba)
     {
-        if ($request->ajax() || $request->wantsJson()) {
-            $rules = [
-                'judul' => 'required|string|max:255',
-                'kategori' => 'required|string|in:Akademik,Non Akademik',
-                'deskripsi' => 'required|string',
-                'penyelenggara' => 'required|string|max:255',
-                'link_registrasi' => 'nullable|url|max:255',
-                'awal_registrasi' => 'required|date',
-                'akhir_registrasi' => 'required|date|after_or_equal:awal_registrasi',
-                'tingkatan_lomba_id' => 'required|exists:tingkatan_lombas,id',
-                'bidang_keahlian_id' => 'required|exists:keahlians,id',
-                'minat_id' => 'required|exists:minats,id',
-                'status_verifikasi' => 'required|string|in:pending,approved,rejected',
-                'jenis_pendaftaran' => 'required|string|in:Online,Offline',
-                'harga_pendaftaran' => 'required|numeric|min:0',
-                'perkiraan_hadiah' => 'nullable|string|max:255',
-                'mendapatkan_uang' => 'boolean',
-                'mendapatkan_sertifikat' => 'boolean',
-                'nilai_benefit' => 'required|integer|min:0|max:100',
-            ];
+        $request->validate([
+            'judul' => 'required|max:255',
+            'kategori' => 'required|in:akademik,non akademik',
+            'tingkatan' => 'required|in:pemula,lokal,regional,nasional,internasional',
+            'penyelenggara' => 'nullable|max:100',
+            'deskripsi' => 'nullable|max:255',
+            'link_registrasi' => 'nullable|url|max:255',
+            'awal_registrasi' => 'nullable|date',
+            'akhir_registrasi' => 'nullable|date|after_or_equal:awal_registrasi',
+            'bidang_keahlian_id' => 'nullable|exists:keahlians,id',
+            'minat_id' => 'nullable|exists:minats,id',
+            'jenis_pendaftaran' => 'nullable|string|max:100',
+            'harga_pendaftaran' => 'nullable|numeric|min:0',
+            'perkiraan_hadiah' => 'nullable|string|max:255',
+            'mendapatkan_uang' => 'nullable|boolean',
+            'mendapatkan_sertifikat' => 'nullable|boolean',
+            'nilai_benefit' => 'nullable|numeric|min:0',
+            'status_verifikasi' => 'nullable|in:pending,disetujui,ditolak',
+        ]);
 
-            $validator = Validator::make($request->all(), $rules);
+        $tingkatanLomba = TingkatanLomba::where('nama', $request->tingkatan)->first();
 
-            if ($validator->fails()) {
-                return response()->json([
-                    'status'   => false,
-                    'message'  => 'Validasi gagal.',
-                    'msgField' => $validator->errors()
-                ]);
-            }
+        $lomba->update([
+            'judul' => $request->judul,
+            'kategori' => $request->kategori,
+            'tingkatan_lomba_id' => $tingkatanLomba ? $tingkatanLomba->id : null,
+            'penyelenggara' => $request->penyelenggara,
+            'deskripsi' => $request->deskripsi,
+            'link_registrasi' => $request->link_registrasi,
+            'awal_registrasi' => $request->awal_registrasi,
+            'akhir_registrasi' => $request->akhir_registrasi,
+            'bidang_keahlian_id' => $request->bidang_keahlian_id,
+            'minat_id' => $request->minat_id,
+            'jenis_pendaftaran' => $request->jenis_pendaftaran,
+            'harga_pendaftaran' => $request->harga_pendaftaran,
+            'perkiraan_hadiah' => $request->perkiraan_hadiah,
+            'mendapatkan_uang' => $request->mendapatkan_uang ?? 0,
+            'mendapatkan_sertifikat' => $request->mendapatkan_sertifikat ?? 0,
+            'nilai_benefit' => $request->nilai_benefit,
+            'status_verifikasi' => $request->status_verifikasi ?? 'pending',
+        ]);
 
-            $lomba = Lomba::find($id);
-            if ($lomba) {
-                $lomba->update($request->all());
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Data Lomba berhasil diupdate'
-                ]);
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
-            }
-        }
-        return redirect('/'); 
-    }
-
-    /**
-     * Menampilkan konfirmasi hapus lomba (via modal AJAX).
-     */
-    public function confirm(string $id)
-    {
-        $lomba = Lomba::find($id);
-
-        if ($lomba) {
-            return view('lombas.confirm', compact('lomba'));
-        } else {
-            return response()->json([
-                'status' => false,
-                'message' => 'Data tidak ditemukan'
-            ]);
-        }
+        return redirect()->route('lomba.index')->with('success', 'Lomba berhasil diperbarui!');
     }
 
     /**
      * Remove the specified resource from storage.
-     * Menghapus lomba tertentu dari database (via AJAX).
      */
-    public function destroy(string $id, Request $request)
+    public function confirm(string $id)
     {
-        if ($request->ajax() || $request->wantsJson()) {
-            $lomba = Lomba::find($id);
+        $lomba = Lomba::with('tingkatanLomba')->findOrFail($id);
 
-            if ($lomba) {
-                try {
-                    $lomba->delete();
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Data Lomba berhasil dihapus'
-                    ]);
-                } catch (\Illuminate\Database\QueryException $e) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Data tidak dapat dihapus karena masih terkait dengan data lain (misal: prestasi, pendaftaran lomba).'
-                    ]);
-                }
-            } else {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Data tidak ditemukan'
-                ]);
-            }
-        }
-        return redirect('/');
+        return view('lomba.confirm', compact('lomba'));
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        $lomba = Lomba::with('tingkatanLomba')->findOrFail($id);
+
+        $deletedData = [
+            'judul' => $lomba->judul ?? '-',
+            'tingkatan' => $lomba->tingkatanLomba->nama ?? '-',
+            'penyelenggara' => $lomba->penyelenggara ?? '-',
+            'deskripsi' => $lomba->deskripsi ?? '-',
+        ];
+
+        $lomba->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Data lomba berhasil dihapus.',
+            'deleted_data' => $deletedData
+        ]);
     }
 }

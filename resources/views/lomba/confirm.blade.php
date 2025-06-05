@@ -39,11 +39,11 @@
                     <table class="table table-sm table-bordered table-striped">
                         <tr>
                             <th class="text-right col-3">Judul Lomba:</th>
-                            <td class="col-9">{{ $lomba->judul_lomba ?? '-' }}</td>
+                            <td class="col-9">{{ $lomba->judul ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Tingkatan:</th>
-                            <td class="col-9">{{ ucfirst($lomba->tingkatan) ?? '-' }}</td>
+                            <td class="col-9">{{ $lomba->tingkatanLomba->nama ?? '-' }}</td>
                         </tr>
                         <tr>
                             <th class="text-right col-3">Penyelenggara:</th>
@@ -53,12 +53,7 @@
                             <th class="text-right col-3">Deskripsi:</th>
                             <td class="col-9">{{ $lomba->deskripsi ?? '-' }}</td>
                         </tr>
-                        <tr>
-                            <th class="text-right col-3">Program Studi:</th>
-                            <td class="col-9">{{ $lomba->prodi->name ?? '-' }}</td>
-                        </tr>
                     </table>
-
                 </div>
 
                 <div class="modal-footer">
