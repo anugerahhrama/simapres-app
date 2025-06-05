@@ -24,8 +24,12 @@ class DetailUserController extends Controller
 
         $prodis = ProgramStudi::all();
         $levels = Level::all();
+        $totalUsers = User::count();
+        $totalAdmin = User::where('level_id', 1)->count();
+        $totalDosen = User::where('level_id', 2)->count();
+        $totalMahasiswa = User::where('level_id', 3)->count();
 
-        return view('detail_users.index', compact('breadcrumb', 'prodis', 'levels'));
+        return view('detail_users.index', compact('breadcrumb', 'prodis', 'levels', 'totalUsers', 'totalAdmin', 'totalMahasiswa', 'totalDosen'));
     }
 
     public function list(Request $request)
@@ -34,6 +38,12 @@ class DetailUserController extends Controller
 
         if ($request->prodi_id) {
             $data->where('prodi_id', $request->prodi_id);
+        }
+
+        if ($request->level_id) {
+            $data->whereHas('detailUser', function ($query) use ($request) {
+                $query->where('level_id', $request->level_id);
+            });
         }
 
         return DataTables::of($data)

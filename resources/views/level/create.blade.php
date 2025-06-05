@@ -1,28 +1,52 @@
 <form action="{{ route('levels.store') }}" method="POST" id="form-tambah">
     @csrf
     <div id="modal-master" class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Tambah Data level</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header text-dark" style="background-color: #f0f5fe; border-radius: 8px 8px 0 0;">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    <i class="fas fa-regular fa-circle-plus mr-2"></i>Tambah Data Level
+                </h5>
+                <button type="button" class="close text-dark" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <div class="form-group">
-                    <label>Kode Level</label>
-                    <input value="" type="text" name="level_code" id="level_code" class="form-control" required>
+                    <label class="font-weight-bold">Kode Level</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-user-tag"></i>
+                            </span>
+                        </div>
+                        <input value="" type="text" name="level_code" id="level_code" 
+                            class="form-control border-left-0" style="border: none; border-radius: 0 4px 4px 0 !important;"
+                            placeholder="Masukkan kode level" required>
+                    </div>
                     <small id="error-level_code" class="error-text form-text text-danger"></small>
                 </div>
                 <div class="form-group">
-                    <label>Nama Level</label>
-                    <input value="" type="text" name="nama_level" id="nama_level" class="form-control" required>
+                    <label class="font-weight-bold">Nama Level</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-layer-group"></i>
+                            </span>
+                        </div>
+                        <input value="" type="text" name="nama_level" id="nama_level"
+                            class="form-control border-left-0" style="border: none; border-radius: 0 4px 4px 0 !important;"
+                            placeholder="Masukkan nama level" required>
+                    </div>
                     <small id="error-nama_level" class="error-text form-text text-danger"></small>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" data-dismiss="modal" class="btn btn-warning">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+            <div class="modal-footer bg-light">
+                <button type="button" data-dismiss="modal" class="btn btn-light border shadow-sm">
+                    <i class="fas fa-times mr-2"></i>Batal
+                </button>
+                <button type="submit" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-save mr-2"></i>Simpan
+                </button>
             </div>
         </div>
     </div>
@@ -54,7 +78,9 @@
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Berhasil',
-                                text: response.message
+                                text: response.message,
+                                showConfirmButton: false,
+                                timer: 1500
                             });
                             dataLevel.ajax.reload();
                         } else {
