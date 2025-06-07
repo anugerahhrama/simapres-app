@@ -91,6 +91,30 @@
                             </li>
                         </ul>
                     </li>
+
+                    <li class="nav-item {{ request()->is('*verifikasi*') ? 'menu-is-opening menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->is('*verifikasi*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-circle-check"></i>
+                            <p>
+                                Verifikasi
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('verifPres.index') }}" class="nav-link {{ request()->is('*verifPres*') ? 'active' : '' }}" style="padding-left: 35px;">
+                                    <i class="fas fa-solid fa-trophy nav-icon"></i>
+                                    <p>Prestasi</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('verifLombas.index') }}" class="nav-link {{ request()->is('*verifLomba*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-medal"></i>
+                                    <p>Lomba</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 @endif
 
                 @if (auth()->check() && auth()->user()->level->level_code === 'MHS')

@@ -77,6 +77,23 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
     });
 });
 
+Route::prefix('verifikasi')->middleware(['auth', 'level:ADM'])->group(function () {
+
+    // Verifikasi Prestasi
+    Route::resource('verifPres', PrestasiController::class);
+    Route::prefix('verifPres')->controller(PrestasiController::class)->name('verifPres.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
+
+    // Lomba
+    Route::resource('verifLombas', LombaController::class);
+    Route::prefix('verifLombas')->controller(LombaController::class)->name('verifLombas.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
+});
+
 Route::get('rekomendasi-lomba', [RekomendasiLombaController::class, 'index'])->middleware(['auth', 'level:MHS'])->name('rekomendasi.lomba');
 
 // Prestasi
