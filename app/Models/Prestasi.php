@@ -23,6 +23,7 @@ class Prestasi extends Model
         'pencapaian',
         'evaluasi_diri',
         'status_verifikasi',
+        'catatan',
     ];
 
     /**

@@ -80,10 +80,11 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
 Route::prefix('verifikasi')->middleware(['auth', 'level:ADM'])->group(function () {
 
     // Verifikasi Prestasi
-    Route::resource('verifPres', PrestasiController::class);
     Route::prefix('verifPres')->controller(PrestasiController::class)->name('verifPres.')->group(function () {
-        Route::post('list', 'list')->name('list');
-        Route::get('confirm/{id}', 'confirm')->name('confirm');
+        Route::get('/', 'index_verif')->name('index');
+        Route::post('list', 'list_verif')->name('list');
+        Route::get('{id}', 'show_verif')->name('show');
+        Route::post('/{id}/update-status', [PrestasiController::class, 'updateStatus'])->name('updateStatus');
     });
 
     // Lomba
