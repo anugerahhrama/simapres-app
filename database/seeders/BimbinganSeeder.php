@@ -14,7 +14,7 @@ class BimbinganSeeder extends Seeder
     {
         // Contoh data bimbingan, sesuaikan id dosen & mahasiswa sesuai data user di tabel users
         Bimbingan::create([
-            'dosen_id' => 26,
+            'dosen_id' => 2,
             'mahasiswa_id' => 1,
             'tanggal_mulai' => now()->subDays(10)->format('Y-m-d'),
             'tanggal_selesai' => now()->addDays(20)->format('Y-m-d'),
@@ -23,7 +23,7 @@ class BimbinganSeeder extends Seeder
         ]);
 
         Bimbingan::create([
-            'dosen_id' => 26,
+            'dosen_id' => 2,
             'mahasiswa_id' => 1,
             'tanggal_mulai' => now()->subDays(30)->format('Y-m-d'),
             'tanggal_selesai' => now()->subDays(5)->format('Y-m-d'),
