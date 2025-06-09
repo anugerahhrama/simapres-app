@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             ProgramStudiSeeder::class,
             DetailUserSeeder::class,
             TingkatanLombaSeeder::class,
+            ManajemenPeriodeSeeder::class,
         ]);
     }
 }
