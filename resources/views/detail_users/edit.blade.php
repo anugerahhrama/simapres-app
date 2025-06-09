@@ -44,7 +44,7 @@
                     <select name="level_id" id="level_id" class="form-control" required>
                         <option value="">-- Pilih Level --</option>
                         @foreach ($levels as $level)
-                            <option value="{{ $level->id }}" data-level-code="{{ $level->level_code }}">
+                            <option value="{{ $level->id }}" {{ $detailUser->user->level_id == $level->id ? 'selected' : '' }}>
                                 {{ $level->nama_level }}
                             </option>
                         @endforeach
@@ -56,20 +56,10 @@
                     <select name="prodi_id" id="prodi_id" class="form-control">
                         <option value="">-- Pilih Program Studi --</option>
                         @foreach ($prodis as $prodi)
-                            <option value="{{ $prodi->id }}">{{ $prodi->name }}</option>
+                            <option value="{{ $prodi->id }}" {{ $detailUser->prodi_id == $prodi->id ? 'selected' : '' }}>{{ $prodi->name }}</option>
                         @endforeach
                     </select>
                     <small id="error-prodi_id" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" id="password" class="form-control" required>
-                    <small id="error-password" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Konfirmasi Password</label>
-                    <input type="password" name="confirmpassword" id="confirmpassword" class="form-control" required>
-                    <small id="error-confirmpassword" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -81,40 +71,41 @@
 </form>
 
 <script>
-    $(document).ready(function () {
-        function toggleProdi() {
-            var selected = $('#level_id option:selected');
-            var levelCode = selected.data('level-code');
-            if (levelCode === 'MHS') {
-                $('#prodi-group').show();
-                $('#prodi_id').prop('required', true);
-            } else {
-                $('#prodi-group').hide();
-                $('#prodi_id').prop('required', false).val('');
-                $('#error-prodi_id').text('');
-            }
-        }
-        toggleProdi();
-        $('#level_id').on('change', toggleProdi);
-
+    $(document).ready(function() {
         $('#form-edit').validate({
             rules: {
-                no_induk: { required: true, maxlength: 50 },
-                nama_lengkap: { required: true, maxlength: 100 },
-                email: { required: true, email: true },
-                phone: { required: true, maxlength: 15 },
-                jenis_kelamin: { required: true },
-                prodi_id: { required: true },
-                level_id: { required: true },
-                password: { required: true, minlength: 6 },
-                confirmpassword: { required: true, equalTo: "#password" }
+                no_induk: {
+                    required: true,
+                    maxlength: 50
+                },
+                nama_lengkap: {
+                    required: true,
+                    maxlength: 100
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                phone: {
+                    required: true,
+                    maxlength: 15
+                },
+                jenis_kelamin: {
+                    required: true
+                },
+                prodi_id: {
+                    required: true
+                },
+                level_id: {
+                    required: true
+                },
             },
-            submitHandler: function (form) {
+            submitHandler: function(form) {
                 $.ajax({
                     url: form.action,
                     type: 'POST',
                     data: $(form).serialize(),
-                    success: function (response) {
+                    success: function(response) {
                         if (response.status) {
                             $('#myModal').modal('hide');
                             Swal.fire('Berhasil', response.message, 'success');
@@ -123,27 +114,27 @@
                             }
                         } else {
                             $('.error-text').text('');
-                            $.each(response.msgField, function (prefix, val) {
+                            $.each(response.msgField, function(prefix, val) {
                                 $('#error-' + prefix).text(val[0]);
                             });
                             Swal.fire('Gagal', response.message, 'error');
                         }
                     },
-                    error: function () {
+                    error: function() {
                         Swal.fire('Error', 'Terjadi kesalahan pada server.', 'error');
                     }
                 });
                 return false;
             },
             errorElement: 'span',
-            errorPlacement: function (error, element) {
+            errorPlacement: function(error, element) {
                 error.addClass('invalid-feedback');
                 element.closest('.form-group').append(error);
             },
-            highlight: function (element) {
+            highlight: function(element) {
                 $(element).addClass('is-invalid');
             },
-            unhighlight: function (element) {
+            unhighlight: function(element) {
                 $(element).removeClass('is-invalid');
             }
         });

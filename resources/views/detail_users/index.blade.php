@@ -28,7 +28,7 @@
                 <div class="stat-header">
                     <span class="stat-title">Total Mahasiswa</span>
                 </div>
-                <div class="stat-value">{{ $totalMahasiswa ?? '0' }}</div> 
+                <div class="stat-value">{{ $totalMahasiswa ?? '0' }}</div>
                 <div class="stat-subtitle">Total mahasiswa terdaftar</div>
             </div>
         </div>
@@ -45,7 +45,7 @@
     </div>
 
     <!-- Main Data Table Card -->
-    <div class="card mt-4">
+    <div class="card">
         <div class="card-header" style="background: white; border-bottom: 1px solid #e2e8f0; padding: 15px 20px;">
             <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
                 <div class="d-flex" style="gap: 1rem;">
@@ -68,8 +68,7 @@
                 </div>
 
                 <div>
-                    <button onclick="modalAction('{{ route('detailusers.create') }}')" class="btn btn-primary"
-                        style="white-space: nowrap;">
+                    <button onclick="modalAction('{{ route('detailusers.create') }}')" class="btn btn-primary" style="white-space: nowrap;">
                         <i class="fas fa-plus mr-1"></i>
                         Tambah
                     </button>
@@ -116,8 +115,7 @@
         </div>
     </div>
 
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
-        data-keyboard="false" data-width="100%" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="100%" aria-hidden="true"></div>
 @endsection
 
 @push('js')
@@ -201,5 +199,9 @@
                 dataTable.ajax.reload();
             });
         });
+        
+        $(function() {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
     </script>
 @endpush

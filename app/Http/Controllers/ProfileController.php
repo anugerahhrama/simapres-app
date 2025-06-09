@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Keahlian;
 use App\Models\ProgramStudi;
+use App\Models\TingkatanLomba;
 use App\Models\User;
+use App\Models\UserKeahlian;
+use App\Models\UserTingkatLomba;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -141,5 +145,118 @@ class ProfileController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+
+    public function createKeahlian()
+    {
+        $allKeahlian = Keahlian::all();
+
+        return view('profile.keahlian.create', compact('allKeahlian'));
+    }
+
+    public function storeKeahlian(Request $request)
+    {
+        $user = Auth::user();
+        $inputKeahlian = $request->input('keahlian'); // mix of IDs and new names
+        $keahlianIds = [];
+
+        foreach ($inputKeahlian as $item) {
+            if (is_numeric($item)) {
+                $keahlianIds[] = (int) $item;
+            } else {
+                $existing = Keahlian::whereRaw('LOWER(nama_keahlian) = ?', [strtolower($item)])->first();
+
+                if ($existing) {
+                    $keahlianIds[] = $existing->id;
+                } else {
+                    $new = Keahlian::create(['nama_keahlian' => $item]);
+                    $keahlianIds[] = $new->id;
+                }
+            }
+        }
+
+        foreach ($keahlianIds as $id) {
+            UserKeahlian::firstOrCreate([
+                'user_id' => $user->id,
+                'keahlian_id' => $id
+            ]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Keahlian berhasil disimpan.'
+        ]);
+    }
+
+    public function deleteKeahlian($id)
+    {
+        $user = Auth::user();
+
+        $keahlianUser = UserKeahlian::where('id', $id)->where('user_id', $user->id)->first();
+
+        if (!$keahlianUser) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data keahlian tidak ditemukan atau bukan milik Anda.'
+            ]);
+        }
+
+        $keahlianUser->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Keahlian berhasil dihapus.'
+        ]);
+    }
+
+    public function tingkatanCreate()
+    {
+        $user = Auth::user();
+        $tingkatan = TingkatanLomba::all();
+        $preferensi = UserTingkatLomba::where('user_id', $user->id)->first();
+
+        $preferensiIds = [];
+
+        if ($preferensi) {
+            $preferensiIds = array_filter([
+                $preferensi->pilihan_utama_id,
+                $preferensi->pilihan_kedua_id,
+                $preferensi->pilihan_ketiga_id,
+            ]);
+        }
+
+        $orderedTingkatan = $tingkatan->sortBy(function ($item) use ($preferensiIds) {
+            $index = array_search($item->id, $preferensiIds);
+            return $index !== false ? $index : 999;
+        });
+
+
+        return view('profile.tingkatan.create', [
+            'tingkatan' => $orderedTingkatan,
+            'preferensi' => $preferensi,
+            'user' => $user,
+        ]);
+    }
+
+    public function tingkatanStore(Request $request)
+    {
+        $user = Auth::user();
+
+        $urutan = $request->input('urutan');
+
+        UserTingkatLomba::where('user_id', $user->id)->delete();
+
+        UserTingkatLomba::create([
+            'user_id' => $user->id,
+            'pilihan_utama_id' => $urutan[0] ?? null,
+            'pilihan_kedua_id' => $urutan[1] ?? null,
+            'pilihan_ketiga_id' => $urutan[2] ?? null,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Preferensi berhasil disimpan!'
+        ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Models\ProgramStudi;
 use App\Models\User;
 use App\Models\Level;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -34,14 +35,14 @@ class DetailUserController extends Controller
 
     public function list(Request $request)
     {
-        $data = DetailUser::with(['user.level', 'prodi']); // Ganti detailUser.level jadi user.level
+        $data = DetailUser::with(['user', 'prodi']); // Ganti detailUser.level jadi user.level
 
         if ($request->prodi_id) {
             $data->where('prodi_id', $request->prodi_id);
         }
 
         if ($request->level_id) {
-            $data->whereHas('detailUser', function ($query) use ($request) {
+            $data->whereHas('user', function ($query) use ($request) {
                 $query->where('level_id', $request->level_id);
             });
         }
@@ -61,9 +62,38 @@ class DetailUserController extends Controller
                 return $row->prodi->name ?? '-';
             })
             ->addColumn('aksi', function ($row) {
-                $btn = '<button onclick="modalAction(\'' . route('detailusers.show', $row->id) . '\')" class="btn btn-info btn-sm mr-1">Detail</button>';
-                $btn .= '<button onclick="modalAction(\'' . route('detailusers.edit', $row->id) . '\')" class="btn btn-warning btn-sm mr-1">Edit</button>';
-                $btn .= '<button onclick="modalAction(\'' . route('detailusers.confirm', $row->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
+                $btn = '<div style="display: flex; justify-content: center; align-items: center; gap: 4px;">';
+
+                $btn .= '<button type="button" class="btn btn-info btn-sm"
+            style="padding: 4px 8px; font-size: 12px;"
+            data-toggle="tooltip" data-placement="top" title="Lihat Detail"
+            onclick="modalAction(\'' . route('detailusers.show', $row->id) . '\')">
+            <i class="fas fa-eye"></i>
+        </button>';
+
+                $btn .= '<button type="button" class="btn btn-warning btn-sm"
+            style="padding: 4px 8px; font-size: 12px;"
+            data-toggle="tooltip" data-placement="top" title="Edit Data"
+            onclick="modalAction(\'' . route('detailusers.edit', $row->id) . '\')">
+            <i class="fas fa-edit"></i>
+        </button>';
+
+                $btn .= '<button type="button" class="btn btn-danger btn-sm"
+            style="padding: 4px 8px; font-size: 12px;"
+            data-toggle="tooltip" data-placement="top" title="Hapus Data"
+            onclick="modalAction(\'' . route('detailusers.confirm', $row->id) . '\')">
+            <i class="fas fa-trash"></i>
+        </button>';
+
+                $btn .= '<button type="button" class="btn btn-secondary btn-sm"
+            style="padding: 4px 8px; font-size: 12px;"
+            data-toggle="tooltip" data-placement="top" title="Ganti Password"
+            onclick="modalAction(\'' . route('detailusers.pass', $row->id) . '\')">
+            <i class="fas fa-key"></i>
+        </button>';
+
+                $btn .= '</div>';
+
                 return $btn;
             })
             ->rawColumns(['aksi'])
@@ -149,7 +179,7 @@ class DetailUserController extends Controller
      */
     public function edit(string $id)
     {
-        $detailUser = DetailUser::with(['user.level'])->findOrFail($id);
+        $detailUser = DetailUser::with(['user'])->findOrFail($id);
         $prodis = ProgramStudi::all();
         $levels = Level::all();
 
@@ -172,8 +202,6 @@ class DetailUserController extends Controller
                 'level_id' => 'required|exists:levels,id',
                 'phone' => 'nullable|string|max:20',
                 'jenis_kelamin' => 'nullable|in:L,P',
-                'password' => 'nullable|min:6',
-                'confirmpassword' => 'nullable|same:password',
             ];
             if ($level && $level->level_code === 'MHS') {
                 $rules['prodi_id'] = 'required|exists:program_studis,id';
@@ -195,11 +223,6 @@ class DetailUserController extends Controller
                     'email' => $request->email,
                     'level_id' => $request->level_id,
                 ]);
-                if ($request->password) {
-                    $user->update([
-                        'password' => bcrypt($request->password)
-                    ]);
-                }
             }
 
             $detailUser->update([
@@ -258,6 +281,45 @@ class DetailUserController extends Controller
             'status' => true,
             'message' => 'Detail user berhasil dihapus.',
             'deleted_data' => $deletedData
+        ]);
+    }
+
+    public function changePass(string $id)
+    {
+        $detailUser = DetailUser::with(['user'])->findOrFail($id);
+
+        return view('detail_users.pass', compact('detailUser'));
+    }
+
+    public function changePassUpdate(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'password' => ['required', 'string', 'min:6'],
+            'confirmpassword' => ['required', 'same:password']
+        ], [
+            'password.required' => 'Password wajib diisi.',
+            'password.min' => 'Password minimal 6 karakter.',
+            'confirmpassword.required' => 'Konfirmasi password wajib diisi.',
+            'confirmpassword.same' => 'Konfirmasi password tidak cocok.'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal.',
+                'msgField' => $validator->errors()
+            ]);
+        }
+
+        $detailUser = DetailUser::findOrFail($id);
+        $user = $detailUser->user;
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password berhasil diperbarui.'
         ]);
     }
 }

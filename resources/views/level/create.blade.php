@@ -19,9 +19,7 @@
                                 <i class="fas fa-user-tag"></i>
                             </span>
                         </div>
-                        <input value="" type="text" name="level_code" id="level_code" 
-                            class="form-control border-left-0" style="border: none; border-radius: 0 4px 4px 0 !important;"
-                            placeholder="Masukkan kode level" required>
+                        <input value="" type="text" name="level_code" id="level_code" class="form-control border-left-0" style="border: none; border-radius: 0 4px 4px 0 !important;" placeholder="Masukkan kode level" required>
                     </div>
                     <small id="error-level_code" class="error-text form-text text-danger"></small>
                 </div>
@@ -33,9 +31,7 @@
                                 <i class="fas fa-layer-group"></i>
                             </span>
                         </div>
-                        <input value="" type="text" name="nama_level" id="nama_level"
-                            class="form-control border-left-0" style="border: none; border-radius: 0 4px 4px 0 !important;"
-                            placeholder="Masukkan nama level" required>
+                        <input value="" type="text" name="nama_level" id="nama_level" class="form-control border-left-0" style="border: none; border-radius: 0 4px 4px 0 !important;" placeholder="Masukkan nama level" required>
                     </div>
                     <small id="error-nama_level" class="error-text form-text text-danger"></small>
                 </div>

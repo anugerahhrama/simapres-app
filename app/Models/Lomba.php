@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lomba extends Model
@@ -22,7 +23,6 @@ class Lomba extends Model
         'awal_registrasi',
         'akhir_registrasi',
         'tingkatan_lomba_id',
-        'bidang_keahlian_id',
         'minat_id',
         'created_by',
         'status_verifikasi',
@@ -45,13 +45,13 @@ class Lomba extends Model
     }
 
     /**
-     * Get the user that owns the Lomba
+     * Get all of the keahlian for the Lomba
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function keahlian(): BelongsTo
+    public function keahlian(): BelongsToMany
     {
-        return $this->belongsTo(Keahlian::class, 'bidang_keahlian_id', 'id');
+        return $this->belongsToMany(Keahlian::class, 'lomba_keahlians', 'lomba_id', 'keahlian_id');
     }
 
     /**
@@ -103,5 +103,4 @@ class Lomba extends Model
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
-
 }

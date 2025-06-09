@@ -9,6 +9,8 @@ use App\Models\TingkatanLomba;
 use App\Models\Keahlian;
 use App\Models\Minat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -20,22 +22,22 @@ class LombaController extends Controller
     public function index()
     {
         $breadcrumb = (object) [
-        'title' => 'Daftar Lomba',
-        'list'  => ['Home', 'Lomba']
-    ];
-    $tingkatanLomba = TingkatanLomba::all();
+            'title' => 'Daftar Lomba',
+            'list'  => ['Home', 'Lomba']
+        ];
+        $tingkatanLomba = TingkatanLomba::all();
 
-    return view('lomba.index', compact('breadcrumb', 'tingkatanLomba'));
+        return view('lomba.index', compact('breadcrumb', 'tingkatanLomba'));
     }
 
     public function list(Request $request)
     {
-       $data = Lomba::with(['tingkatanLomba']) 
-        ->when($request->tingkatan, function ($query) use ($request) {
-            $query->whereHas('tingkatanLomba', function ($q) use ($request) {
-                $q->where('nama', 'like', '%' . $request->tingkatan . '%');
+        $data = Lomba::with(['tingkatanLomba'])
+            ->when($request->tingkatan, function ($query) use ($request) {
+                $query->whereHas('tingkatanLomba', function ($q) use ($request) {
+                    $q->where('nama', 'like', '%' . $request->tingkatan . '%');
+                });
             });
-        });
 
         return DataTables::of($data)
             ->addIndexColumn()
@@ -52,9 +54,9 @@ class LombaController extends Controller
                 return $row->penyelenggara ?? '-';
             })
             ->addColumn('aksi', function ($row) {
-                $btn = '<div class="d-flex justify-content-center align-items-center" style="gap: 5px;">';
+                $btn = '<div class="d-flex justify-content-center align-items-center" style="gap: 2px;">';
                 $btn .= '<button onclick="modalAction(\'' . route('lomba.show', $row->id) . '\')" class="btn btn-info btn-sm">Detail</button>';
-                $btn .= '<a href="' . route('lomba.edit', $row->id) . '" class="btn btn-warning btn-sm mr-1" style="text-decoration: none;">Edit</a>';
+                $btn .= '<a href="' . route('lomba.edit', $row->id) . '" class="btn btn-warning btn-sm" style="text-decoration: none;">Edit</a>';
                 $btn .= '<button onclick="modalAction(\'' . route('lomba.confirm', $row->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
@@ -74,7 +76,7 @@ class LombaController extends Controller
 
         $breadcrumb = (object) [
             'title' => 'Tambah Lomba',
-            'list'  => ['Home', 'Lomba', 'Edit']
+            'list'  => ['Home', 'Lomba', 'Create']
         ];
 
         return view('lomba.create', compact('tingkatanLombas', 'keahlians', 'minats', 'breadcrumb'));
@@ -85,55 +87,99 @@ class LombaController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'judul' => 'required|max:255',
-            'kategori' => 'required',
+        $validator = Validator::make($request->all(), [
+            'judul' => 'required|string|max:255',
+            'kategori' => 'required|in:akademik,non akademik',
             'tingkatan_lomba_id' => 'required|exists:tingkatan_lombas,id',
-            'penyelenggara' => 'nullable|max:100',
-            'deskripsi' => 'nullable|max:255',
-            'link_registrasi' => 'nullable|url',
-            'awal_registrasi' => 'nullable|date',
-            'akhir_registrasi' => 'nullable|date|after_or_equal:awal_registrasi',
-            'bidang_keahlian_id' => 'nullable|exists:keahlians,id',
-            'minat_id' => 'nullable|exists:minats,id',
-            'jenis_pendaftaran' => 'nullable|string|max:100',
+            'penyelenggara' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'link_registrasi' => 'required|url',
+            'awal_registrasi' => 'required|date',
+            'akhir_registrasi' => 'required|date|after_or_equal:awal_registrasi',
+            'keahlian' => 'required|array|min:1',
+            'keahlian.*' => 'string|max:255',
+            'jenis_pendaftaran' => 'required|in:gratis,berbayar',
             'harga_pendaftaran' => 'nullable|numeric|min:0',
-            'perkiraan_hadiah' => 'nullable|string|max:255',
-            'mendapatkan_uang' => 'nullable|boolean',
-            'mendapatkan_sertifikat' => 'nullable|boolean',
-            'nilai_benefit' => 'nullable|numeric|min:0',
-            'status_verifikasi' => 'nullable|in:pending,disetujui,ditolak',
+            'mendapatkan_uang' => 'required|in:0,1',
+            'mendapatkan_sertifikat' => 'required|in:0,1',
+            'status_verifikasi' => 'required|in:pending,verified,rejected',
         ]);
 
-        $lomba = new Lomba();
+        if ($validator->fails()) {
+            Log::warning('Validasi gagal saat membuat lomba', [
+                'errors' => $validator->errors()->all(),
+                'input' => $request->all()
+            ]);
 
-        $lomba->fill([
-            'judul' => $request->judul,
-            'kategori' => $request->kategori,
-            'tingkatan_lomba_id' => $request->tingkatan_lomba_id,
-            'penyelenggara' => $request->penyelenggara,
-            'deskripsi' => $request->deskripsi,
-            'link_registrasi' => $request->link_registrasi,
-            'awal_registrasi' => $request->awal_registrasi,
-            'akhir_registrasi' => $request->akhir_registrasi,
-            'bidang_keahlian_id' => $request->bidang_keahlian_id,
-            'minat_id' => $request->minat_id,
-            'jenis_pendaftaran' => $request->jenis_pendaftaran,
-            'harga_pendaftaran' => $request->harga_pendaftaran,
-            'perkiraan_hadiah' => $request->perkiraan_hadiah,
-            'mendapatkan_uang' => $request->mendapatkan_uang ?? 0,
-            'mendapatkan_sertifikat' => $request->mendapatkan_sertifikat ?? 0,
-            'nilai_benefit' => $request->nilai_benefit,
-            'status_verifikasi' => $request->status_verifikasi ?? 'pending',
-            'created_by' => auth()->user()->id,
-        ]);
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
 
-        $lomba->save();
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('lomba.index')->with('success', 'Lomba berhasil ditambahkan!');
+            $validated = $validator->validated();
+
+            Log::info('Validasi berhasil. Data terverifikasi untuk disimpan.', $validated);
+
+            if ($validated['jenis_pendaftaran'] === 'gratis') {
+                $validated['harga_pendaftaran'] = 0;
+                Log::info('Jenis pendaftaran gratis, harga di-set ke 0');
+            }
+
+            $lomba = Lomba::create([
+                'judul' => $validated['judul'],
+                'kategori' => $validated['kategori'],
+                'tingkatan_lomba_id' => $validated['tingkatan_lomba_id'],
+                'penyelenggara' => $validated['penyelenggara'],
+                'deskripsi' => $validated['deskripsi'],
+                'link_registrasi' => $validated['link_registrasi'],
+                'awal_registrasi' => $validated['awal_registrasi'],
+                'akhir_registrasi' => $validated['akhir_registrasi'],
+                'jenis_pendaftaran' => $validated['jenis_pendaftaran'],
+                'harga_pendaftaran' => $validated['harga_pendaftaran'],
+                'mendapatkan_uang' => $validated['mendapatkan_uang'],
+                'mendapatkan_sertifikat' => $validated['mendapatkan_sertifikat'],
+                'status_verifikasi' => $validated['status_verifikasi'],
+                'created_by' => auth()->id(),
+            ]);
+
+            Log::info('Lomba berhasil disimpan.', ['lomba_id' => $lomba->id]);
+
+            $keahlianIDs = [];
+
+            foreach ($validated['keahlian'] as $input) {
+                if (is_numeric($input)) {
+                    $keahlianIDs[] = (int)$input;
+                } else {
+                    $keahlian = Keahlian::firstOrCreate(
+                        ['nama_keahlian' => trim($input)]
+                    );
+                    $keahlianIDs[] = $keahlian->id;
+
+                    Log::info('Keahlian baru dibuat:', ['nama' => $input, 'id' => $keahlian->id]);
+                }
+            }
+
+            $lomba->keahlian()->sync($keahlianIDs);
+
+            Log::info('Relasi keahlian berhasil di-sync.', ['keahlian_ids' => $keahlianIDs]);
+
+            DB::commit();
+
+            return redirect()->route('lomba.index')->with('success', 'Lomba berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error('Terjadi error saat menyimpan lomba', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.')->withInput();
+        }
     }
-
-
 
     /**
      * Display the specified resource.
@@ -155,15 +201,16 @@ class LombaController extends Controller
      */
     public function edit(Lomba $lomba)
     {
-        $keahlians = Keahlian::all();
-        $minats = Minat::all();
-
         $breadcrumb = (object) [
             'title' => 'Edit Lomba',
             'list'  => ['Home', 'Lomba', 'Edit']
         ];
 
-        return view('lomba.edit', compact('lomba', 'keahlians', 'minats', 'breadcrumb'));
+        $lomba = Lomba::with('keahlian')->findOrFail($lomba->id);
+        $tingkatanLombas = TingkatanLomba::all();
+        $keahlians = Keahlian::all();
+
+        return view('lomba.edit', compact('lomba', 'tingkatanLombas', 'keahlians'));
     }
 
     /**
@@ -171,49 +218,75 @@ class LombaController extends Controller
      */
     public function update(Request $request, Lomba $lomba)
     {
-        $request->validate([
-            'judul' => 'required|max:255',
+        $validator = Validator::make($request->all(), [
+            'judul' => 'required|string|max:255',
             'kategori' => 'required|in:akademik,non akademik',
-            'tingkatan' => 'required|in:pemula,lokal,regional,nasional,internasional',
-            'penyelenggara' => 'nullable|max:100',
-            'deskripsi' => 'nullable|max:255',
-            'link_registrasi' => 'nullable|url|max:255',
-            'awal_registrasi' => 'nullable|date',
-            'akhir_registrasi' => 'nullable|date|after_or_equal:awal_registrasi',
-            'bidang_keahlian_id' => 'nullable|exists:keahlians,id',
-            'minat_id' => 'nullable|exists:minats,id',
-            'jenis_pendaftaran' => 'nullable|string|max:100',
+            'tingkatan_lomba_id' => 'required|exists:tingkatan_lombas,id',
+            'penyelenggara' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'link_registrasi' => 'required|url',
+            'awal_registrasi' => 'required|date',
+            'akhir_registrasi' => 'required|date|after_or_equal:awal_registrasi',
+            'keahlian' => 'required|array|min:1',
+            'keahlian.*' => 'string|max:255',
+            'jenis_pendaftaran' => 'required|in:gratis,berbayar',
             'harga_pendaftaran' => 'nullable|numeric|min:0',
-            'perkiraan_hadiah' => 'nullable|string|max:255',
-            'mendapatkan_uang' => 'nullable|boolean',
-            'mendapatkan_sertifikat' => 'nullable|boolean',
-            'nilai_benefit' => 'nullable|numeric|min:0',
-            'status_verifikasi' => 'nullable|in:pending,disetujui,ditolak',
+            'mendapatkan_uang' => 'required|in:0,1',
+            'mendapatkan_sertifikat' => 'required|in:0,1',
+            'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
         ]);
 
-        $tingkatanLomba = TingkatanLomba::where('nama', $request->tingkatan)->first();
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
-        $lomba->update([
-            'judul' => $request->judul,
-            'kategori' => $request->kategori,
-            'tingkatan_lomba_id' => $tingkatanLomba ? $tingkatanLomba->id : null,
-            'penyelenggara' => $request->penyelenggara,
-            'deskripsi' => $request->deskripsi,
-            'link_registrasi' => $request->link_registrasi,
-            'awal_registrasi' => $request->awal_registrasi,
-            'akhir_registrasi' => $request->akhir_registrasi,
-            'bidang_keahlian_id' => $request->bidang_keahlian_id,
-            'minat_id' => $request->minat_id,
-            'jenis_pendaftaran' => $request->jenis_pendaftaran,
-            'harga_pendaftaran' => $request->harga_pendaftaran,
-            'perkiraan_hadiah' => $request->perkiraan_hadiah,
-            'mendapatkan_uang' => $request->mendapatkan_uang ?? 0,
-            'mendapatkan_sertifikat' => $request->mendapatkan_sertifikat ?? 0,
-            'nilai_benefit' => $request->nilai_benefit,
-            'status_verifikasi' => $request->status_verifikasi ?? 'pending',
-        ]);
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('lomba.index')->with('success', 'Lomba berhasil diperbarui!');
+            $validated = $validator->validated();
+
+            if ($validated['jenis_pendaftaran'] === 'gratis') {
+                $validated['harga_pendaftaran'] = 0;
+            }
+
+            $lomba = Lomba::findOrFail($lomba->id);
+            $lomba->update([
+                'judul' => $validated['judul'],
+                'kategori' => $validated['kategori'],
+                'tingkatan_lomba_id' => $validated['tingkatan_lomba_id'],
+                'penyelenggara' => $validated['penyelenggara'],
+                'deskripsi' => $validated['deskripsi'],
+                'link_registrasi' => $validated['link_registrasi'],
+                'awal_registrasi' => $validated['awal_registrasi'],
+                'akhir_registrasi' => $validated['akhir_registrasi'],
+                'jenis_pendaftaran' => $validated['jenis_pendaftaran'],
+                'harga_pendaftaran' => $validated['harga_pendaftaran'],
+                'mendapatkan_uang' => $validated['mendapatkan_uang'],
+                'mendapatkan_sertifikat' => $validated['mendapatkan_sertifikat'],
+                'status_verifikasi' => $validated['status_verifikasi'],
+            ]);
+
+            $keahlianIDs = [];
+            foreach ($validated['keahlian'] as $input) {
+                if (is_numeric($input)) {
+                    $keahlianIDs[] = (int)$input;
+                } else {
+                    $keahlian = Keahlian::firstOrCreate(['nama_keahlian' => trim($input)]);
+                    $keahlianIDs[] = $keahlian->id;
+                }
+            }
+
+            $lomba->keahlian()->sync($keahlianIDs);
+
+            DB::commit();
+
+            return redirect()->route('lomba.index')->with('success', 'Lomba berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            report($e);
+
+            return redirect()->back()->with('error', 'Gagal memperbarui data.')->withInput();
+        }
     }
 
     /**
