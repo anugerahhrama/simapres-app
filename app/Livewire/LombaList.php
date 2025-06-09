@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Lomba;
 use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -49,22 +50,21 @@ class LombaList extends Component
             $query->where('judul', 'like', '%' . $this->search . '%');
         }
 
-        $lombas = $query->get()->map(function ($lomba) use ($user) {
-            $lomba->skor = $this->hitungSpk($user, $lomba);
-            return $lomba;
-        })->sortByDesc('skor')->values();
+        $lombas = $query->get()
+            ->map(fn($lomba) => $lomba->forceFill(['skor' => $this->hitungSpk($user, $lomba)]))
+            ->sortByDesc('skor')
+            ->values();
 
-        $page = request()->get('page', 1); // Ganti ini
         $perPage = 12;
-
-        $paged = $lombas->forPage($page, $perPage);
+        $currentPage = request()->get('page', 1);
+        $paged = $lombas->forPage($currentPage, $perPage);
 
         return view('livewire.lomba-list', [
-            'lombas' => new \Illuminate\Pagination\LengthAwarePaginator(
+            'lombas' => new LengthAwarePaginator(
                 $paged,
                 $lombas->count(),
                 $perPage,
-                $page,
+                $currentPage,
                 ['path' => request()->url(), 'query' => request()->query()]
             )
         ]);
@@ -72,17 +72,15 @@ class LombaList extends Component
 
     private function hitungSpk(User $user, Lomba $lomba): float
     {
-        // 1. C1: Kecocokan Keahlian
+        // C1: Kecocokan Keahlian
         $userKeahlianIds = $user->keahlian->pluck('id')->toArray();
         $lombaKeahlianIds = $lomba->keahlian->pluck('id')->toArray();
+        $c1 = count(array_intersect($userKeahlianIds, $lombaKeahlianIds)) > 0 ? 5 : 1;
 
-        $cocok = array_intersect($userKeahlianIds, $lombaKeahlianIds);
-        $c1 = count($cocok) > 0 ? 5 : 1;
-
-        // 2. C2: Jenis Pendaftaran
+        // C2: Jenis Pendaftaran
         $c2 = $lomba->jenis_pendaftaran === 'gratis' ? 5 : 1;
 
-        // 3. C3: Biaya Pendaftaran
+        // C3: Biaya Pendaftaran
         $harga = $lomba->harga_pendaftaran ?? 0;
         $c3 = match (true) {
             $harga <= 50000 => 5,
@@ -92,20 +90,18 @@ class LombaList extends Component
             default => 1,
         };
 
-        // 4. C4: Preferensi Tingkatan Lomba
+        // C4: Preferensi Tingkatan Lomba
         $c4 = 1;
-        if ($user->preferensiTingkatLomba) {
-            $pref = $user->preferensiTingkatLomba;
-            if ($lomba->tingkatan_lomba_id == $pref->pilihan_utama_id) {
-                $c4 = 5;
-            } elseif ($lomba->tingkatan_lomba_id == $pref->pilihan_kedua_id) {
-                $c4 = 3;
-            } elseif ($lomba->tingkatan_lomba_id == $pref->pilihan_ketiga_id) {
-                $c4 = 1;
-            }
+        if ($pref = $user->preferensiTingkatLomba) {
+            $c4 = match ($lomba->tingkatan_lomba_id) {
+                $pref->pilihan_utama_id => 5,
+                $pref->pilihan_kedua_id => 3,
+                $pref->pilihan_ketiga_id => 1,
+                default => 1,
+            };
         }
 
-        // 5. C5: Benefit (Hadiah dan Sertifikat)
+        // C5: Benefit (Hadiah dan Sertifikat)
         $hadiah = $lomba->perkiraan_hadiah ?? 0;
         $benefit = $lomba->mendapatkan_sertifikat;
         $c5 = match (true) {
@@ -116,18 +112,20 @@ class LombaList extends Component
             default => 1,
         };
 
+        // Bobot
         $bobot = [
-            'c1' => 0.25,
-            'c2' => 0.10,
-            'c3' => 0.10,
-            'c4' => 0.20,
-            'c5' => 0.35,
+            'c1' => 0.4,
+            'c2' => 0.2,
+            'c3' => 0.1,
+            'c4' => 0.2,
+            'c5' => 0.1,
         ];
 
-        return $c1 * $bobot['c1']
-            + $c2 * $bobot['c2']
-            + $c3 * $bobot['c3']
-            + $c4 * $bobot['c4']
-            + $c5 * $bobot['c5'];
+        // WASPAS Calculation
+        $wsm = $c1 * $bobot['c1'] + $c2 * $bobot['c2'] + $c3 * $bobot['c3'] + $c4 * $bobot['c4'] + $c5 * $bobot['c5'];
+        $wpm = pow($c1, $bobot['c1']) * pow($c2, $bobot['c2']) * pow($c3, $bobot['c3']) * pow($c4, $bobot['c4']) * pow($c5, $bobot['c5']);
+        $lambda = 0.5;
+
+        return $lambda * $wsm + (1 - $lambda) * $wpm;
     }
 }
