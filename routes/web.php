@@ -129,7 +129,8 @@ Route::prefix('manajemen')->middleware(['auth', 'level:MHS', 'check.profile.comp
     });
 
     //Route untuk fitur monitoring
-    Route::resource('monitoring', MonitoringController::class);
+    Route::resource('monitoring', MonitoringController::class)->only(['index']);
+    Route::get('monitoring/cetak', [MonitoringController::class, 'cetak'])->name('monitoring.cetak');
 });
 
 
