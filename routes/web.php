@@ -30,13 +30,25 @@ Route::get('/dashboard', function () {
     return view('index');
 })->name('dashboard')->middleware('auth');
 
-// Route::resource('profile', ProfileController::class);
-Route::prefix('profile')->controller(ProfileController::class)->name('profile.')->group(function () {
+Route::prefix('profile')->controller(ProfileController::class)->name('profile.')->middleware('auth')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('edit/{id}', 'edit')->name('edit');
     Route::put('update/{id}', 'update')->name('update');
     Route::get('photo/{id}', 'editPhoto')->name('photo.edit');
     Route::put('photo/update/{id}', 'updatePhoto')->name('photo.update');
+
+    // keahlian
+    Route::prefix('keahlian')->name('keahlian.')->group(function () {
+        Route::get('create', 'createKeahlian')->name('create');
+        Route::post('store', 'storeKeahlian')->name('store');
+        Route::delete('destroy/{id}', 'deleteKeahlian')->name('destroy');
+    });
+
+    // tingkatan
+    Route::prefix('tingkatan')->name('tingkatan.')->group(function () {
+        Route::get('create', 'tingkatanCreate')->name('create');
+        Route::post('store', 'tingkatanStore')->name('store');
+    });
 });
 
 Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function () {
@@ -49,24 +61,26 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
     });
 
     // Periode
-    Route::resource('periodes', PeriodeController::class)->middleware(['auth', 'level:ADM']);
-    Route::prefix('periodes')->controller(PeriodeController::class)->name('periodes.')->middleware(['auth', 'level:ADM'])->group(function () {
+    Route::resource('periodes', PeriodeController::class);
+    Route::prefix('periodes')->controller(PeriodeController::class)->name('periodes.')->group(function () {
         Route::post('list',  'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 
     // Prodi
-    Route::resource('prodis', ProgramStudiController::class)->middleware(['auth', 'level:ADM']);
-    Route::prefix('prodis')->controller(ProgramStudiController::class)->name('prodis.')->middleware(['auth', 'level:ADM'])->group(function () {
+    Route::resource('prodis', ProgramStudiController::class);
+    Route::prefix('prodis')->controller(ProgramStudiController::class)->name('prodis.')->group(function () {
         Route::post('list',  'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 
     // Detail Users
-    Route::resource('detailusers', DetailUserController::class)->middleware(['auth', 'level:ADM']);
-    Route::prefix('detailusers')->controller(DetailUserController::class)->name('detailusers.')->middleware(['auth', 'level:ADM'])->group(function () {
+    Route::resource('detailusers', DetailUserController::class);
+    Route::prefix('detailusers')->controller(DetailUserController::class)->name('detailusers.')->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
+        Route::get('changepass/{id}', 'changePass')->name('pass');
+        Route::put('changepass/{id}', 'changePassUpdate')->name('pass.update');
     });
 
     // Lomba
@@ -77,14 +91,24 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
     });
 });
 
-Route::get('rekomendasi-lomba', [RekomendasiLombaController::class, 'index'])->middleware(['auth', 'level:MHS'])->name('rekomendasi.lomba');
 
-// Prestasi
-Route::resource('prestasi', PrestasiController::class);
-Route::prefix('prestasi')->controller(PrestasiController::class)->name('prestasi.')->group(function () {
-    Route::post('list', 'list')->name('list');
-    Route::get('confirm/{id}', 'confirm')->name('confirm');
+Route::prefix('manajemen')->middleware(['auth', 'level:MHS', 'check.profile.complete'])->group(function () {
+
+    // rekomendasi lomba
+    Route::get('rekomendasi-lomba', [RekomendasiLombaController::class, 'index'])->name('rekomendasi.lomba');
+    Route::get('rekomendasi-list', [RekomendasiLombaController::class, 'list'])->name('rekomendasi.list');
+
+    // Prestasi
+    Route::resource('prestasi', PrestasiController::class);
+    Route::prefix('prestasi')->controller(PrestasiController::class)->name('prestasi.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
+
+    //Route untuk fitur monitoring
+    Route::resource('monitoring', MonitoringController::class);
 });
+
 
 Route::resource('minats', MinatController::class);
 Route::get('minats/list', [MinatController::class, 'list'])->name('minats.list');
@@ -97,7 +121,5 @@ Route::prefix('bimbingan')->controller(BimbinganController::class)->name('bimbin
     Route::post('list', 'list')->name('list');
     Route::get('confirm/{id}', 'confirm')->name('confirm');
 });
-//Route untuk fitur monitoring
-Route::resource('monitoring', MonitoringController::class)->middleware(['auth', 'level:MHS']);
 
 require __DIR__ . '/auth.php';

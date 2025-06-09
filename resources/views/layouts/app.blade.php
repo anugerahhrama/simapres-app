@@ -8,7 +8,7 @@
     <title>{{ $breadcrumb->title ?? 'Dashboard' }} | SIMAPRES</title>
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/logo/logo1.png') }}">
 
@@ -32,12 +32,12 @@
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/daterangepicker/daterangepicker.css') }}">
     <!-- summernote -->
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/summernote/summernote-bs4.min.css') }}">
-
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css') }}">
+    
     <!-- Select2 -->
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
@@ -47,7 +47,7 @@
     <style>
         /* Custom Styles for Door2Day-like Interface */
         .main-sidebar {
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
         }
 
         .brand-link {
@@ -104,7 +104,7 @@
 
         .card {
             border-radius: 12px !important;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
             border: none !important;
         }
 
@@ -116,8 +116,8 @@
         }
 
         .btn-primary:hover {
-            background: #2f55e1   !important;
-            border-color: #2f55e1   !important;
+            background: #2f55e1 !important;
+            border-color: #2f55e1 !important;
             box-shadow: 0 4px 12px rgba(68, 115, 237, 0.3) !important;
         }
 
@@ -158,14 +158,14 @@
             background: white;
             padding: 24px;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             transition: all 0.2s;
             margin-bottom: 20px;
         }
 
         .stats-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .stat-header {

@@ -1,179 +1,208 @@
 @extends('layouts.app')
 
+@section('title', 'Edit Lomba')
+
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card border-0 shadow-lg" style="border-radius: 10px;">
-                <div class="card-body p-4">
-                    <form action="{{ route('lomba.update', $lomba->id) }}" method="POST" id="form-edit">
-                        @csrf
-                        @method('PUT')
+    <div class="container mt-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h4>Edit Lomba</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('lomba.update', $lomba->id) }}" method="POST" id="form-edit">
+                    @csrf
+                    @method('PUT')
 
-                        @php
-                            $inputIcon = fn($icon) => "<span class='input-group-text bg-light'><i class='fas fa-$icon'></i></span>";
-                        @endphp
+                    @php
+                        $inputIcon = fn($icon) => "<div class='input-group-prepend'><span class='input-group-text bg-light'><i class='fas fa-$icon'></i></span></div>";
+                    @endphp
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Judul Lomba</label>
-                            <div class="input-group">
-                                {!! $inputIcon('book') !!}
-                                <input type="text" name="judul" value="{{ $lomba->judul }}" class="form-control border-left-0" placeholder="Masukkan judul lomba" required>
-                            </div>
-                            <small id="error-judul" class="form-text text-danger error-text"></small>
+                    {{-- Judul --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Judul Lomba</label>
+                        <div class="input-group">
+                            {!! $inputIcon('book') !!}
+                            <input type="text" name="judul" class="form-control border-left-0" value="{{ old('judul', $lomba->judul) }}" required>
                         </div>
+                        <small class="text-danger">{{ $errors->first('judul') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Kategori</label>
-                            <div class="input-group">
-                                {!! $inputIcon('tags') !!}
-                                <select name="kategori" class="form-control border-left-0" required>
-                                    <option value="" disabled {{ !$lomba->kategori ? 'selected' : '' }}>-- Pilih Kategori --</option>
-                                    <option value="akademik" {{ $lomba->kategori == 'akademik' ? 'selected' : '' }}>Akademik</option>
-                                    <option value="non akademik" {{ $lomba->kategori == 'non akademik' ? 'selected' : '' }}>Non Akademik</option>
-                                </select>
-                            </div>
-                            <small id="error-kategori" class="form-text text-danger error-text"></small>
+                    {{-- Kategori --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Kategori</label>
+                        <div class="input-group">
+                            {!! $inputIcon('tags') !!}
+                            <select name="kategori" class="form-control border-left-0" required>
+                                <option disabled>-- Pilih Kategori --</option>
+                                <option value="akademik" {{ old('kategori', $lomba->kategori) == 'akademik' ? 'selected' : '' }}>Akademik</option>
+                                <option value="non akademik" {{ old('kategori', $lomba->kategori) == 'non akademik' ? 'selected' : '' }}>Non Akademik</option>
+                            </select>
                         </div>
+                        <small class="text-danger">{{ $errors->first('kategori') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Tingkatan</label>
-                            <div class="input-group">
-                                {!! $inputIcon('layer-group') !!}
-                                <select name="tingkatan" class="form-control border-left-0" required>
-                                    <option value="" disabled {{ !$lomba->tingkatan ? 'selected' : '' }}>-- Pilih Tingkatan --</option>
-                                    @foreach(['pemula', 'lokal', 'regional', 'nasional', 'internasional'] as $tingkatan)
-                                        <option value="{{ $tingkatan }}" {{ $lomba->tingkatan == $tingkatan ? 'selected' : '' }}>{{ ucfirst($tingkatan) }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <small id="error-tingkatan" class="form-text text-danger error-text"></small>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold">Penyelenggara</label>
-                            <div class="input-group">
-                                {!! $inputIcon('building') !!}
-                                <input type="text" name="penyelenggara" value="{{ $lomba->penyelenggara }}" class="form-control border-left-0" placeholder="Masukkan penyelenggara lomba">
-                            </div>
-                            <small id="error-penyelenggara" class="form-text text-danger error-text"></small>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold">Deskripsi</label>
-                            <textarea name="deskripsi" class="form-control" rows="3" placeholder="Masukkan deskripsi lomba">{{ $lomba->deskripsi }}</textarea>
-                            <small id="error-deskripsi" class="form-text text-danger error-text"></small>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold">Link Registrasi</label>
-                            <div class="input-group">
-                                {!! $inputIcon('link') !!}
-                                <input type="url" name="link_registrasi" value="{{ $lomba->link_registrasi }}" class="form-control border-left-0" placeholder="https://contoh.com">
-                            </div>
-                            <small id="error-link_registrasi" class="form-text text-danger error-text"></small>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold">Awal Registrasi</label>
-                            <div class="input-group">
-                                {!! $inputIcon('calendar-alt') !!}
-                                <input type="date" name="awal_registrasi" value="{{ $lomba->awal_registrasi }}" class="form-control border-left-0">
-                            </div>
-                            <small id="error-awal_registrasi" class="form-text text-danger error-text"></small>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold">Akhir Registrasi</label>
-                            <div class="input-group">
-                                {!! $inputIcon('calendar-check') !!}
-                                <input type="date" name="akhir_registrasi" value="{{ $lomba->akhir_registrasi }}" class="form-control border-left-0">
-                            </div>
-                            <small id="error-akhir_registrasi" class="form-text text-danger error-text"></small>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="font-weight-bold">Bidang Keahlian</label>
-                            <select name="bidang_keahlian_id" class="form-control">
-                                @foreach($keahlians as $keahlian)
-                                    <option value="{{ $keahlian->id }}" {{ $lomba->keahlian_id == $keahlian->id ? 'selected' : '' }}>{{ $keahlian->nama_keahlian }}</option>
+                    {{-- Tingkatan --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Tingkatan</label>
+                        <div class="input-group">
+                            {!! $inputIcon('layer-group') !!}
+                            <select name="tingkatan_lomba_id" class="form-control border-left-0" required>
+                                <option disabled>-- Pilih Tingkatan --</option>
+                                @foreach ($tingkatanLombas as $tingkatan)
+                                    <option value="{{ $tingkatan->id }}" {{ old('tingkatan_lomba_id', $lomba->tingkatan_lomba_id) == $tingkatan->id ? 'selected' : '' }}>
+                                        {{ ucfirst($tingkatan->nama) }}
+                                    </option>
                                 @endforeach
                             </select>
-                            <small id="error-keahlian_id" class="form-text text-danger error-text"></small>
                         </div>
+                        <small class="text-danger">{{ $errors->first('tingkatan_lomba_id') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Minat</label>
-                            <select name="minat_id" class="form-control">
-                                @foreach($minats as $minat)
-                                    <option value="{{ $minat->id }}" {{ $lomba->minat_id == $minat->id ? 'selected' : '' }}>{{ $minat->nama_minat }}</option>
-                                @endforeach
-                            </select>
-                            <small id="error-minat_id" class="form-text text-danger error-text"></small>
+                    {{-- Penyelenggara --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Penyelenggara</label>
+                        <div class="input-group">
+                            {!! $inputIcon('building') !!}
+                            <input type="text" name="penyelenggara" class="form-control border-left-0" value="{{ old('penyelenggara', $lomba->penyelenggara) }}" required>
                         </div>
+                        <small class="text-danger">{{ $errors->first('penyelenggara') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Jenis Pendaftaran</label>
-                            <input type="text" name="jenis_pendaftaran" value="{{ $lomba->jenis_pendaftaran }}" class="form-control">
-                            <small id="error-jenis_pendaftaran" class="form-text text-danger error-text"></small>
-                        </div>
+                    {{-- Deskripsi --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Deskripsi</label>
+                        <textarea name="deskripsi" class="form-control" rows="3" required>{{ old('deskripsi', $lomba->deskripsi) }}</textarea>
+                        <small class="text-danger">{{ $errors->first('deskripsi') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Harga Pendaftaran</label>
-                            <input type="number" name="harga_pendaftaran" value="{{ $lomba->harga_pendaftaran }}" class="form-control">
-                            <small id="error-harga_pendaftaran" class="form-text text-danger error-text"></small>
+                    {{-- Link --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Link Registrasi</label>
+                        <div class="input-group">
+                            {!! $inputIcon('link') !!}
+                            <input type="url" name="link_registrasi" class="form-control border-left-0" value="{{ old('link_registrasi', $lomba->link_registrasi) }}" required>
                         </div>
+                        <small class="text-danger">{{ $errors->first('link_registrasi') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Perkiraan Hadiah</label>
-                            <input type="text" name="perkiraan_hadiah" value="{{ $lomba->perkiraan_hadiah }}" class="form-control">
-                            <small id="error-perkiraan_hadiah" class="form-text text-danger error-text"></small>
+                    {{-- Tanggal --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Awal Registrasi</label>
+                        <div class="input-group">
+                            {!! $inputIcon('calendar-alt') !!}
+                            <input type="date" name="awal_registrasi" class="form-control border-left-0" value="{{ old('awal_registrasi', $lomba->awal_registrasi) }}" required>
                         </div>
+                        <small class="text-danger">{{ $errors->first('awal_registrasi') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Mendapatkan Uang?</label>
-                            <select name="mendapatkan_uang" class="form-control">
-                                <option value="1" {{ $lomba->mendapatkan_uang ? 'selected' : '' }}>Ya</option>
-                                <option value="0" {{ !$lomba->mendapatkan_uang ? 'selected' : '' }}>Tidak</option>
-                            </select>
+                    <div class="form-group">
+                        <label class="font-weight-bold">Akhir Registrasi</label>
+                        <div class="input-group">
+                            {!! $inputIcon('calendar-check') !!}
+                            <input type="date" name="akhir_registrasi" class="form-control border-left-0" value="{{ old('akhir_registrasi', $lomba->akhir_registrasi) }}" required>
                         </div>
+                        <small class="text-danger">{{ $errors->first('akhir_registrasi') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Mendapatkan Sertifikat?</label>
-                            <select name="mendapatkan_sertifikat" class="form-control">
-                                <option value="1" {{ $lomba->mendapatkan_sertifikat ? 'selected' : '' }}>Ya</option>
-                                <option value="0" {{ !$lomba->mendapatkan_sertifikat ? 'selected' : '' }}>Tidak</option>
-                            </select>
-                        </div>
+                    {{-- Keahlian --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Bidang Keahlian</label>
+                        <select class="form-control select2bs4" name="keahlian[]" multiple="multiple" required>
+                            @foreach ($keahlians as $keahlian)
+                                <option value="{{ $keahlian->id }}" {{ in_array($keahlian->id, old('keahlian', $lomba->keahlian->pluck('id')->toArray())) ? 'selected' : '' }}>
+                                    {{ $keahlian->nama_keahlian }}
+                                </option>
+                            @endforeach
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Nilai Benefit</label>
-                            <input type="number" step="0.01" name="nilai_benefit" value="{{ $lomba->nilai_benefit }}" class="form-control">
-                            <small id="error-nilai_benefit" class="form-text text-danger error-text"></small>
-                        </div>
+                            {{-- Tambahkan opsi baru yang diketik manual --}}
+                            @foreach (old('keahlian', []) as $item)
+                                @if (!is_numeric($item))
+                                    <option value="{{ $item }}" selected>{{ $item }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        <small class="text-danger">{{ $errors->first('keahlian') }}</small>
+                    </div>
 
-                        <div class="form-group">
-                            <label class="font-weight-bold">Status Verifikasi</label>
-                            <select name="status_verifikasi" class="form-control">
-                                <option value="pending" {{ $lomba->status_verifikasi == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="disetujui" {{ $lomba->status_verifikasi == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                                <option value="ditolak" {{ $lomba->status_verifikasi == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                            </select>
-                            <small id="error-status_verifikasi" class="form-text text-danger error-text"></small>
+                    {{-- Jenis Pendaftaran --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Jenis Pendaftaran</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="jenis_pendaftaran" value="gratis" {{ old('jenis_pendaftaran', $lomba->jenis_pendaftaran) === 'gratis' ? 'checked' : '' }}>
+                            <label class="form-check-label">Gratis</label>
                         </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="jenis_pendaftaran" value="berbayar" {{ old('jenis_pendaftaran', $lomba->jenis_pendaftaran) === 'berbayar' ? 'checked' : '' }}>
+                            <label class="form-check-label">Berbayar</label>
+                        </div>
+                        <small class="text-danger">{{ $errors->first('jenis_pendaftaran') }}</small>
+                    </div>
 
-                        <div class="d-flex justify-content-end mt-4">
-                            <a href="{{ route('lomba.index') }}" class="btn btn-light border shadow-sm mr-2">
-                                <i class="fas fa-arrow-left mr-2"></i>Kembali
-                            </a>
-                            <button type="submit" class="btn btn-warning shadow-sm">
-                                <i class="fas fa-save mr-2"></i>Simpan Perubahan
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                    {{-- Harga Pendaftaran --}}
+                    <div class="form-group" id="formHarga" style="{{ old('jenis_pendaftaran', $lomba->jenis_pendaftaran) === 'berbayar' ? '' : 'display: none;' }}">
+                        <label class="font-weight-bold">Harga Pendaftaran</label>
+                        <input type="number" name="harga_pendaftaran" class="form-control" value="{{ old('harga_pendaftaran', $lomba->harga_pendaftaran) }}">
+                        <small class="text-danger">{{ $errors->first('harga_pendaftaran') }}</small>
+                    </div>
+
+                    {{-- Uang dan Sertifikat --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Mendapatkan Uang?</label>
+                        <select name="mendapatkan_uang" class="form-control" required>
+                            <option value="1" {{ old('mendapatkan_uang', $lomba->mendapatkan_uang) == 1 ? 'selected' : '' }}>Ya</option>
+                            <option value="0" {{ old('mendapatkan_uang', $lomba->mendapatkan_uang) == 0 ? 'selected' : '' }}>Tidak</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="font-weight-bold">Mendapatkan Sertifikat?</label>
+                        <select name="mendapatkan_sertifikat" class="form-control" required>
+                            <option value="1" {{ old('mendapatkan_sertifikat', $lomba->mendapatkan_sertifikat) == 1 ? 'selected' : '' }}>Ya</option>
+                            <option value="0" {{ old('mendapatkan_sertifikat', $lomba->mendapatkan_sertifikat) == 0 ? 'selected' : '' }}>Tidak</option>
+                        </select>
+                    </div>
+
+                    {{-- Verifikasi --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold">Status Verifikasi</label>
+                        <select name="status_verifikasi" class="form-control" required>
+                            <option value="pending" {{ old('status_verifikasi', $lomba->status_verifikasi) === 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="verified" {{ old('status_verifikasi', $lomba->status_verifikasi) === 'verified' ? 'selected' : '' }}>Disetujui</option>
+                            <option value="rejected" {{ old('status_verifikasi', $lomba->status_verifikasi) === 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                        </select>
+                        <small class="text-danger">{{ $errors->first('status_verifikasi') }}</small>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <a href="{{ route('lomba.index') }}" class="btn btn-secondary mr-2">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('.select2bs4').select2({
+                theme: 'bootstrap4',
+                tags: true,
+                tokenSeparators: [',']
+            });
+
+            $('input[name="jenis_pendaftaran"]').on('change', function() {
+                if ($(this).val() === 'berbayar') {
+                    $('#formHarga').slideDown();
+                } else {
+                    $('#formHarga').slideUp();
+                }
+            });
+        });
+    </script>
+@endpush

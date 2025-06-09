@@ -155,4 +155,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(DetailUser::class, 'user_id', 'id');
     }
+
+    /**
+     * Get all of the tingkatanLomba for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function preferensiTingkatLomba(): HasOne
+    {
+        return $this->hasOne(UserTingkatLomba::class, 'user_id');
+    }
 }

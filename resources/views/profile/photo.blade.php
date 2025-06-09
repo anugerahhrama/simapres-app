@@ -31,7 +31,7 @@
                 <div class="modal-body">
                     <div class="d-flex justify-content-center">
                         @if ($user->detailUser?->photo_file)
-                            <img src="{{ asset('storage/' . $user->detailUser->photo_file) }}" class="rounded-circle border border-white shadow-sm w-25 h-25 mb-4" style="object-fit: cover; object-position: center" alt="User profile picture">
+                            <img src="{{ asset('storage/' . $user->detailUser->photo_file) }}" class="rounded-circle border border-white shadow-sm mb-4" style="width: 150px; height: 150px; object-fit: cover; object-position: center; border-radius: 50%;" alt="User profile picture">
                         @else
                             <img src="https://ui-avatars.com/api/?name={{ urlencode($user->detailUser?->name ?? $user->name) }}&background=667eea&color=fff" class="rounded-circle border border-white shadow-sm w-25 h-25 object-fit-cover mb-4" alt="Default avatar">
                         @endif

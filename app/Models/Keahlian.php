@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Keahlian extends Model
@@ -21,7 +22,7 @@ class Keahlian extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function keahlian(): HasMany
+    public function user(): HasMany
     {
         return $this->hasMany(UserKeahlian::class, 'keahlian_id');
     }
@@ -31,9 +32,8 @@ class Keahlian extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function lomba(): HasMany
+    public function lomba(): BelongsToMany
     {
-        return $this->hasMany(Lomba::class, 'bidang_keahlian_id');
+        return $this->belongsToMany(Lomba::class, 'lomba_keahlians', 'keahlian_id', 'lomba_id');
     }
-    
 }
