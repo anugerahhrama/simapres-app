@@ -44,11 +44,7 @@
                 </tr>
                 <tr>
                     <th class="text-right">Bidang Keahlian :</th>
-                    <td>{{ $lomba->keahlian->nama_keahlian ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th class="text-right">Minat :</th>
-                    <td>{{ $lomba->minat->nama_minat ?? '-' }}</td>
+                    <td>{{ $lomba->keahlian->pluck('nama_keahlian')->implode(', ') }}</td>
                 </tr>
                 <tr>
                     <th class="text-right">Jenis Pendaftaran :</th>
@@ -60,19 +56,7 @@
                 </tr>
                 <tr>
                     <th class="text-right">Perkiraan Hadiah :</th>
-                    <td>{{ $lomba->perkiraan_hadiah ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th class="text-right">Mendapatkan Uang? :</th>
-                    <td>{{ $lomba->mendapatkan_uang ? 'Ya' : 'Tidak' }}</td>
-                </tr>
-                <tr>
-                    <th class="text-right">Mendapatkan Sertifikat? :</th>
-                    <td>{{ $lomba->mendapatkan_sertifikat ? 'Ya' : 'Tidak' }}</td>
-                </tr>
-                <tr>
-                    <th class="text-right">Nilai Benefit :</th>
-                    <td>{{ $lomba->nilai_benefit ?? '-' }}</td>
+                    <td> {{ is_array($lomba->hadiah) ? implode(', ', $lomba->hadiah) : '-' }}</td>
                 </tr>
                 <tr>
                     <th class="text-right">Status Verifikasi :</th>

@@ -87,6 +87,14 @@ class LombaController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->filled('jadwal_registrasi')) {
+            [$awal, $akhir] = explode(' - ', $request->jadwal_registrasi);
+            $request->merge([
+                'awal_registrasi' => trim($awal),
+                'akhir_registrasi' => trim($akhir),
+            ]);
+        }
+
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'kategori' => 'required|in:akademik,non akademik',
@@ -98,10 +106,11 @@ class LombaController extends Controller
             'akhir_registrasi' => 'required|date|after_or_equal:awal_registrasi',
             'keahlian' => 'required|array|min:1',
             'keahlian.*' => 'string|max:255',
-            'jenis_pendaftaran' => 'required|in:gratis,berbayar',
+            'jenis_pendaftaran' => 'required|in:individu,tim',
+            'jenis_biaya' => 'required|in:gratis,berbayar',
             'harga_pendaftaran' => 'nullable|numeric|min:0',
-            'mendapatkan_uang' => 'required|in:0,1',
-            'mendapatkan_sertifikat' => 'required|in:0,1',
+            'hadiah' => 'required|array|min:1',
+            'hadiah.*' => 'in:uang,trofi,sertifikat',
             'status_verifikasi' => 'required|in:pending,verified,rejected',
         ]);
 
@@ -121,11 +130,9 @@ class LombaController extends Controller
 
             $validated = $validator->validated();
 
-            Log::info('Validasi berhasil. Data terverifikasi untuk disimpan.', $validated);
-
-            if ($validated['jenis_pendaftaran'] === 'gratis') {
+            if ($validated['jenis_biaya'] === 'gratis') {
                 $validated['harga_pendaftaran'] = 0;
-                Log::info('Jenis pendaftaran gratis, harga di-set ke 0');
+                Log::info('Jenis biaya gratis, harga di-set ke 0');
             }
 
             $lomba = Lomba::create([
@@ -139,19 +146,18 @@ class LombaController extends Controller
                 'akhir_registrasi' => $validated['akhir_registrasi'],
                 'jenis_pendaftaran' => $validated['jenis_pendaftaran'],
                 'harga_pendaftaran' => $validated['harga_pendaftaran'],
-                'mendapatkan_uang' => $validated['mendapatkan_uang'],
-                'mendapatkan_sertifikat' => $validated['mendapatkan_sertifikat'],
+                'hadiah' => $validated['hadiah'],
                 'status_verifikasi' => $validated['status_verifikasi'],
                 'created_by' => auth()->id(),
             ]);
 
             Log::info('Lomba berhasil disimpan.', ['lomba_id' => $lomba->id]);
 
+            // Proses keahlian
             $keahlianIDs = [];
-
             foreach ($validated['keahlian'] as $input) {
                 if (is_numeric($input)) {
-                    $keahlianIDs[] = (int)$input;
+                    $keahlianIDs[] = (int) $input;
                 } else {
                     $keahlian = Keahlian::firstOrCreate(
                         ['nama_keahlian' => trim($input)]
@@ -164,8 +170,6 @@ class LombaController extends Controller
 
             $lomba->keahlian()->sync($keahlianIDs);
 
-            Log::info('Relasi keahlian berhasil di-sync.', ['keahlian_ids' => $keahlianIDs]);
-
             DB::commit();
 
             return redirect()->route('lomba.index')->with('success', 'Lomba berhasil ditambahkan.');
@@ -177,7 +181,7 @@ class LombaController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.')->withInput();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data.')->withInput();
         }
     }
 
@@ -210,7 +214,7 @@ class LombaController extends Controller
         $tingkatanLombas = TingkatanLomba::all();
         $keahlians = Keahlian::all();
 
-        return view('lomba.edit', compact('lomba', 'tingkatanLombas', 'keahlians'));
+        return view('lomba.edit', compact('lomba', 'tingkatanLombas', 'keahlians', 'breadcrumb'));
     }
 
     /**
@@ -218,6 +222,14 @@ class LombaController extends Controller
      */
     public function update(Request $request, Lomba $lomba)
     {
+        if ($request->filled('jadwal_registrasi')) {
+            [$awal, $akhir] = explode(' - ', $request->jadwal_registrasi);
+            $request->merge([
+                'awal_registrasi' => trim($awal),
+                'akhir_registrasi' => trim($akhir),
+            ]);
+        }
+
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'kategori' => 'required|in:akademik,non akademik',
@@ -229,15 +241,24 @@ class LombaController extends Controller
             'akhir_registrasi' => 'required|date|after_or_equal:awal_registrasi',
             'keahlian' => 'required|array|min:1',
             'keahlian.*' => 'string|max:255',
-            'jenis_pendaftaran' => 'required|in:gratis,berbayar',
+            'jenis_pendaftaran' => 'required|in:individu,tim',
+            'jenis_biaya' => 'required|in:gratis,berbayar',
             'harga_pendaftaran' => 'nullable|numeric|min:0',
-            'mendapatkan_uang' => 'required|in:0,1',
-            'mendapatkan_sertifikat' => 'required|in:0,1',
-            'status_verifikasi' => 'required|in:pending,disetujui,ditolak',
+            'hadiah' => 'required|array|min:1',
+            'hadiah.*' => 'in:uang,trofi,sertifikat',
+            'status_verifikasi' => 'required|in:pending,verified,rejected',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            Log::warning('Validasi gagal saat mengupdate lomba', [
+                'errors' => $validator->errors()->all(),
+                'input' => $request->all()
+            ]);
+
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput()
+                ->with('error', 'Validasi gagal. Silakan periksa form Anda.');
         }
 
         try {
@@ -245,11 +266,10 @@ class LombaController extends Controller
 
             $validated = $validator->validated();
 
-            if ($validated['jenis_pendaftaran'] === 'gratis') {
+            if ($validated['jenis_biaya'] === 'gratis') {
                 $validated['harga_pendaftaran'] = 0;
             }
 
-            $lomba = Lomba::findOrFail($lomba->id);
             $lomba->update([
                 'judul' => $validated['judul'],
                 'kategori' => $validated['kategori'],
@@ -261,21 +281,19 @@ class LombaController extends Controller
                 'akhir_registrasi' => $validated['akhir_registrasi'],
                 'jenis_pendaftaran' => $validated['jenis_pendaftaran'],
                 'harga_pendaftaran' => $validated['harga_pendaftaran'],
-                'mendapatkan_uang' => $validated['mendapatkan_uang'],
-                'mendapatkan_sertifikat' => $validated['mendapatkan_sertifikat'],
+                'hadiah' => $validated['hadiah'],
                 'status_verifikasi' => $validated['status_verifikasi'],
             ]);
 
             $keahlianIDs = [];
             foreach ($validated['keahlian'] as $input) {
                 if (is_numeric($input)) {
-                    $keahlianIDs[] = (int)$input;
+                    $keahlianIDs[] = (int) $input;
                 } else {
                     $keahlian = Keahlian::firstOrCreate(['nama_keahlian' => trim($input)]);
                     $keahlianIDs[] = $keahlian->id;
                 }
             }
-
             $lomba->keahlian()->sync($keahlianIDs);
 
             DB::commit();
@@ -283,11 +301,16 @@ class LombaController extends Controller
             return redirect()->route('lomba.index')->with('success', 'Lomba berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            report($e);
 
-            return redirect()->back()->with('error', 'Gagal memperbarui data.')->withInput();
+            Log::error('Gagal mengupdate lomba', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data.')->withInput();
         }
     }
+
 
     /**
      * Remove the specified resource from storage.

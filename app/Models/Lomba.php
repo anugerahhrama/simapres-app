@@ -28,11 +28,13 @@ class Lomba extends Model
         'status_verifikasi',
         'jenis_pendaftaran',
         'harga_pendaftaran',
-        'perkiraan_hadiah',
-        'mendapatkan_uang',
-        'mendapatkan_sertifikat',
-        'nilai_benefit',
+        'hadiah',
     ];
+
+    protected $casts = [
+        'hadiah' => 'array',
+    ];
+
 
     /**
      * Get the user that owns the Lomba

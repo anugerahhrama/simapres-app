@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title', 'Create Lomba')
+
 @section('content')
     <div class="card border-0 shadow-lg my-4" style="border-radius: 10px;">
         <div class="card-body p-4">
@@ -78,24 +80,18 @@
                     <small id="error-link_registrasi" class="form-text text-danger error-text"></small>
                 </div>
 
-                {{-- Awal Registrasi --}}
+                {{-- Jadwal Registrasi --}}
                 <div class="form-group">
-                    <label class="font-weight-bold">Awal Registrasi</label>
+                    <label class="font-weight-bold">Jadwal Registrasi</label>
                     <div class="input-group">
                         {!! $inputIcon('calendar-alt') !!}
-                        <input type="date" name="awal_registrasi" class="form-control border-left-0" value="{{ old('awal_registrasi') }}" required>
+                        <input type="text" name="jadwal_registrasi" class="form-control border-left-0" id="reservation" value="{{ old('awal_registrasi') && old('akhir_registrasi') ? old('awal_registrasi') . ' - ' . old('akhir_registrasi') : '' }}" placeholder="Pilih rentang tanggal registrasi">
                     </div>
-                    <small id="error-awal_registrasi" class="form-text text-danger error-text"></small>
-                </div>
-
-                {{-- Akhir Registrasi --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Akhir Registrasi</label>
-                    <div class="input-group">
-                        {!! $inputIcon('calendar-check') !!}
-                        <input type="date" name="akhir_registrasi" class="form-control border-left-0" value="{{ old('akhir_registrasi') }}" required>
-                    </div>
-                    <small id="error-akhir_registrasi" class="form-text text-danger error-text"></small>
+                    @if ($errors->has('awal_registrasi') || $errors->has('akhir_registrasi'))
+                        <small class="form-text text-danger">
+                            {{ $errors->first('awal_registrasi') ?: $errors->first('akhir_registrasi') }}
+                        </small>
+                    @endif
                 </div>
 
                 {{-- Keahlian --}}
@@ -121,18 +117,31 @@
                 <div class="form-group">
                     <label class="font-weight-bold">Jenis Pendaftaran</label>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisGratis" value="gratis" {{ old('jenis_pendaftaran', 'gratis') == 'gratis' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="jenisGratis">Gratis</label>
+                        <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisIndividu" value="individu" {{ old('jenis_pendaftaran') == 'individu' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="jenisIndividu">Individu</label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisBerbayar" value="berbayar" {{ old('jenis_pendaftaran') == 'berbayar' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="jenisBerbayar">Berbayar</label>
+                        <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisTim" value="tim" {{ old('jenis_pendaftaran') == 'tim' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="jenisTim">Tim</label>
                     </div>
                     <small id="error-jenis_pendaftaran" class="form-text text-danger error-text"></small>
                 </div>
 
+                {{-- Gratis/Berbayar --}}
+                <div class="form-group">
+                    <label class="font-weight-bold">Jenis Biaya</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisGratis" value="gratis" {{ old('jenis_biaya') == 'gratis' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="jenisGratis">Gratis</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisBerbayar" value="berbayar" {{ old('jenis_biaya') == 'berbayar' ? 'checked' : '' }}>
+                        <label class="form-check-label" for="jenisBerbayar">Berbayar</label>
+                    </div>
+                </div>
+
                 {{-- Harga Pendaftaran --}}
-                <div class="form-group" id="formHarga" style="{{ old('jenis_pendaftaran') == 'berbayar' ? '' : 'display: none;' }}">
+                <div class="form-group" id="formHarga" style="{{ old('jenis_biaya') == 'berbayar' ? '' : 'display: none;' }}">
                     <label class="font-weight-bold">Harga Pendaftaran</label>
                     <div class="input-group">
                         {!! $inputIcon('money-bill-wave') !!}
@@ -141,22 +150,15 @@
                     <small id="error-harga_pendaftaran" class="form-text text-danger error-text"></small>
                 </div>
 
-                {{-- Mendapatkan Uang --}}
+                {{-- Hadiah --}}
                 <div class="form-group">
-                    <label class="font-weight-bold">Mendapatkan Uang?</label>
-                    <select name="mendapatkan_uang" class="form-control" required>
-                        <option value="1" {{ old('mendapatkan_uang') == '1' ? 'selected' : '' }}>Ya</option>
-                        <option value="0" {{ old('mendapatkan_uang') == '0' ? 'selected' : '' }}>Tidak</option>
+                    <label class="font-weight-bold">Hadiah</label>
+                    <select class="select2bs4-2 form-control" name="hadiah[]" multiple="multiple" data-placeholder="Pilih hadiah" style="width: 100%;" required>
+                        <option value="uang" {{ in_array('uang', old('hadiah', [])) ? 'selected' : '' }}>Uang</option>
+                        <option value="trofi" {{ in_array('trofi', old('hadiah', [])) ? 'selected' : '' }}>Trofi</option>
+                        <option value="sertifikat" {{ in_array('sertifikat', old('hadiah', [])) ? 'selected' : '' }}>Sertifikat</option>
                     </select>
-                </div>
-
-                {{-- Mendapatkan Sertifikat --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Mendapatkan Sertifikat?</label>
-                    <select name="mendapatkan_sertifikat" class="form-control" required>
-                        <option value="1" {{ old('mendapatkan_sertifikat') == '1' ? 'selected' : '' }}>Ya</option>
-                        <option value="0" {{ old('mendapatkan_sertifikat') == '0' ? 'selected' : '' }}>Tidak</option>
-                    </select>
+                    <small id="error-hadiah" class="form-text text-danger error-text"></small>
                 </div>
 
                 {{-- Status Verifikasi --}}
@@ -187,12 +189,32 @@
 @push('js')
     <script>
         $(document).ready(function() {
+            $('#reservation').daterangepicker({
+                locale: {
+                    format: 'YYYY-MM-DD',
+                    separator: ' - '
+                }
+            });
+
             $('.select2bs4').select2({
                 tags: true,
                 tokenSeparators: [','],
                 placeholder: "Pilih atau buat tag baru",
                 allowClear: true,
                 theme: 'bootstrap4'
+            });
+
+            $('.select2bs4-2').select2({
+                allowClear: true,
+                theme: 'bootstrap4'
+            });
+
+            $('input[name="jenis_biaya"]').on('change', function() {
+                if ($(this).val() === 'berbayar') {
+                    $('#formHarga').show();
+                } else {
+                    $('#formHarga').hide();
+                }
             });
 
             $('input[name="jenis_pendaftaran"]').on('change', function() {
@@ -218,4 +240,19 @@
             });
         </script>
     @endif
+
+    @if ($errors->any())
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: 'Terdapat beberapa error pada form. Silakan periksa kembali.',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            });
+        </script>
+    @endif
+
 @endpush
