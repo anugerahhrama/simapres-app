@@ -19,7 +19,7 @@ class PrestasiSeeder extends Seeder
         DB::table('prestasis')->insert([
             [
                 'mahasiswa_id' => 1, // Contoh: Mahasiswa 3
-                'nama_kegiatan' => 'Web Development',
+                'nama_lomba' => 'Web Development',
                 'deskripsi' => 'Meraih juara ketiga dalam Kompetisi Pemrograman Nasional.',
                 'tanggal' => '2024-04-05',
                 'kategori' => 'Akademik',

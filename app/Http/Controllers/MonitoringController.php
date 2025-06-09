@@ -66,28 +66,28 @@ class MonitoringController extends Controller
         //                            ->limit(5)
         //                            ->get();
 
-        // return view('monitoring.index', compact(
-        //     'user',
-        //     'detailUser',
-        //     'totalLombaAktif',
-        //     'totalDokumenTertunda',
-        //     'totalSertifikat',
-        //     'totalEvaluasi',
-        //     'pendaftaranLombas',
-        //     'dokumenDiunggah',
+        return view('monitoring.index', compact(
+            'user',
+            'detailUser',
+            'totalLombaAktif',
+            'totalDokumenTertunda',
+            'totalSertifikat',
+            'totalEvaluasi',
+            'pendaftaranLombas',
+            'dokumenDiunggah',
         //     //'logAktivitas'
-        // ));
+        ));
 
-        return response()->json([
-            'user' => $user,
-            'detailUser' => $detailUser,
-            'totalLombaAktif' => $totalLombaAktif,
-            'totalDokumenTertunda' => $totalDokumenTertunda,
-            'totalSertifikat' => $totalSertifikat,
-            'totalEvaluasi' => $totalEvaluasi,
-            'pendaftaranLombas' => $pendaftaranLombas,
-            'dokumenDiunggah' => $dokumenDiunggah,
-            //'logAktivitas' => $logAktivitas
-        ]);
+        //return response()->json([
+        //    'user' => $user,
+        //    'detailUser' => $detailUser,
+        //    'totalLombaAktif' => $totalLombaAktif,
+        //    'totalDokumenTertunda' => $totalDokumenTertunda,
+        //    'totalSertifikat' => $totalSertifikat,
+        //    'totalEvaluasi' => $totalEvaluasi,
+        //    'pendaftaranLombas' => $pendaftaranLombas,
+        //    'dokumenDiunggah' => $dokumenDiunggah,
+        //    //'logAktivitas' => $logAktivitas
+        //]);
     }
 }
