@@ -53,11 +53,11 @@
                     <div class="form-group">
                         <label>Status</label>
                         <select name="status" class="form-control" required>
-                            <option value="1" {{ $bimbingan->status == 1 ? 'selected' : '' }}>1 - Belum Mulai</option>
-                            <option value="2" {{ $bimbingan->status == 2 ? 'selected' : '' }}>2 - Berjalan</option>
-                            <option value="3" {{ $bimbingan->status == 3 ? 'selected' : '' }}>3 - Selesai</option>
+                            <option value="1" {{ $bimbingan->status == 1 ? 'selected' : '' }}>Belum Mulai</option>
+                            <option value="2" {{ $bimbingan->status == 2 ? 'selected' : '' }}>Berjalan</option>
+                            <option value="3" {{ $bimbingan->status == 3 ? 'selected' : '' }}>Selesai</option>
                         </select>
-                        <small class="form-text text-muted">Keterangan: 1 = Belum Mulai, 2 = Berjalan, 3 = Selesai</small>
+                        <small class="form-text text-muted">Keterangan: Belum Mulai, Berjalan, Selesai</small>
                         <small id="error-status" class="error-text form-text text-danger"></small>
                     </div>
                     <div class="form-group">

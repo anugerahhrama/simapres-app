@@ -67,14 +67,6 @@
                         <th class="text-right col-3">Catatan Bimbingan :</th>
                         <td class="col-9">{{ $bimbingan->catatan_bimbingan }}</td>
                     </tr>
-                    <tr>
-                        <th class="text-right col-3">Email :</th>
-                        <td>{{ $detailUser->user->email ?? '-' }}</td>
-                    </tr>
-                    <tr>
-                        <th class="text-right col-3">Level :</th>
-                        <td>{{ $detailUser->user->level->nama_level ?? '-' }}</td>
-                    </tr>
                 </table>
             </div>
         </div>
