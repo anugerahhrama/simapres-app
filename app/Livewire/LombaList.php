@@ -75,20 +75,15 @@ class LombaList extends Component
         // C1: Kecocokan Keahlian
         $userKeahlianIds = $user->keahlian->pluck('id')->toArray();
         $lombaKeahlianIds = $lomba->keahlian->pluck('id')->toArray();
-        $c1 = count(array_intersect($userKeahlianIds, $lombaKeahlianIds)) > 0 ? 5 : 1;
+        $c1 = count(array_intersect($userKeahlianIds, $lombaKeahlianIds)) > 0 ? 3 : 1;
 
         // C2: Jenis Pendaftaran
-        $c2 = $lomba->jenis_pendaftaran === 'gratis' ? 5 : 1;
+        $c2 = $lomba->jenis_pendaftaran === 'tim' ? 3 : 1;
 
         // C3: Biaya Pendaftaran
         $harga = $lomba->harga_pendaftaran ?? 0;
-        $c3 = match (true) {
-            $harga <= 50000 => 5,
-            $harga <= 150000 => 3,
-            $harga <= 300000 => 2,
-            $harga > 300000 => 1,
-            default => 1,
-        };
+        $c3 = $harga == 0 ? 3 : 1;
+
 
         // C4: Preferensi Tingkatan Lomba
         $c4 = 1;
@@ -102,13 +97,16 @@ class LombaList extends Component
         }
 
         // C5: Benefit (Hadiah dan Sertifikat)
-        $hadiah = $lomba->perkiraan_hadiah ?? 0;
-        $benefit = $lomba->mendapatkan_sertifikat;
+        $hadiah = $lomba->hadiah ?? []; // array: ['uang', 'trofi', 'sertifikat']
+        $uang = in_array('uang', $hadiah);
+        $trofi = in_array('trofi', $hadiah);
+        $sertifikat = in_array('sertifikat', $hadiah);
         $c5 = match (true) {
-            $hadiah > 5000000 && $benefit => 5,
-            $hadiah > 1000000 && $benefit => 4,
-            $hadiah >= 500000 || $benefit => 3,
-            $hadiah <= 500000 || $benefit => 2,
+            $uang && $trofi && $sertifikat => 5,
+            $uang && $sertifikat && !$trofi => 4,
+            $trofi && $sertifikat && !$uang => 3,
+            ($uang xor $trofi) && !$sertifikat => 2,
+            !$uang && !$trofi && $sertifikat => 1,
             default => 1,
         };
 

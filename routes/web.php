@@ -26,6 +26,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::pattern('id', '[0-9]+');
 
+Route::get('/', function () {
+    return view('landing.index');
+});
+
 Route::get('/dashboard', function () {
     return view('index');
 })->name('dashboard')->middleware('auth');

@@ -27,35 +27,36 @@
                     </button>
                 </div>
 
+                @if (auth()->user()->level->level_code !== 'ADM')
+                    <h3 class="profile-username text-center">
+                        {{ $user->detailUser->name }}
+                    </h3>
 
-                <h3 class="profile-username text-center">
-                    {{ $user->detailUser->name }}
-                </h3>
+                    <p class="text-muted text-center">
+                        {{ $user->detailUser?->prodi?->name }}
+                    </p>
 
-                <p class="text-muted text-center">
-                    {{ $user->detailUser?->prodi?->name }}
-                </p>
+                    <table class="table table-md table-borderless">
+                        <tr>
+                            <th class="text-left col-3">No Induk</th>
+                            <td>:</td>
+                            <td class="col-9">{{ $user->detailUser?->no_induk }}</td>
+                        </tr>
+                        <tr>
+                            <th class="text-left col-3">Phone</th>
+                            <td>:</td>
+                            <td class="col-9">{{ $user->detailUser?->phone }}</td>
+                        </tr>
+                    </table>
 
-                <table class="table table-md table-borderless">
-                    <tr>
-                        <th class="text-left col-3">No Induk</th>
-                        <td>:</td>
-                        <td class="col-9">{{ $user->detailUser?->no_induk }}</td>
-                    </tr>
-                    <tr>
-                        <th class="text-left col-3">Phone</th>
-                        <td>:</td>
-                        <td class="col-9">{{ $user->detailUser?->phone }}</td>
-                    </tr>
-                </table>
-
-                <button type="button" onclick="modalAction('{{ route('profile.edit', $user->id) }}')" class="btn btn-primary w-100 mt-4">Edit Profile</button>
+                    <button type="button" onclick="modalAction('{{ route('profile.edit', $user->id) }}')" class="btn btn-primary w-100 mt-4">Edit Profile</button>
+                @endif
             </div>
             <!-- /.card-body -->
         </div>
         <!-- /.card -->
 
-        <div class="col h-100">
+        <div class="col h-100 {{ auth()->user()->level->level_code !== 'ADM' ? '' : 'd-none' }}">
             <div class="card card-primary card-outline p-4 mt-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4>
