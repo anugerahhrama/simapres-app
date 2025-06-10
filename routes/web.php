@@ -149,4 +149,9 @@ Route::prefix('bimbingan')->controller(BimbinganController::class)->name('bimbin
     Route::get('confirm/{id}', 'confirm')->name('confirm');
 });
 
+Route::resource('lomba', LombaController::class)->middleware(['auth', 'level:DSN']);
+Route::prefix('lomba')->controller(LombaController::class)->name('lomba.')->group(function () {
+    Route::post('list', 'list')->name('list');
+    Route::get('confirm/{id}', 'confirm')->name('confirm');
+});
 require __DIR__ . '/auth.php';
