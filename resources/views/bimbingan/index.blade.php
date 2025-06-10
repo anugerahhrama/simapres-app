@@ -58,6 +58,10 @@
 @push('js')
 <script>
     function modalAction(url = '') {
+
+        if ($('#myModal').length === 0) {
+            $('body').append('<div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="100%" aria-hidden="true"></div>');
+        }
         $('#myModal').load(url, function() {
             $('#myModal').modal({
                 backdrop: 'static',
@@ -73,7 +77,9 @@
     $(document).on('hidden.bs.modal', '#myModal', function () {
         $('#myModal').remove();
         // Tambahkan kembali modal kosong agar bisa dipakai ulang
-        $('body').append('<div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="100%" aria-hidden="true"></div>');
+        if ($('#myModal').length === 0) {
+            $('body').append('<div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="100%" aria-hidden="true"></div>');
+        }
     });
 
     // Optional: Pastikan tombol close tidak fokus saat modal tertutup

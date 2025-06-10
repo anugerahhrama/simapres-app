@@ -33,9 +33,9 @@
                 <div class="form-group">
                     <label>Status</label>
                     <select name="status" class="form-control" required>
-                        <option value="1">1 - Belum Mulai</option>
-                        <option value="2">2 - Berjalan</option>
-                        <option value="3">3 - Selesai</option>
+                        <option value="1">Belum Mulai</option>
+                        <option value="2">Berjalan</option>
+                        <option value="3">Selesai</option>
                     </select>
                     <small id="error-status" class="error-text form-text text-danger"></small>
                 </div>
@@ -43,16 +43,6 @@
                     <label>Catatan Bimbingan</label>
                     <textarea name="catatan_bimbingan" class="form-control"></textarea>
                     <small id="error-catatan_bimbingan" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" id="email" class="form-control" required>
-                    <small id="error-email" class="error-text form-text text-danger"></small>
-                </div>
-                <div class="form-group">
-                    <label>Level</label>
-                    <input type="text" class="form-control" value="{{ $detailUser->user->level->nama_level }}" readonly>
-                    <small id="error-level_id" class="error-text form-text text-danger"></small>
                 </div>
             </div>
             <div class="modal-footer">
@@ -70,9 +60,7 @@
                 tanggal_mulai: { required: true, date: true },
                 tanggal_selesai: { date: true },
                 status: { required: true },
-                catatan_bimbingan: { maxlength: 255 },
-                email: { required: true, email: true },
-                level_id: { required: true }
+                catatan_bimbingan: { maxlength: 255 }
             },
             submitHandler: function(form) {
                 $.ajax({
@@ -83,7 +71,9 @@
                         if (response.status) {
                             $('#myModal').modal('hide');
                             Swal.fire({ icon: 'success', title: 'Berhasil', text: response.message });
-                            dataBimbingan.ajax.reload();
+                            if (typeof dataBimbingan !== 'undefined') {
+                                dataBimbingan.ajax.reload();
+                            }
                         } else {
                             $('.error-text').text('');
                             $.each(response.msgField, function(prefix, val) {
