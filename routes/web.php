@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\BimbinganController;
 use App\Http\Controllers\RekomendasiLombaController;
+use App\Http\Controllers\SpkController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -29,6 +30,8 @@ Route::pattern('id', '[0-9]+');
 Route::get('/', function () {
     return view('landing.index');
 });
+
+Route::get('spk', [SpkController::class, 'index'])->middleware('auth');
 
 Route::get('/dashboard', function () {
     return view('index');
