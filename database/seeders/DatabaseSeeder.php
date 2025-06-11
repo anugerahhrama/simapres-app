@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             DetailUserSeeder::class,
             TingkatanLombaSeeder::class,
             ManajemenPeriodeSeeder::class,
+            LombaKeahlianSeeder::class,
         ]);
     }
 }

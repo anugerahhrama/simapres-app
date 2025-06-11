@@ -9,165 +9,227 @@
                 @csrf
 
                 @php
-                    $inputIcon = fn($icon) => "<div class='input-group-prepend'><span class='input-group-text bg-light'><i class='fas fa-$icon'></i></span></div>";
+                    $inputIcon = fn(
+                        $icon,
+                    ) => "<div class='input-group-prepend'><span class='input-group-text bg-light'><i class='fas fa-$icon text-primary'></i></span></div>";
                 @endphp
 
-                {{-- Judul Lomba --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Judul Lomba</label>
-                    <div class="input-group">
-                        {!! $inputIcon('book') !!}
-                        <input type="text" name="judul" class="form-control border-left-0" placeholder="Masukkan judul lomba" value="{{ old('judul') }}" required>
+                <div class="row">
+                    {{-- Judul Lomba --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted mb-2">Judul Lomba</label>
+                            <div class="input-group">
+                                {!! $inputIcon('book') !!}
+                                <input type="text" name="judul" class="form-control border-left-0"
+                                    placeholder="Masukkan judul lomba" value="{{ old('judul') }}" required>
+                            </div>
+                            <small id="error-judul" class="form-text text-danger error-text"></small>
+                        </div>
                     </div>
-                    <small id="error-judul" class="form-text text-danger error-text"></small>
-                </div>
 
-                {{-- Kategori --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Kategori</label>
-                    <div class="input-group">
-                        {!! $inputIcon('tags') !!}
-                        <select name="kategori" class="form-control border-left-0" required>
-                            <option value="" disabled {{ old('kategori') ? '' : 'selected' }}>-- Pilih Kategori --</option>
-                            <option value="akademik" {{ old('kategori') == 'akademik' ? 'selected' : '' }}>Akademik</option>
-                            <option value="non akademik" {{ old('kategori') == 'non akademik' ? 'selected' : '' }}>Non Akademik</option>
-                        </select>
+                    {{-- Penyelenggara --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted mb-2">Penyelenggara</label>
+                            <div class="input-group">
+                                {!! $inputIcon('building') !!}
+                                <input type="text" name="penyelenggara" class="form-control border-left-0"
+                                    placeholder="Masukkan penyelenggara lomba" value="{{ old('penyelenggara') }}" required>
+                            </div>
+                            <small id="error-penyelenggara" class="form-text text-danger error-text"></small>
+                        </div>
                     </div>
-                    <small id="error-kategori" class="form-text text-danger error-text"></small>
                 </div>
 
-                {{-- Tingkatan --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Tingkatan</label>
-                    <div class="input-group">
-                        {!! $inputIcon('layer-group') !!}
-                        <select name="tingkatan_lomba_id" class="form-control border-left-0" required>
-                            <option value="" disabled {{ old('tingkatan_lomba_id') ? '' : 'selected' }}>-- Pilih Tingkatan --</option>
-                            @foreach ($tingkatanLombas as $tingkatan)
-                                <option value="{{ $tingkatan->id }}" {{ old('tingkatan_lomba_id') == $tingkatan->id ? 'selected' : '' }}>
-                                    {{ ucfirst($tingkatan->nama) }}
-                                </option>
-                            @endforeach
-                        </select>
+                <div class="row">     
+                    {{-- Link Registrasi --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted mb-2">Link Registrasi</label>
+                            <div class="input-group">
+                                {!! $inputIcon('link') !!}
+                                <input type="url" name="link_registrasi" class="form-control border-left-0"
+                                    placeholder="https://contoh.com" required>
+                            </div>
+                            <small id="error-link_registrasi" class="form-text text-danger error-text"></small>
+                        </div>
                     </div>
-                    <small id="error-tingkatan_lomba_id" class="form-text text-danger error-text"></small>
-                </div>
 
-                {{-- Penyelenggara --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Penyelenggara</label>
-                    <div class="input-group">
-                        {!! $inputIcon('building') !!}
-                        <input type="text" name="penyelenggara" class="form-control border-left-0" placeholder="Masukkan penyelenggara lomba" value="{{ old('penyelenggara') }}" required>
-                    </div>
-                    <small id="error-penyelenggara" class="form-text text-danger error-text"></small>
-                </div>
-
-                {{-- Deskripsi --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Deskripsi</label>
-                    <textarea name="deskripsi" class="form-control" rows="3" placeholder="Masukkan deskripsi lomba" required>{{ old('deskripsi') }}</textarea>
-                    <small id="error-deskripsi" class="form-text text-danger error-text"></small>
-                </div>
-
-                {{-- Link Registrasi --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Link Registrasi</label>
-                    <div class="input-group">
-                        {!! $inputIcon('link') !!}
-                        <input type="url" name="link_registrasi" class="form-control border-left-0" placeholder="https://contoh.com" value="{{ old('link_registrasi') }}" required>
-                    </div>
-                    <small id="error-link_registrasi" class="form-text text-danger error-text"></small>
-                </div>
-
-                {{-- Jadwal Registrasi --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Jadwal Registrasi</label>
-                    <div class="input-group">
-                        {!! $inputIcon('calendar-alt') !!}
-                        <input type="text" name="jadwal_registrasi" class="form-control border-left-0" id="reservation" value="{{ old('awal_registrasi') && old('akhir_registrasi') ? old('awal_registrasi') . ' - ' . old('akhir_registrasi') : '' }}" placeholder="Pilih rentang tanggal registrasi">
-                    </div>
-                    @if ($errors->has('awal_registrasi') || $errors->has('akhir_registrasi'))
-                        <small class="form-text text-danger">
-                            {{ $errors->first('awal_registrasi') ?: $errors->first('akhir_registrasi') }}
-                        </small>
-                    @endif
-                </div>
-
-                {{-- Keahlian --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Bidang Keahlian</label>
-                    <select class="select2bs4 form-control" name="keahlian[]" multiple="multiple" data-placeholder="Pilih atau buat tag baru" style="width: 100%;" required>
-                        @foreach ($keahlians as $keahlian)
-                            <option value="{{ $keahlian->id }}" {{ collect(old('keahlian', []))->contains($keahlian->id) ? 'selected' : '' }}>
-                                {{ $keahlian->nama_keahlian }}
-                            </option>
-                        @endforeach
-                        {{-- Tambahkan input manual --}}
-                        @foreach (old('keahlian', []) as $val)
-                            @if (!is_numeric($val))
-                                <option value="{{ $val }}" selected>{{ $val }}</option>
+                    {{-- Jadwal Registrasi --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted mb-2">Jadwal Registrasi</label>
+                            <div class="input-group">
+                                {!! $inputIcon('calendar-alt') !!}
+                                <input type="text" name="jadwal_registrasi" class="form-control border-left-0"
+                                    id="reservation"
+                                    value="{{ old('awal_registrasi') && old('akhir_registrasi') ? old('awal_registrasi') . ' - ' . old('akhir_registrasi') : '' }}"
+                                    placeholder="Pilih rentang tanggal registrasi">
+                            </div>
+                            @if ($errors->has('awal_registrasi') || $errors->has('akhir_registrasi'))
+                                <small class="form-text text-danger">
+                                    {{ $errors->first('awal_registrasi') ?: $errors->first('akhir_registrasi') }}
+                                </small>
                             @endif
-                        @endforeach
-                    </select>
-                    <small id="error-keahlian_id" class="form-text text-danger error-text"></small>
+                        </div>
+                    </div>
                 </div>
 
-                {{-- Jenis Pendaftaran --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Jenis Pendaftaran</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisIndividu" value="individu" {{ old('jenis_pendaftaran') == 'individu' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="jenisIndividu">Individu</label>
+                <div class="row">
+                    {{-- Tingkatan --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted mb-2">Tingkatan</label>
+                            <div class="input-group">
+                                {!! $inputIcon('layer-group') !!}
+                                <select name="tingkatan_lomba_id" class="form-control border-left-0" required>
+                                    <option value="" disabled {{ old('tingkatan_lomba_id') ? '' : 'selected' }}>--
+                                        Pilih Tingkatan --</option>
+                                    @foreach ($tingkatanLombas as $tingkatan)
+                                        <option value="{{ $tingkatan->id }}"
+                                            {{ old('tingkatan_lomba_id') == $tingkatan->id ? 'selected' : '' }}>
+                                            {{ ucfirst($tingkatan->nama) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <small id="error-tingkatan_lomba_id" class="form-text text-danger error-text"></small>
+                        </div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisTim" value="tim" {{ old('jenis_pendaftaran') == 'tim' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="jenisTim">Tim</label>
+
+                    {{-- Kategori --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted mb-2">Kategori</label>
+                            <div class="input-group">
+                                {!! $inputIcon('tags') !!}
+                                <select name="kategori" class="form-control border-left-0" required>
+                                    <option value="" disabled {{ old('kategori') ? '' : 'selected' }}>-- Pilih
+                                        Kategori --</option>
+                                    <option value="Akademik" {{ old('kategori') == 'akademik' ? 'selected' : '' }}>Akademik
+                                    </option>
+                                    <option value="Non akademik" {{ old('kategori') == 'non akademik' ? 'selected' : '' }}>
+                                        Non Akademik</option>
+                                </select>
+                            </div>
+                            <small id="error-kategori" class="form-text text-danger error-text"></small>
+                        </div>
                     </div>
-                    <small id="error-jenis_pendaftaran" class="form-text text-danger error-text"></small>
                 </div>
 
-                {{-- Gratis/Berbayar --}}
-                <div class="form-group">
-                    <label class="font-weight-bold">Jenis Biaya</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisGratis" value="gratis" {{ old('jenis_biaya') == 'gratis' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="jenisGratis">Gratis</label>
+                <div class="row">
+                    {{-- Keahlian --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted">Bidang Keahlian</label>
+                            <select class="select2bs4 form-control" name="keahlian[]" multiple="multiple"
+                                data-placeholder="Pilih keahlian" style="width: 100%;" required>
+                                @foreach ($keahlians as $keahlian)
+                                    <option value="{{ $keahlian->id }}"
+                                        {{ collect(old('keahlian', []))->contains($keahlian->id) ? 'selected' : '' }}>
+                                        {{ $keahlian->nama_keahlian }}
+                                    </option>
+                                @endforeach
+                                {{-- Tambahkan input manual --}}
+                                @foreach (old('keahlian', []) as $val)
+                                    @if (!is_numeric($val))
+                                        <option value="{{ $val }}" selected>{{ $val }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                            <small id="error-keahlian_id" class="form-text text-danger error-text"></small>
+                        </div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisBerbayar" value="berbayar" {{ old('jenis_biaya') == 'berbayar' ? 'checked' : '' }}>
-                        <label class="form-check-label" for="jenisBerbayar">Berbayar</label>
+
+                    {{-- Hadiah --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted">Hadiah</label>
+                            <select class="select2bs4-2 form-control" name="hadiah[]" multiple="multiple"
+                                data-placeholder="Pilih hadiah" style="width: 100%;" required>
+                                <option value="uang" {{ in_array('uang', old('hadiah', [])) ? 'selected' : '' }}>Uang
+                                </option>
+                                <option value="trofi" {{ in_array('trofi', old('hadiah', [])) ? 'selected' : '' }}>Trofi
+                                </option>
+                                <option value="sertifikat"
+                                    {{ in_array('sertifikat', old('hadiah', [])) ? 'selected' : '' }}>
+                                    Sertifikat</option>
+                            </select>
+                            <small id="error-hadiah" class="form-text text-danger error-text"></small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    {{-- Jenis Biaya --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted">Jenis Biaya</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisGratis"
+                                    value="gratis" {{ old('jenis_biaya') == 'gratis' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="jenisGratis">Gratis</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisBerbayar"
+                                    value="berbayar" {{ old('jenis_biaya') == 'berbayar' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="jenisBerbayar">Berbayar</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Jenis Pendaftaran --}}
+                    <div class="col-md-6">
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-muted">Jenis Pendaftaran</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="jenis_pendaftaran"
+                                    id="jenisIndividu" value="individu"
+                                    {{ old('jenis_pendaftaran') == 'individu' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="jenisIndividu">Individu</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisTim"
+                                    value="tim" {{ old('jenis_pendaftaran') == 'tim' ? 'checked' : '' }}>
+                                <label class="form-check-label" for="jenisTim">Tim</label>
+                            </div>
+                            <small id="error-jenis_pendaftaran" class="form-text text-danger error-text"></small>
+                        </div>
                     </div>
                 </div>
 
                 {{-- Harga Pendaftaran --}}
-                <div class="form-group" id="formHarga" style="{{ old('jenis_biaya') == 'berbayar' ? '' : 'display: none;' }}">
-                    <label class="font-weight-bold">Harga Pendaftaran</label>
-                    <div class="input-group">
-                        {!! $inputIcon('money-bill-wave') !!}
-                        <input type="number" name="harga_pendaftaran" class="form-control border-left-0" placeholder="Masukkan harga (Rp)" value="{{ old('harga_pendaftaran') }}">
+                <div class="col-md-6">
+                    <div class="form-group" id="formHarga"
+                        style="{{ old('jenis_biaya') == 'berbayar' ? '' : 'display: none;' }}">
+                        <label class="font-weight-bold text-muted">Harga Pendaftaran</label>
+                        <div class="input-group">
+                            {!! $inputIcon('money-bill-wave') !!}
+                            <input type="number" name="harga_pendaftaran" class="form-control border-left-0"
+                                placeholder="Masukkan harga (Rp)" value="{{ old('harga_pendaftaran') }}">
+                        </div>
+                        <small id="error-harga_pendaftaran" class="form-text text-danger error-text"></small>
                     </div>
-                    <small id="error-harga_pendaftaran" class="form-text text-danger error-text"></small>
                 </div>
 
-                {{-- Hadiah --}}
+                {{-- Deskripsi --}}
                 <div class="form-group">
-                    <label class="font-weight-bold">Hadiah</label>
-                    <select class="select2bs4-2 form-control" name="hadiah[]" multiple="multiple" data-placeholder="Pilih hadiah" style="width: 100%;" required>
-                        <option value="uang" {{ in_array('uang', old('hadiah', [])) ? 'selected' : '' }}>Uang</option>
-                        <option value="trofi" {{ in_array('trofi', old('hadiah', [])) ? 'selected' : '' }}>Trofi</option>
-                        <option value="sertifikat" {{ in_array('sertifikat', old('hadiah', [])) ? 'selected' : '' }}>Sertifikat</option>
-                    </select>
-                    <small id="error-hadiah" class="form-text text-danger error-text"></small>
+                    <label class="font-weight-bold text-muted">Deskripsi</label>
+                    <textarea name="deskripsi" class="form-control" rows="3" placeholder="Masukkan deskripsi lomba" required>{{ old('deskripsi') }}</textarea>
+                    <small id="error-deskripsi" class="form-text text-danger error-text"></small>
                 </div>
 
                 {{-- Status Verifikasi --}}
                 <div class="form-group">
-                    <label class="font-weight-bold">Status Verifikasi</label>
+                    <label class="font-weight-bold text-muted">Status Verifikasi</label>
                     <select name="status_verifikasi" class="form-control" required>
-                        <option value="pending" {{ old('status_verifikasi') == 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="verified" {{ old('status_verifikasi') == 'verified' ? 'selected' : '' }}>Disetujui</option>
-                        <option value="rejected" {{ old('status_verifikasi') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
+                        <option value="pending" {{ old('status_verifikasi') == 'pending' ? 'selected' : '' }}>Pending
+                        </option>
+                        <option value="verified" {{ old('status_verifikasi') == 'verified' ? 'selected' : '' }}>Disetujui
+                        </option>
+                        <option value="rejected" {{ old('status_verifikasi') == 'rejected' ? 'selected' : '' }}>Ditolak
+                        </option>
                     </select>
                     <small id="error-status_verifikasi" class="form-text text-danger error-text"></small>
                 </div>
