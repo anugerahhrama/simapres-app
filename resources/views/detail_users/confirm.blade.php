@@ -85,8 +85,9 @@
     </form>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             $("#form-delete").validate({
+                rules: {},
                 submitHandler: function(form) {
                     $.ajax({
                         url: form.action,
@@ -102,6 +103,10 @@
                                 });
                                 dataTable.ajax.reload();
                             } else {
+                                $('.error-text').text('');
+                                $.each(response.msgField, function(prefix, val) {
+                                    $('#error-' + prefix).text(val[0]);
+                                });
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Terjadi Kesalahan',
@@ -117,10 +122,10 @@
                     error.addClass('invalid-feedback');
                     element.closest('.form-group').append(error);
                 },
-                highlight: function(element) {
+                highlight: function(element, errorClass, validClass) {
                     $(element).addClass('is-invalid');
                 },
-                unhighlight: function(element) {
+                unhighlight: function(element, errorClass, validClass) {
                     $(element).removeClass('is-invalid');
                 }
             });

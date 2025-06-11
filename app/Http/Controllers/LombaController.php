@@ -27,7 +27,17 @@ class LombaController extends Controller
         ];
         $tingkatanLomba = TingkatanLomba::all();
 
-        return view('lomba.index', compact('breadcrumb', 'tingkatanLomba'));
+        $totalLombas = Lomba::where('status_verifikasi', 'verified')->count();
+        $totalLombaPending = Lomba::where('status_verifikasi', 'pending')->count();
+        $totalLombaAktif = Lomba::where('status_verifikasi', 'verified')
+            ->where('awal_registrasi', '<=', now())
+            ->where('akhir_registrasi', '>=', now())
+            ->count();
+        $totalLombaSelesai = Lomba::where('status_verifikasi', 'verified')
+            ->where('akhir_registrasi', '<', now())
+            ->count();
+
+        return view('lomba.index', compact('breadcrumb', 'tingkatanLomba', 'totalLombas', 'totalLombaPending', 'totalLombaAktif', 'totalLombaSelesai'));
     }
 
     public function list(Request $request)
@@ -37,6 +47,9 @@ class LombaController extends Controller
                 $query->whereHas('tingkatanLomba', function ($q) use ($request) {
                     $q->where('nama', 'like', '%' . $request->tingkatan . '%');
                 });
+            })
+            ->when($request->kategori, function ($query) use ($request) {
+                $query->where('kategori', $request->kategori);
             });
 
         return DataTables::of($data)
@@ -53,6 +66,15 @@ class LombaController extends Controller
             ->addColumn('penyelenggara', function ($row) {
                 return $row->penyelenggara ?? '-';
             })
+            ->addColumn('status', function ($row) {
+                if ($row->status_verifikasi === 'verified') {
+                    return '<span class="badge badge-success" style="font-size: 12px;">Terverifikasi</span>';
+                } else if ($row->status_verifikasi === 'rejected') {
+                    return '<span class="badge badge-danger" style="font-size: 12px;">Ditolak</span>';
+                } else {
+                    return '<span class="badge badge-secondary" style="font-size: 12px;">Belum Terverifikasi</span>';
+                }
+            })
             ->addColumn('aksi', function ($row) {
                 $btn = '<div class="d-flex justify-content-center align-items-center" style="gap: 2px;">';
                 $btn .= '<button onclick="modalAction(\'' . route('lomba.show', $row->id) . '\')" class="btn btn-info btn-sm">Detail</button>';
@@ -60,7 +82,7 @@ class LombaController extends Controller
                 $btn .= '<button onclick="modalAction(\'' . route('lomba.confirm', $row->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
                 return $btn;
             })
-            ->rawColumns(['aksi'])
+            ->rawColumns(['status', 'aksi'])
             ->make(true);
     }
 
@@ -75,7 +97,7 @@ class LombaController extends Controller
         $minats = Minat::all();
 
         $breadcrumb = (object) [
-            'title' => 'Tambah Lomba',
+            'title' => 'Tambah Lomba Baru',
             'list'  => ['Home', 'Lomba', 'Create']
         ];
 
@@ -97,7 +119,7 @@ class LombaController extends Controller
 
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
-            'kategori' => 'required|in:akademik,non akademik',
+            'kategori' => 'required|in:Akademik,Non akademik',
             'tingkatan_lomba_id' => 'required|exists:tingkatan_lombas,id',
             'penyelenggara' => 'required|string|max:255',
             'deskripsi' => 'required|string',
@@ -232,7 +254,7 @@ class LombaController extends Controller
 
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
-            'kategori' => 'required|in:akademik,non akademik',
+            'kategori' => 'required|in:Akademik,Non akademik',
             'tingkatan_lomba_id' => 'required|exists:tingkatan_lombas,id',
             'penyelenggara' => 'required|string|max:255',
             'deskripsi' => 'required|string',

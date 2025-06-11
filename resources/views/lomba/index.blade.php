@@ -1,32 +1,76 @@
 @extends('layouts.app')
 
 @section('content')
+    <!-- Stats Cards Row -->
+    <div class="row mt-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Lomba</span>
+                </div>
+                <div class="stat-value">{{ $totalLombas ?? '0' }}</div>
+                <div class="stat-subtitle">Total lomba terdaftar</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Lomba Pending</span>
+                </div>
+                <div class="stat-value">{{ $totalLombaPending ?? '0' }}</div>
+                <div class="stat-subtitle">Total lomba yang menunggu verifikasi</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Lomba Aktif</span>
+                </div>
+                <div class="stat-value">{{ $totalLombaAktif ?? '0' }}</div>
+                <div class="stat-subtitle">Total lomba yang sedang berlangsung</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="stats-card">
+                <div class="stat-header">
+                    <span class="stat-title">Total Lomba Selesai</span>
+                </div>
+                <div class="stat-value">{{ $totalLombaSelesai ?? '0' }}</div>
+                <div class="stat-subtitle">Total lomba yang telah berakhir pendaftarannya</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Data Table Card -->
-    <div class="card mt-4">
+    <div class="card">
         <div class="card-header" style="background: white; border-bottom: 1px solid #e2e8f0; padding: 15px 20px;">
             <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
                 <div class="w-75">
                     <div class="row px-3 mb-3 mt-2">
                         <div class="col-md-3">
-                            <select class="form-control" id="filter_tingkatan">
+                            <select class="form-control" id="filter_tingkatan" name="tingkatan">
                                 <option value="">Pilih Tingkatan</option>
                                 @foreach ($tingkatanLomba as $item)
-                                    <option value="{{ $item->id }}">{{ $item->nama }}</option>
+                                    <option value="{{ $item->nama }}">{{ $item->nama }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-control" id="filter_kategori">
+                            <select class="form-control" id="filter_kategori" name="kategori">
                                 <option value="">Pilih Kategori</option>
-                                <option value="Akademik">Akademik</option>
-                                <option value="Non-Akademik">Non-Akademik</option>
+                                <option value="akademik">Akademik</option>
+                                <option value="non akademik">Non-Akademik</option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="w-25 d-flex justify-content-end">
                     <form action="{{ route('lomba.create') }}" method="get" style="display: inline;">
-                        <button type="submit" class="btn btn-primary" style="font-weight: 500; padding: 6px 16px; font-size: 14px;">
+                        <button type="submit" class="btn btn-primary"
+                            style="font-weight: 500; padding: 6px 16px; font-size: 14px;">
                             <i class="fas fa-plus mr-1"></i>
                             Tambah
                         </button>
@@ -60,7 +104,8 @@
         </div>
     </div>
 
-    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="100%" aria-hidden="true"></div>
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-width="100%" aria-hidden="true"></div>
 @endsection
 
 @push('css')
@@ -154,16 +199,9 @@
                         width: "25%"
                     },
                     {
-                        data: 'status_verifikasi',
+                        data: 'status',
                         className: 'text-center',
                         width: "15%",
-                        render: function(data, type, row) {
-                            if (data === 'verified') {
-                                return '<span class="badge badge-success" style="font-size: 12px;">Terverifikasi</span>';
-                            } else {
-                                return '<span class="badge badge-secondary" style="font-size: 12px;">Belum Terverifikasi</span>';
-                            }
-                        }
                     },
                     {
                         data: 'aksi',
