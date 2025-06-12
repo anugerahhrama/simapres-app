@@ -108,7 +108,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('verifLombas.index') }}" class="nav-link {{ request()->is('*verifLomba*') ? 'active' : '' }}">
+                                <a href="{{ route('verifLomba.index') }}" class="nav-link {{ request()->is('*verifLomba*') ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-medal"></i>
                                     <p>Lomba</p>
                                 </a>
