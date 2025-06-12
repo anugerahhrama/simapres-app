@@ -1,51 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Stats Cards Row -->
-    <div class="row mt-4">
-        <div class="col-lg-3 col-md-6">
-            <div class="stats-card">
-                <div class="stat-header">
-                    <span class="stat-title">Total Lomba</span>
-                </div>
-                <div class="stat-value">{{ $totalLombas ?? '0' }}</div>
-                <div class="stat-subtitle">Total lomba terdaftar</div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <div class="stats-card">
-                <div class="stat-header">
-                    <span class="stat-title">Total Lomba Pending</span>
-                </div>
-                <div class="stat-value">{{ $totalLombaPending ?? '0' }}</div>
-                <div class="stat-subtitle">Total lomba yang menunggu verifikasi</div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <div class="stats-card">
-                <div class="stat-header">
-                    <span class="stat-title">Total Lomba Aktif</span>
-                </div>
-                <div class="stat-value">{{ $totalLombaAktif ?? '0' }}</div>
-                <div class="stat-subtitle">Total lomba yang sedang berlangsung</div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-            <div class="stats-card">
-                <div class="stat-header">
-                    <span class="stat-title">Total Lomba Selesai</span>
-                </div>
-                <div class="stat-value">{{ $totalLombaSelesai ?? '0' }}</div>
-                <div class="stat-subtitle">Total lomba yang telah berakhir pendaftarannya</div>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Data Table Card -->
-    <div class="card">
+    <div class="card mt-4">
         <div class="card-header" style="background: white; border-bottom: 1px solid #e2e8f0; padding: 15px 20px;">
             <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
                 <div class="w-75">
@@ -66,14 +23,6 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="w-25 d-flex justify-content-end">
-                    <form action="{{ route('lomba.create') }}" method="get" style="display: inline;">
-                        <button type="submit" class="btn btn-primary" style="font-weight: 500; padding: 6px 16px; font-size: 14px;">
-                            <i class="fas fa-plus mr-1"></i>
-                            Tambah
-                        </button>
-                    </form>
                 </div>
             </div>
 
@@ -163,7 +112,7 @@
                 scrollCollapse: true,
                 autoWidth: false,
                 ajax: {
-                    url: "{{ route('lomba.list') }}",
+                    url: "{{ route('verifLomba.list') }}",
                     type: "POST",
                     dataType: "json",
                     data: function(d) {

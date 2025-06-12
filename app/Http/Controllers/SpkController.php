@@ -3,14 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lomba;
+use App\Models\SpkBobot;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class SpkController extends Controller
 {
     public function index()
     {
+        $breadcrumb = (object) [
+            'title' => 'Perhitungan SPK',
+            'list'  => ['Home', 'SPK']
+        ];
+
         $user = Auth::user();
         if (!$user) {
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
@@ -74,6 +81,8 @@ class SpkController extends Controller
 
         return view('spk.index', [
             'hasil' => $result,
+            'breadcrumb' => $breadcrumb,
+            'bobot' => SpkBobot::first(),
         ]);
     }
 
@@ -111,14 +120,72 @@ class SpkController extends Controller
             default => 1,
         };
 
+        $getBobot = SpkBobot::first();
+
         $bobot = [
-            'c1' => 0.4,
-            'c2' => 0.2,
-            'c3' => 0.1,
-            'c4' => 0.2,
-            'c5' => 0.1,
+            'c1' => $getBobot->c1,
+            'c2' => $getBobot->c2,
+            'c3' => $getBobot->c3,
+            'c4' => $getBobot->c4,
+            'c5' => $getBobot->c5,
         ];
 
         return compact('c1', 'c2', 'c3', 'c4', 'c5', 'bobot');
+    }
+
+    public function edit(string $id)
+    {
+        $bobot = SpkBobot::find($id);
+
+        return view('spk.edit', compact('bobot'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $total = $request->c1 + $request->c2 + $request->c3 + $request->c4 + $request->c5;
+        if (round($total, 3) !== 1.0) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Total bobot harus berjumlah 1. Silakan sesuaikan kembali.',
+            ]);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'c1' => 'required|numeric|min:0',
+            'c2' => 'required|numeric|min:0',
+            'c3' => 'required|numeric|min:0',
+            'c4' => 'required|numeric|min:0',
+            'c5' => 'required|numeric|min:0',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validasi gagal. Silakan periksa kembali input Anda.',
+                'msgField' => $validator->errors()
+            ]);
+        }
+
+        $bobot = SpkBobot::find($id);
+
+        if (!$bobot) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan.',
+            ]);
+        }
+
+        $bobot->update([
+            'c1' => $request->c1,
+            'c2' => $request->c2,
+            'c3' => $request->c3,
+            'c4' => $request->c4,
+            'c5' => $request->c5,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Bobot SPK berhasil diperbarui.',
+        ]);
     }
 }

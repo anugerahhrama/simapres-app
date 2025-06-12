@@ -12,6 +12,7 @@ use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\BimbinganController;
 use App\Http\Controllers\RekomendasiLombaController;
 use App\Http\Controllers\SpkController;
+use App\Http\Controllers\VerifLombaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,7 +32,7 @@ Route::get('/', function () {
     return view('landing.index');
 });
 
-Route::get('spk', [SpkController::class, 'index'])->middleware('auth');
+Route::resource('spk', SpkController::class)->middleware('auth');
 
 Route::get('/dashboard', function () {
     return view('index');
@@ -58,32 +59,32 @@ Route::prefix('profile')->controller(ProfileController::class)->name('profile.')
     });
 });
 
-Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function () {
+Route::prefix('manajemen')->group(function () {
 
     // Levels
-    Route::resource('levels', LevelController::class);
-    Route::prefix('levels')->controller(LevelController::class)->name('levels.')->group(function () {
+    Route::resource('levels', LevelController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('levels')->controller(LevelController::class)->name('levels.')->middleware(['auth', 'level:ADM'])->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 
     // Periode
-    Route::resource('periodes', PeriodeController::class);
-    Route::prefix('periodes')->controller(PeriodeController::class)->name('periodes.')->group(function () {
+    Route::resource('periodes', PeriodeController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('periodes')->controller(PeriodeController::class)->name('periodes.')->middleware(['auth', 'level:ADM'])->group(function () {
         Route::post('list',  'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 
     // Prodi
-    Route::resource('prodis', ProgramStudiController::class);
-    Route::prefix('prodis')->controller(ProgramStudiController::class)->name('prodis.')->group(function () {
+    Route::resource('prodis', ProgramStudiController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('prodis')->controller(ProgramStudiController::class)->name('prodis.')->middleware(['auth', 'level:ADM'])->group(function () {
         Route::post('list',  'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
 
     // Detail Users
-    Route::resource('detailusers', DetailUserController::class);
-    Route::prefix('detailusers')->controller(DetailUserController::class)->name('detailusers.')->group(function () {
+    Route::resource('detailusers', DetailUserController::class)->middleware(['auth', 'level:ADM']);
+    Route::prefix('detailusers')->controller(DetailUserController::class)->name('detailusers.')->middleware(['auth', 'level:ADM'])->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
         Route::get('changepass/{id}', 'changePass')->name('pass');
@@ -91,8 +92,8 @@ Route::prefix('manajemen')->middleware(['auth', 'level:ADM'])->group(function ()
     });
 
     // Lomba
-    Route::resource('lomba', LombaController::class);
-    Route::prefix('lomba')->controller(LombaController::class)->name('lomba.')->group(function () {
+    Route::resource('lomba', LombaController::class)->middleware(['auth', 'level:ADM,DSN']);
+    Route::prefix('lomba')->controller(LombaController::class)->name('lomba.')->middleware(['auth', 'level:ADM,DSN'])->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
@@ -109,8 +110,8 @@ Route::prefix('verifikasi')->middleware(['auth', 'level:ADM'])->group(function (
     });
 
     // Lomba
-    Route::resource('verifLombas', LombaController::class);
-    Route::prefix('verifLombas')->controller(LombaController::class)->name('verifLombas.')->group(function () {
+    Route::resource('verifLomba', VerifLombaController::class);
+    Route::prefix('verifLomba')->controller(VerifLombaController::class)->name('verifLomba.')->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
@@ -145,12 +146,6 @@ Route::get('minats/{minat}/confirm', [MinatController::class, 'confirm'])->name(
 // Bimbingan
 Route::resource('bimbingan', BimbinganController::class);
 Route::prefix('bimbingan')->controller(BimbinganController::class)->name('bimbingan.')->group(function () {
-    Route::post('list', 'list')->name('list');
-    Route::get('confirm/{id}', 'confirm')->name('confirm');
-});
-
-Route::resource('lomba', LombaController::class)->middleware(['auth', 'level:DSN']);
-Route::prefix('lomba')->controller(LombaController::class)->name('lomba.')->group(function () {
     Route::post('list', 'list')->name('list');
     Route::get('confirm/{id}', 'confirm')->name('confirm');
 });

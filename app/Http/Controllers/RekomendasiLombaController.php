@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lomba;
 use App\Models\RekomendasiLomba;
+use App\Models\SpkBobot;
 use App\Models\TingkatanLomba;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -54,12 +55,14 @@ class RekomendasiLombaController extends Controller
             default => 1
         };
 
+        $getBobot = SpkBobot::first();
+
         $bobot = [
-            'c1' => 0.25,
-            'c2' => 0.10,
-            'c3' => 0.10,
-            'c4' => 0.20,
-            'c5' => 0.35,
+            'c1' => $getBobot->c1,
+            'c2' => $getBobot->c2,
+            'c3' => $getBobot->c3,
+            'c4' => $getBobot->c4,
+            'c5' => $getBobot->c5,
         ];
 
         // 6. Hitung skor akhir (bobot bisa diambil dari config/bobot_kriterias table)

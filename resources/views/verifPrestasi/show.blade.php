@@ -94,8 +94,7 @@
                                     <span class="font-weight-bold text-primary">
                                         @if ($buktiPrestasi->isNotEmpty())
                                             @foreach ($buktiPrestasi as $bukti)
-                                                <a href="{{ Storage::url($bukti->path_file) }}" target="_blank"
-                                                    class="text-primary d-block mb-1">
+                                                <a href="{{ Storage::url($bukti->path_file) }}" target="_blank" class="text-primary d-block mb-1">
                                                     <i class="fas fa-download mr-1"></i>{{ $bukti->nama_file }}
                                                 </a>
                                             @endforeach
@@ -107,16 +106,17 @@
                                 <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded">
                                     <span class="text-muted"><i class="fas fa-check-circle mr-2"></i>Status
                                         Verifikasi</span>
-                                    <span
-                                        class="font-weight-bold text-dark badge badge-warning">{{ $verifPrestasi->status_verifikasi }}</span>
+                                    <span class="font-weight-bold text-dark badge badge-warning">{{ $verifPrestasi->status_verifikasi }}</span>
                                 </div>
 
                                 @if ($verifPrestasi->status_verifikasi == 'pending')
                                     <div class="mt-4">
                                         <div class="card">
                                             <div class="card-header bg-primary text-white">
-                                                <h6 class="mb-0"><i class="fas fa-check-circle mr-2"></i>Verifikasi
-                                                    Prestasi</h6>
+                                                <h6 class="mb-0">
+                                                    <i class="fas fa-check-circle mr-2"></i>
+                                                    Verifikasi Prestasi
+                                                </h6>
                                             </div>
                                             <div class="card-body">
                                                 <form action="{{ route('verifPres.updateStatus', $verifPrestasi->id) }}" method="POST" id="verifikasiForm">
@@ -124,8 +124,7 @@
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                     <div class="form-group">
                                                         <label for="status_verifikasi">Status Verifikasi</label>
-                                                        <select class="form-control" id="status_verifikasi"
-                                                            name="status_verifikasi" required>
+                                                        <select class="form-control" id="status_verifikasi" name="status_verifikasi" required>
                                                             <option value="">Pilih Status</option>
                                                             <option value="verified">Setujui</option>
                                                             <option value="rejected">Tolak</option>
@@ -133,8 +132,7 @@
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="catatan">Catatan (Opsional)</label>
-                                                        <textarea class="form-control" id="catatan" name="catatan" rows="3"
-                                                            placeholder="Tambahkan catatan jika diperlukan"></textarea>
+                                                        <textarea class="form-control" id="catatan" name="catatan" rows="3" placeholder="Tambahkan catatan jika diperlukan"></textarea>
                                                     </div>
                                                     <div class="text-right">
                                                         <button type="submit" class="btn btn-primary">
