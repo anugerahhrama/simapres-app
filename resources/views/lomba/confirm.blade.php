@@ -87,7 +87,7 @@
                                     title: 'Berhasil',
                                     text: response.message
                                 });
-                                dataLomba.ajax.reload();
+                                dataTable.ajax.reload();
                             } else {
                                 $('.error-text').text('');
                                 $.each(response.msgField, function(prefix, val) {

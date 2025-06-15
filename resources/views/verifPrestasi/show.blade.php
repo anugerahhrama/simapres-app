@@ -87,14 +87,14 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center pb-2 bg-white p-3 rounded">
                                     <span class="text-muted"><i class="fas fa-file-alt mr-2"></i>Deskripsi</span>
-                                    <span class="font-weight-bold text-dark">{{ $verifPrestasi->deskripsi }}</span>
+                                    <span class="font-weight-bold text-dark" style="max-width: 70%;">{{ $verifPrestasi->deskripsi }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center pb-2 bg-light p-3 rounded">
                                     <span class="text-muted"><i class="fas fa-file mr-2"></i>Bukti Prestasi</span>
                                     <span class="font-weight-bold text-primary">
                                         @if ($buktiPrestasi->isNotEmpty())
                                             @foreach ($buktiPrestasi as $bukti)
-                                                <a href="{{ Storage::url($bukti->path_file) }}" target="_blank" class="text-primary d-block mb-1">
+                                                <a href="{{ asset('storage/' . $bukti->path_file) }}" target="_blank" class="text-primary d-block mb-1">
                                                     <i class="fas fa-download mr-1"></i>{{ $bukti->nama_file }}
                                                 </a>
                                             @endforeach

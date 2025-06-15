@@ -69,7 +69,7 @@
                             @foreach ($prestasi->bukti as $bukti)
                                 <div class="d-flex justify-content-between align-items-center pb-2 bg-white p-3 rounded mb-2">
                                     <span class="text-dark"><i class="fas fa-file-alt mr-2"></i>{{ $bukti->nama_file }}</span>
-                                    <a href="{{ Storage::url($bukti->path_file) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <a href="{{ asset('storage/' . $bukti->path_file) }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                         <i class="fas fa-download mr-1"></i>Download
                                     </a>
                                 </div>
