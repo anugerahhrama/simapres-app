@@ -421,7 +421,7 @@ class PrestasiController extends Controller
                 return '<span class="badge badge-warning">Pending</span>';
             })
             ->addColumn('aksi', function ($prestasi) {
-                return '<button onclick="modalAction(\'' . route('verifPres.show', $prestasi->id) . '\')" class="btn btn-info btn-sm mr-1">Detail</button>';
+                return '<button onclick="modalAction(\'' . route('verifPres.show', $prestasi->id) . '\')" class="btn btn-primary btn-sm mr-1">Verifikasi</button>';
             })
             ->rawColumns(['status', 'aksi'])
             ->make(true);
