@@ -9,9 +9,7 @@
                 @csrf
 
                 @php
-                    $inputIcon = fn(
-                        $icon,
-                    ) => "<div class='input-group-prepend'><span class='input-group-text bg-light'><i class='fas fa-$icon text-primary'></i></span></div>";
+                    $inputIcon = fn($icon) => "<div class='input-group-prepend'><span class='input-group-text bg-light'><i class='fas fa-$icon text-primary'></i></span></div>";
                 @endphp
 
                 <div class="row">
@@ -21,8 +19,7 @@
                             <label class="font-weight-bold text-muted mb-2">Judul Lomba</label>
                             <div class="input-group">
                                 {!! $inputIcon('book') !!}
-                                <input type="text" name="judul" class="form-control border-left-0"
-                                    placeholder="Masukkan judul lomba" value="{{ old('judul') }}" required>
+                                <input type="text" name="judul" class="form-control border-left-0" placeholder="Masukkan judul lomba" value="{{ old('judul') }}" required>
                             </div>
                             <small id="error-judul" class="form-text text-danger error-text"></small>
                         </div>
@@ -34,23 +31,21 @@
                             <label class="font-weight-bold text-muted mb-2">Penyelenggara</label>
                             <div class="input-group">
                                 {!! $inputIcon('building') !!}
-                                <input type="text" name="penyelenggara" class="form-control border-left-0"
-                                    placeholder="Masukkan penyelenggara lomba" value="{{ old('penyelenggara') }}" required>
+                                <input type="text" name="penyelenggara" class="form-control border-left-0" placeholder="Masukkan penyelenggara lomba" value="{{ old('penyelenggara') }}" required>
                             </div>
                             <small id="error-penyelenggara" class="form-text text-danger error-text"></small>
                         </div>
                     </div>
                 </div>
 
-                <div class="row">     
+                <div class="row">
                     {{-- Link Registrasi --}}
                     <div class="col-md-6">
                         <div class="form-group mb-4">
                             <label class="font-weight-bold text-muted mb-2">Link Registrasi</label>
                             <div class="input-group">
                                 {!! $inputIcon('link') !!}
-                                <input type="url" name="link_registrasi" class="form-control border-left-0"
-                                    placeholder="https://contoh.com" required>
+                                <input type="url" name="link_registrasi" class="form-control border-left-0" placeholder="https://contoh.com" required>
                             </div>
                             <small id="error-link_registrasi" class="form-text text-danger error-text"></small>
                         </div>
@@ -62,10 +57,7 @@
                             <label class="font-weight-bold text-muted mb-2">Jadwal Registrasi</label>
                             <div class="input-group">
                                 {!! $inputIcon('calendar-alt') !!}
-                                <input type="text" name="jadwal_registrasi" class="form-control border-left-0"
-                                    id="reservation"
-                                    value="{{ old('awal_registrasi') && old('akhir_registrasi') ? old('awal_registrasi') . ' - ' . old('akhir_registrasi') : '' }}"
-                                    placeholder="Pilih rentang tanggal registrasi">
+                                <input type="text" name="jadwal_registrasi" class="form-control border-left-0" id="reservation" value="{{ old('awal_registrasi') && old('akhir_registrasi') ? old('awal_registrasi') . ' - ' . old('akhir_registrasi') : '' }}" placeholder="Pilih rentang tanggal registrasi">
                             </div>
                             @if ($errors->has('awal_registrasi') || $errors->has('akhir_registrasi'))
                                 <small class="form-text text-danger">
@@ -87,8 +79,7 @@
                                     <option value="" disabled {{ old('tingkatan_lomba_id') ? '' : 'selected' }}>--
                                         Pilih Tingkatan --</option>
                                     @foreach ($tingkatanLombas as $tingkatan)
-                                        <option value="{{ $tingkatan->id }}"
-                                            {{ old('tingkatan_lomba_id') == $tingkatan->id ? 'selected' : '' }}>
+                                        <option value="{{ $tingkatan->id }}" {{ old('tingkatan_lomba_id') == $tingkatan->id ? 'selected' : '' }}>
                                             {{ ucfirst($tingkatan->nama) }}
                                         </option>
                                     @endforeach
@@ -123,11 +114,9 @@
                     <div class="col-md-6">
                         <div class="form-group mb-4">
                             <label class="font-weight-bold text-muted">Bidang Keahlian</label>
-                            <select class="select2bs4 form-control" name="keahlian[]" multiple="multiple"
-                                data-placeholder="Pilih keahlian" style="width: 100%;" required>
+                            <select class="select2bs4 form-control" name="keahlian[]" multiple="multiple" data-placeholder="Pilih keahlian" style="width: 100%;" required>
                                 @foreach ($keahlians as $keahlian)
-                                    <option value="{{ $keahlian->id }}"
-                                        {{ collect(old('keahlian', []))->contains($keahlian->id) ? 'selected' : '' }}>
+                                    <option value="{{ $keahlian->id }}" {{ collect(old('keahlian', []))->contains($keahlian->id) ? 'selected' : '' }}>
                                         {{ $keahlian->nama_keahlian }}
                                     </option>
                                 @endforeach
@@ -146,14 +135,12 @@
                     <div class="col-md-6">
                         <div class="form-group mb-4">
                             <label class="font-weight-bold text-muted">Hadiah</label>
-                            <select class="select2bs4-2 form-control" name="hadiah[]" multiple="multiple"
-                                data-placeholder="Pilih hadiah" style="width: 100%;" required>
+                            <select class="select2bs4-2 form-control" name="hadiah[]" multiple="multiple" data-placeholder="Pilih hadiah" style="width: 100%;" required>
                                 <option value="uang" {{ in_array('uang', old('hadiah', [])) ? 'selected' : '' }}>Uang
                                 </option>
                                 <option value="trofi" {{ in_array('trofi', old('hadiah', [])) ? 'selected' : '' }}>Trofi
                                 </option>
-                                <option value="sertifikat"
-                                    {{ in_array('sertifikat', old('hadiah', [])) ? 'selected' : '' }}>
+                                <option value="sertifikat" {{ in_array('sertifikat', old('hadiah', [])) ? 'selected' : '' }}>
                                     Sertifikat</option>
                             </select>
                             <small id="error-hadiah" class="form-text text-danger error-text"></small>
@@ -167,13 +154,11 @@
                         <div class="form-group mb-4">
                             <label class="font-weight-bold text-muted">Jenis Biaya</label>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisGratis"
-                                    value="gratis" {{ old('jenis_biaya') == 'gratis' ? 'checked' : '' }}>
+                                <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisGratis" value="gratis" {{ old('jenis_biaya') == 'gratis' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="jenisGratis">Gratis</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisBerbayar"
-                                    value="berbayar" {{ old('jenis_biaya') == 'berbayar' ? 'checked' : '' }}>
+                                <input class="form-check-input" type="radio" name="jenis_biaya" id="jenisBerbayar" value="berbayar" {{ old('jenis_biaya') == 'berbayar' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="jenisBerbayar">Berbayar</label>
                             </div>
                         </div>
@@ -184,14 +169,11 @@
                         <div class="form-group mb-4">
                             <label class="font-weight-bold text-muted">Jenis Pendaftaran</label>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="jenis_pendaftaran"
-                                    id="jenisIndividu" value="individu"
-                                    {{ old('jenis_pendaftaran') == 'individu' ? 'checked' : '' }}>
+                                <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisIndividu" value="individu" {{ old('jenis_pendaftaran') == 'individu' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="jenisIndividu">Individu</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisTim"
-                                    value="tim" {{ old('jenis_pendaftaran') == 'tim' ? 'checked' : '' }}>
+                                <input class="form-check-input" type="radio" name="jenis_pendaftaran" id="jenisTim" value="tim" {{ old('jenis_pendaftaran') == 'tim' ? 'checked' : '' }}>
                                 <label class="form-check-label" for="jenisTim">Tim</label>
                             </div>
                             <small id="error-jenis_pendaftaran" class="form-text text-danger error-text"></small>
@@ -201,13 +183,11 @@
 
                 {{-- Harga Pendaftaran --}}
                 <div class="col-md-6">
-                    <div class="form-group" id="formHarga"
-                        style="{{ old('jenis_biaya') == 'berbayar' ? '' : 'display: none;' }}">
+                    <div class="form-group" id="formHarga" style="{{ old('jenis_biaya') == 'berbayar' ? '' : 'display: none;' }}">
                         <label class="font-weight-bold text-muted">Harga Pendaftaran</label>
                         <div class="input-group">
                             {!! $inputIcon('money-bill-wave') !!}
-                            <input type="number" name="harga_pendaftaran" class="form-control border-left-0"
-                                placeholder="Masukkan harga (Rp)" value="{{ old('harga_pendaftaran') }}">
+                            <input type="number" name="harga_pendaftaran" class="form-control border-left-0" placeholder="Masukkan harga (Rp)" value="{{ old('harga_pendaftaran') }}">
                         </div>
                         <small id="error-harga_pendaftaran" class="form-text text-danger error-text"></small>
                     </div>

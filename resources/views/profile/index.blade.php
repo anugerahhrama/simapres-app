@@ -27,11 +27,10 @@
                     </button>
                 </div>
 
+                <h3 class="profile-username text-center">
+                    {{ $user->detailUser->name }}
+                </h3>
                 @if (auth()->user()->level->level_code !== 'ADM')
-                    <h3 class="profile-username text-center">
-                        {{ $user->detailUser->name }}
-                    </h3>
-
                     <p class="text-muted text-center">
                         {{ $user->detailUser?->prodi?->name }}
                     </p>
