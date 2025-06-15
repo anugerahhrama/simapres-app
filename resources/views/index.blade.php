@@ -1,569 +1,915 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Stats Cards Row -->
-    <div class="row mt-4">
-        <div class="col-lg-3 col-md-6">
-            <div class="stats-card">
-                <div class="stat-header">
-                    <span class="stat-title">Total Pengguna</span>
-                    <span class="stat-change positive">+7.5%</span>
+    @if (auth()->user()->level->level_code === 'ADM')
+        <!-- Admin Dashboard -->
+        <div class="dashboard-container">
+            <!-- Welcome Section -->
+            <div class="welcome-section mb-4">
+                <h2 class="welcome-title">Selamat Datang, {{ auth()->user()->detailUser->name }}</h2>
+                <p class="welcome-subtitle">Panel Admin SIMAPRES</p>
+            </div>
+
+            <!-- Stats Cards Row -->
+            <div class="row mt-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card">
+                        <div class="stat-header">
+                            <i class="fas fa-users text-dark mr-2"></i>
+                            <span class="stat-title">Total Pengguna</span>
+                        </div>
+                        <div class="stat-value">{{ $totalUsers ?? '0' }}</div>
+                        <div class="stat-subtitle">Total pengguna terdaftar</div>
+                    </div>
                 </div>
-                <div class="stat-value">{{ $totalUsers ?? '0' }}</div>
-                <div class="stat-subtitle">Total pengguna terdaftar</div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card">
+                        <div class="stat-header">
+                            <i class="fas fa-graduation-cap text-dark mr-2"></i>
+                            <span class="stat-title">Total Program Studi</span>
+                        </div>
+                        <div class="stat-value">{{ $totalProdis ?? '0' }}</div>
+                        <div class="stat-subtitle">Total program studi terdaftar</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card">
+                        <div class="stat-header">
+                            <i class="fas fa-trophy text-dark mr-2"></i>
+                            <span class="stat-title">Total Lomba</span>
+                        </div>
+                        <div class="stat-value">{{ $totalLomba ?? '0' }}</div>
+                        <div class="stat-subtitle">Total lomba terdaftar</div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card">
+                        <div class="stat-header">
+                            <i class="fas fa-medal text-dark mr-2"></i>
+                            <span class="stat-title">Total Prestasi</span>
+                        </div>
+                        <div class="stat-value">{{ $totalPrestasi ?? '0' }}</div>
+                        <div class="stat-subtitle">Total prestasi terdaftar</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Row -->
+            <div class="row">
+                <!-- Left Column -->
+                <section class="col-lg-7 connectedSortable">
+                    <!-- Prestasi Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-trophy mr-1"></i>
+                                Statistik Prestasi
+                            </h3>
+                            <div class="card-tools">
+                                <ul class="nav nav-pills ml-auto">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="#prestasi-chart" data-toggle="tab">Bulanan</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="#prestasi-trend" data-toggle="tab">Tahunan</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content p-0">
+                                <div class="chart tab-pane active" id="prestasi-chart"
+                                    style="position: relative; height: 500px;">
+                                    <div class="mb-3">
+                                        <form action="{{ route('dashboard') }}" method="GET" class="form-inline">
+                                            <div class="form-group">
+                                                <label for="tahun" class="mr-2">Tahun:</label>
+                                                <select name="tahun" id="tahun" class="form-control form-control-sm"
+                                                    onchange="this.form.submit()">
+                                                    @foreach ($tahunTersedia as $tahun)
+                                                        <option value="{{ $tahun }}"
+                                                            {{ $tahun == $tahunSekarang ? 'selected' : '' }}>
+                                                            {{ $tahun }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <canvas id="prestasi-chart-canvas" height="500" style="height: 500px;"></canvas>
+                                </div>
+                                <div class="chart tab-pane" id="prestasi-trend" style="position: relative; height: 500px;">
+                                    <canvas id="prestasi-trend-canvas" height="500" style="height: 500px;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-clock mr-1"></i>
+                                Butuh Verifikasi
+                            </h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <!-- Verifikasi Lomba -->
+                                @forelse($butuhVerifikasi as $lomba)
+                                    <div class="time-label">
+                                        <span class="bg-warning">{{ $lomba->created_at->format('d M Y') }}</span>
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-trophy bg-info"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i>
+                                                {{ $lomba->created_at->format('H:i') }}</span>
+                                            <h3 class="timeline-header">
+                                                Nama Lomba: {{ $lomba->judul }}
+                                                <br>
+                                                Penyelenggara: {{ $lomba->penyelenggara }}
+                                            </h3>
+                                            <h3 class="timeline-header">
+                                                Dibuat Oleh: {{ $lomba->createdBy->detailUser->name }}
+                                            </h3>
+                                            <div class="timeline-body">
+                                                <a href="{{ route('verifLomba.index') }}" class="btn btn-sm btn-primary">
+                                                    Verifikasi
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="text-center p-3">
+                                        <p class="text-muted">Tidak ada lomba yang perlu diverifikasi</p>
+                                    </div>
+                                @endforelse
+
+                                <!-- Verifikasi Prestasi -->
+                                @forelse($butuhVerifikasiPrestasi as $prestasi)
+                                    <div class="time-label">
+                                        <span class="bg-warning">{{ $prestasi->created_at->format('d M Y') }}</span>
+                                    </div>
+                                    <div>
+                                        <i class="fas fa-medal bg-success"></i>
+                                        <div class="timeline-item">
+                                            <span class="time"><i class="fas fa-clock"></i>
+                                                {{ $prestasi->created_at->format('H:i') }}</span>
+                                            <h3 class="timeline-header">
+                                                Nama Prestasi: {{ $prestasi->nama_lomba }}
+                                            </h3>
+                                            <h3 class="timeline-header">
+                                                Mahasiswa: {{ $prestasi->user->detailUser->name }}
+                                            </h3>
+                                            <div class="timeline-body">
+                                                <a href="{{ route('verifPres.index') }}" class="btn btn-sm btn-primary">
+                                                    Verifikasi
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="text-center p-3">
+                                        <p class="text-muted">Tidak ada prestasi yang perlu diverifikasi</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right Column -->
+                <section class="col-lg-5 connectedSortable">
+                    <!-- Upcoming Events -->
+                    <div class="card bg-gradient-primary">
+                        <div class="card-header border-0">
+                            <h3 class="card-title">
+                                <i class="fas fa-calendar-alt mr-1"></i>
+                                Jadwal Lomba Aktif
+                            </h3>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="space-y-2">
+                                @forelse($upcomingEvents as $event)
+                                    @if ($event->status_verifikasi === 'verified')
+                                        <div
+                                            class="bg-white/10 backdrop-blur-sm rounded-xl p-3 hover:bg-white/20 transition-all">
+                                            <div class="flex items-start gap-3">
+                                                <div
+                                                    class="flex-shrink-0 w-14 h-14 bg-white/20 rounded-xl flex flex-col items-center justify-center">
+                                                    <span
+                                                        class="text-lg font-bold">{{ \Carbon\Carbon::parse($event->awal_registrasi)->format('d') }}</span>
+                                                    <span
+                                                        class="text-sm">{{ \Carbon\Carbon::parse($event->awal_registrasi)->format('M') }}</span>
+                                                </div>
+                                                <div class="flex-grow">
+                                                    <h5 class="text-base font-semibold mb-0.5">{{ $event->nama_lomba }}
+                                                    </h5>
+                                                    <p class="text-white/80 text-sm mb-1">{{ Str::limit($event->judul) }}
+                                                    </p>
+                                                    <div class="flex flex-wrap gap-4 text-sm text-white/70">
+                                                        <span class="flex items-center gap-1">
+                                                            <i class="fas fa-map-marker-alt"></i>
+                                                            {{ $event->penyelenggara }}
+                                                        </span>
+                                                        <span class="flex items-center gap-1 ml-2">
+                                                            <i class="fas fa-calendar"></i>
+                                                            {{ \Carbon\Carbon::parse($event->awal_registrasi)->format('d M Y') }}
+                                                            -
+                                                            {{ \Carbon\Carbon::parse($event->akhir_registrasi)->format('d M Y') }}
+                                                        </span>
+                                                    </div>
+                                                    <button type="button"
+                                                        class="mt-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-all"
+                                                        data-toggle="modal"
+                                                        data-target="#modal-detail-{{ $event->id }}">
+                                                        <i class="fas fa-info-circle mr-1"></i> Detail
+                                                    </button>
+
+                                                    <div class="modal fade" id="modal-detail-{{ $event->id }}"
+                                                        tabindex="-1" role="dialog"
+                                                        aria-labelledby="modal-detail-label-{{ $event->id }}"
+                                                        aria-hidden="true">
+                                                        <div class="modal-dialog modal-lg" role="document">
+                                                            <div class="modal-body">
+                                                                @include('lomba.show', ['lomba' => $event])
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @empty
+                                    <div class="text-center py-3">
+                                        <p class="text-white/70 text-sm">Tidak ada jadwal lomba aktif</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Prestasi Terbaru -->
+                    <div class="card">
+                        <div class="card-header bg-gradient-primary">
+                            <h3 class="card-title text-white">
+                                <i class="fas fa-medal mr-1"></i>
+                                Prestasi Terbaru
+                            </h3>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush">
+                                @forelse($prestasiTerbaru as $prestasi)
+                                    @if ($prestasi->status_verifikasi === 'verified')
+                                        <div class="list-group-item border-bottom">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0" style="margin-left: 1rem;">
+                                                    @if ($prestasi->user->detailUser->photo_file)
+                                                        <img src="{{ asset('storage/' . $prestasi->user->detailUser->photo_file) }}"
+                                                            class="rounded-circle"
+                                                            style="width: 50px; height: 50px; object-fit: cover;"
+                                                            alt="User Avatar">
+                                                    @else
+                                                        <img class="rounded-circle" style="width: 50px; height: 50px;"
+                                                            src="https://ui-avatars.com/api/?name={{ urlencode(optional($prestasi->user->detailUser)->name ?? 'User') }}&background=667eea&color=fff"
+                                                            alt="user photo">
+                                                    @endif
+                                                </div>
+                                                <div class="flex-grow-1" style="margin-left: 1rem;">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h6 class="mb-0 fw-bold">{{ $prestasi->user->detailUser->name }}
+                                                        </h6>
+                                                        <small
+                                                            class="text-muted">{{ \Carbon\Carbon::parse($prestasi->tanggal)->diffForHumans() }}</small>
+                                                    </div>
+                                                    <p class="mb-1 text-muted">{{ $prestasi->pencapaian }}</p>
+                                                    <div class="d-flex align-items-center">
+                                                        <i class="fas fa-trophy text-warning me-2"></i>
+                                                        <span class="text-muted">{{ $prestasi->nama_lomba }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @empty
+                                    <div class="text-center py-4">
+                                        <p class="text-muted mb-0">Belum ada prestasi terbaru</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Mahasiswa Bimbingan -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        Daftar Mahasiswa Bimbingan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>NIM</th>
+                                    <th>Program Studi</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($mahasiswaBimbingan ?? [] as $bimbingan)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm me-2">
+                                                    @if ($bimbingan->mahasiswa->detailUser->photo_file)
+                                                        <img src="{{ asset('storage/' . $bimbingan->mahasiswa->detailUser->photo_file) }}"
+                                                            class="rounded-circle"
+                                                            style="width: 40px; height: 40px; object-fit: cover;"
+                                                            alt="User Avatar">
+                                                    @else
+                                                        <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">{{ $bimbingan->mahasiswa->detailUser->name }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ $bimbingan->mahasiswa->detailUser->no_induk }}</td>
+                                        <td>{{ $bimbingan->mahasiswa->detailUser->programStudi->name ?? '-' }}</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{{ route('bimbingan.index') }}" class="btn btn-sm btn-info"
+                                                    title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">
+                                            <div class="empty-state">
+                                                <i class="fas fa-user-graduate fa-3x mb-3"></i>
+                                                <p>Belum ada mahasiswa bimbingan</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
+    @elseif(auth()->user()->level->level_code === 'MHS')
+        <!-- Mahasiswa Dashboard -->
+        <div class="dashboard-container">
+            <div class="welcome-section mb-4">
+                <h2 class="welcome-title">Selamat Datang, {{ auth()->user()->detailUser->name }}</h2>
+                <p class="welcome-subtitle">Portal Mahasiswa SIMAPRES</p>
+            </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="stats-card">
-                <div class="stat-header">
-                    <span class="stat-title">Total Program Studi</span>
-                    <span class="stat-change negative">-2.1%</span>
+            <!-- Recent Achievements -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-trophy me-2"></i>
+                        Prestasi Saya
+                    </h5>
                 </div>
-                <div class="stat-value">{{ $totalProdis ?? '0' }}</div>
-                <div class="stat-subtitle">Total program studi terdaftar</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nama Prestasi</th>
+                                    <th>Pencapaian</th>
+                                    <th>Penyelenggara</th>
+                                    <th>Tanggal</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($prestasiTerbaru as $prestasi)
+                                    <tr>
+                                        <td>{{ $prestasi->nama_lomba }}</td>
+                                        <td>{{ $prestasi->pencapaian }}</td>
+                                        <td>{{ $prestasi->penyelenggara }}</td>
+                                        <td>{{ $prestasi->tanggal }}</td>
+                                        <td>
+                                            <span
+                                                class="badge bg-{{ $prestasi->status_verifikasi === 'verified' ? 'success' : ($prestasi->status_verifikasi === 'pending' ? 'warning' : 'danger') }}">
+                                                {{ ucfirst($prestasi->status_verifikasi) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('prestasi.index', $prestasi->id) }}"
+                                                class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">Belum ada prestasi</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lomba Aktif -->
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-flag me-2"></i>
+                        Lomba Aktif
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nama Lomba</th>
+                                    <th>Penyelenggara</th>
+                                    <th>Tingkat</th>
+                                    <th>Kategori</th>
+                                    <th>Jenis Pendaftaran</th>
+                                    <th>Tanggal Mulai</th>
+                                    <th>Tanggal Selesai</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($lombaTerdaftar as $lomba)
+                                    <tr>
+                                        <td>{{ $lomba->judul }}</td>
+                                        <td>{{ $lomba->penyelenggara }}</td>
+                                        <td>{{ $lomba->tingkatanLomba->nama }}</td>
+                                        <td>{{ $lomba->kategori }}</td>
+                                        <td>{{ $lomba->jenis_pendaftaran }}</td>
+                                        <td>{{ $lomba->awal_registrasi }}</td>
+                                        <td>{{ $lomba->akhir_registrasi }}</td>
+                                        <td>
+                                            <a href="{{ route('lomba.index', $lomba->id) }}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center">Belum ada lomba yang terdaftar</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <div class="col-lg-3 col-md-6">
-            <div class="stats-card">
-                <div class="stat-header">
-                    <span class="stat-title">Total LOM</span>
-                    <span class="stat-change positive">+12.3%</span>
-                </div>
-                <div class="stat-value">{{ $totalLomba ?? '0' }}</div>
-                <div class="stat-subtitle">Total lomba terdaftar</div>
-            </div>
         </div>
-
-        <div class="col-lg-3 col-md-6">
-            <div class="stats-card">
-                <div class="stat-header">
-                    <span class="stat-title">Total Prestasi</span>
-                    <span class="stat-change positive">+8.7%</span>
-                </div>
-                <div class="stat-value">{{ $totalPrestasi ?? '0' }}</div>
-                <div class="stat-subtitle">Total prestasi terdaftar</div>
+    @elseif(auth()->user()->level->level_code === 'DSN')
+        <!-- Dosen Dashboard -->
+        <div class="dashboard-container">
+            <div class="welcome-section mb-4">
+                <h2 class="welcome-title">Selamat Datang, {{ auth()->user()->detailUser->name }}</h2>
+                <p class="welcome-subtitle">Portal Dosen SIMAPRES</p>
             </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4">
+                <div class="col-lg-6 col-md-6">
+                    <div class="stats-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-header">
+                                <span class="stat-title">Mahasiswa Bimbingan</span>
+                            </div>
+                            <div class="stat-value" style="color: black;">{{ $totalBimbingan ?? 0 }}</div>
+                            <div class="stat-subtitle"">Total mahasiswa yang dibimbing</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 col-md-6">
+                    <div class="stats-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-header">
+                                <span class="stat-title">Menunggu Verifikasi</span>
+                            </div>
+                            <div class="stat-value" style="color: black;">{{ $totalPendingVerification ?? 0 }}</div>
+                            <div class="stat-subtitle">Lomba yang perlu diverifikasi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mahasiswa Bimbingan -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-graduate me-2"></i>
+                        Daftar Mahasiswa Bimbingan
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Nama Mahasiswa</th>
+                                    <th>NIM</th>
+                                    <th>Program Studi</th>
+                                    <th>Tanggal Mulai</th>
+                                    <th>Tanggal Selesai</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($mahasiswaBimbingan ?? [] as $bimbingan)
+                                    <tr
+                                        class="@if ($bimbingan->status == 1) border-secondary @elseif($bimbingan->status == 2) border-success @elseif($bimbingan->status == 3) border-danger @endif">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm me-2">
+                                                    @if ($bimbingan->mahasiswa->detailUser->photo_file)
+                                                        <img src="{{ asset('storage/' . $bimbingan->mahasiswa->detailUser->photo_file) }}"
+                                                            class="rounded-circle"
+                                                            style="width: 40px; height: 40px; object-fit: cover;"
+                                                            alt="User Avatar">
+                                                    @else
+                                                        <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">{{ $bimbingan->mahasiswa->detailUser->name }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ $bimbingan->mahasiswa->detailUser->no_induk }}</td>
+                                        <td>{{ $bimbingan->mahasiswa->detailUser->prodi->name ?? '-' }}</td>
+                                        <td>{{ $bimbingan->tanggal_mulai ? \Carbon\Carbon::parse($bimbingan->tanggal_mulai)->format('d/m/Y') : '-' }}
+                                        </td>
+                                        <td>{{ $bimbingan->tanggal_selesai ? \Carbon\Carbon::parse($bimbingan->tanggal_selesai)->format('d/m/Y') : '-' }}
+                                        </td>
+                                        <td>
+                                            @if ($bimbingan->status == 1)
+                                                <span class="badge bg-secondary">Belum Mulai</span>
+                                            @elseif($bimbingan->status == 2)
+                                                <span class="badge bg-success">Berjalan</span>
+                                            @elseif($bimbingan->status == 3)
+                                                <span class="badge bg-danger">Selesai</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{{ route('bimbingan.index') }}" class="btn btn-sm btn-info"
+                                                    title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center py-4">
+                                            <div class="empty-state">
+                                                <i class="fas fa-user-graduate fa-3x mb-3"></i>
+                                                <p>Belum ada mahasiswa bimbingan</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inputan Lomba -->
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2"></i>
+                        Inputan Lomba
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Judul Lomba</th>
+                                    <th>Penyelenggara</th>
+                                    <th>Tanggal Mulai</th>
+                                    <th>Tanggal Selesai</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($antrianVerifikasi ?? [] as $lomba)
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm me-2">
+                                                    <i class="fas fa-trophy fa-2x text-warning"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">{{ $lomba->judul }}</div>
+                                                    <small>{{ $lomba->kategori }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{{ $lomba->penyelenggara }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($lomba->awal_registrasi)->format('d/m/Y') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($lomba->akhir_registrasi)->format('d/m/Y') }}</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{{ route('lomba.show', $lomba->id) }}"
+                                                    class="btn btn-sm btn-info" title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ route('lomba.verify', $lomba->id) }}"
+                                                    class="btn btn-sm btn-success" title="Verifikasi">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">
+                                            <div class="empty-state">
+                                                <p>Tidak ada lomba yang diinput</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .stats-card {
+                    background: white;
+                    border-radius: 15px;
+                    padding: 1.5rem;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+                    transition: transform 0.3s ease;
+                }
+
+                .stats-card:hover {
+                    transform: translateY(-5px);
+                }
+
+                .stat-icon {
+                    font-size: 2rem;
+                    margin-bottom: 1rem;
+                    color: #6B73FF;
+                }
+
+                .stat-value {
+                    font-size: 2rem;
+                    font-weight: bold;
+                    margin: 0.5rem 0;
+                    color: #000DFF;
+                }
+
+                .empty-state {
+                    padding: 2rem;
+                    text-align: center;
+                    color: #6c757d;
+                }
+
+                .avatar-sm {
+                    width: 40px;
+                    height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .btn-group .btn {
+                    padding: 0.375rem 0.75rem;
+                    border: 1px solid #ddd;
+                }
+
+                .btn-group .btn:hover {
+                    background: #f8f9fa;
+                }
+            </style>
         </div>
-    </div>
+    @else
+        <div class="alert alert-danger">
+            Anda tidak memiliki akses ke halaman ini. Silakan hubungi administrator.
+        </div>
+    @endif
 
-    <!-- /.row -->
-    <!-- Main row -->
-    <div class="row">
-        <!-- Left col -->
-        <section class="col-lg-7 connectedSortable">
-            <!-- Custom tabs (Charts with tabs)-->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-pie mr-1"></i>
-                        Sales
-                    </h3>
-                    <div class="card-tools">
-                        <ul class="nav nav-pills ml-auto">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#revenue-chart" data-toggle="tab">Area</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#sales-chart" data-toggle="tab">Donut</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div><!-- /.card-header -->
-                <div class="card-body">
-                    <div class="tab-content p-0">
-                        <!-- Morris chart - Sales -->
-                        <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;">
-                            <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>
-                        </div>
-                        <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
-                            <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
-                        </div>
-                    </div>
-                </div><!-- /.card-body -->
-            </div>
-            <!-- /.card -->
+    <style>
+        .dashboard-container {
+            padding: 20px;
+        }
 
-            <!-- DIRECT CHAT -->
-            <div class="card direct-chat direct-chat-primary">
-                <div class="card-header">
-                    <h3 class="card-title">Direct Chat</h3>
+        .welcome-section {
+            background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 30px;
+        }
 
-                    <div class="card-tools">
-                        <span title="3 New Messages" class="badge badge-primary">3</span>
-                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
-                            <i class="fas fa-comments"></i>
-                        </button>
-                        <button type="button" class="btn btn-tool" data-card-widget="remove">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                    <!-- Conversations are loaded here -->
-                    <div class="direct-chat-messages">
-                        <!-- Message. Default to the left -->
-                        <div class="direct-chat-msg">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name float-left">Alexander Pierce</span>
-                                <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
-                            </div>
-                            <!-- /.direct-chat-infos -->
-                            <img class="direct-chat-img" src="dist/img/user1-128x128.jpg" alt="message user image">
-                            <!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                Is this template really for free? That's unbelievable!
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>
-                        <!-- /.direct-chat-msg -->
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
 
-                        <!-- Message to the right -->
-                        <div class="direct-chat-msg right">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name float-right">Sarah Bullock</span>
-                                <span class="direct-chat-timestamp float-left">23 Jan 2:05 pm</span>
-                            </div>
-                            <!-- /.direct-chat-infos -->
-                            <img class="direct-chat-img" src="dist/img/user3-128x128.jpg" alt="message user image">
-                            <!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                You better believe it!
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>
-                        <!-- /.direct-chat-msg -->
+        .welcome-subtitle {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+    </style>
 
-                        <!-- Message. Default to the left -->
-                        <div class="direct-chat-msg">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name float-left">Alexander Pierce</span>
-                                <span class="direct-chat-timestamp float-right">23 Jan 5:37 pm</span>
-                            </div>
-                            <!-- /.direct-chat-infos -->
-                            <img class="direct-chat-img" src="dist/img/user1-128x128.jpg" alt="message user image">
-                            <!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                Working with AdminLTE on a great new app! Wanna join?
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>
-                        <!-- /.direct-chat-msg -->
+    @push('js')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Data untuk chart bulanan
+                const dataBulanan = @json($statistikPrestasi['bulanan']);
+                const labelsBulanan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus',
+                    'September', 'Oktober', 'November', 'Desember'
+                ];
 
-                        <!-- Message to the right -->
-                        <div class="direct-chat-msg right">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name float-right">Sarah Bullock</span>
-                                <span class="direct-chat-timestamp float-left">23 Jan 6:10 pm</span>
-                            </div>
-                            <!-- /.direct-chat-infos -->
-                            <img class="direct-chat-img" src="dist/img/user3-128x128.jpg" alt="message user image">
-                            <!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                I would love to.
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>
-                        <!-- /.direct-chat-msg -->
+                // Data untuk chart tahunan
+                const dataTahunan = @json($statistikPrestasi['tahunan']);
+                const labelsTahunan = dataTahunan.map(item => item.tahun);
+                const valuesTahunan = dataTahunan.map(item => item.total);
 
-                    </div>
-                    <!--/.direct-chat-messages-->
+                console.log('Data Bulanan:', dataBulanan);
+                console.log('Data Tahunan:', dataTahunan);
 
-                    <!-- Contacts are loaded here -->
-                    <div class="direct-chat-contacts">
-                        <ul class="contacts-list">
-                            <li>
-                                <a href="#">
-                                    <img class="contacts-list-img" src="dist/img/user1-128x128.jpg" alt="User Avatar">
+                // Dapatkan nilai maksimum dari data bulanan
+                const maxMonthlyValue = Math.max(...labelsBulanan.map((_, index) => {
+                    const bulanData = dataBulanan.find(item => item.bulan === index + 1);
+                    return bulanData ? bulanData.total : 0;
+                }));
 
-                                    <div class="contacts-list-info">
-                                        <span class="contacts-list-name">
-                                            Count Dracula
-                                            <small class="contacts-list-date float-right">2/28/2015</small>
-                                        </span>
-                                        <span class="contacts-list-msg">How have you been? I was...</span>
-                                    </div>
-                                    <!-- /.contacts-list-info -->
-                                </a>
-                            </li>
-                            <!-- End Contact Item -->
-                            <li>
-                                <a href="#">
-                                    <img class="contacts-list-img" src="dist/img/user7-128x128.jpg" alt="User Avatar">
+                // Dapatkan nilai maksimum dari data tahunan
+                const maxYearlyValue = Math.max(...valuesTahunan);
 
-                                    <div class="contacts-list-info">
-                                        <span class="contacts-list-name">
-                                            Sarah Doe
-                                            <small class="contacts-list-date float-right">2/23/2015</small>
-                                        </span>
-                                        <span class="contacts-list-msg">I will be waiting for...</span>
-                                    </div>
-                                    <!-- /.contacts-list-info -->
-                                </a>
-                            </li>
-                            <!-- End Contact Item -->
-                            <li>
-                                <a href="#">
-                                    <img class="contacts-list-img" src="dist/img/user3-128x128.jpg" alt="User Avatar">
+                // Chart Bulanan
+                const ctxBulanan = document.getElementById('prestasi-chart-canvas').getContext('2d');
+                new Chart(ctxBulanan, {
+                    type: 'bar',
+                    data: {
+                        labels: labelsBulanan,
+                        datasets: [{
+                            label: 'Jumlah Prestasi',
+                            data: labelsBulanan.map((_, index) => {
+                                const bulanData = dataBulanan.find(item => item.bulan ===
+                                    index + 1);
+                                return bulanData ? bulanData.total : 0;
+                            }),
+                            backgroundColor: 'rgba(54, 162, 235, 1)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.8,
+                            categoryPercentage: 0.8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: Math.max(20, Math.ceil(maxMonthlyValue / 10) * 10),
+                                ticks: {
+                                    stepSize: 10,
+                                    precision: 0
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Statistik Prestasi Bulanan Tahun {{ $tahunSekarang }}',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                padding: {
+                                    top: 10,
+                                    bottom: 20
+                                }
+                            },
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Jumlah Prestasi: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
 
-                                    <div class="contacts-list-info">
-                                        <span class="contacts-list-name">
-                                            Nadia Jolie
-                                            <small class="contacts-list-date float-right">2/20/2015</small>
-                                        </span>
-                                        <span class="contacts-list-msg">I'll call you back at...</span>
-                                    </div>
-                                    <!-- /.contacts-list-info -->
-                                </a>
-                            </li>
-                            <!-- End Contact Item -->
-                            <li>
-                                <a href="#">
-                                    <img class="contacts-list-img" src="dist/img/user5-128x128.jpg" alt="User Avatar">
-
-                                    <div class="contacts-list-info">
-                                        <span class="contacts-list-name">
-                                            Nora S. Vans
-                                            <small class="contacts-list-date float-right">2/10/2015</small>
-                                        </span>
-                                        <span class="contacts-list-msg">Where is your new...</span>
-                                    </div>
-                                    <!-- /.contacts-list-info -->
-                                </a>
-                            </li>
-                            <!-- End Contact Item -->
-                            <li>
-                                <a href="#">
-                                    <img class="contacts-list-img" src="dist/img/user6-128x128.jpg" alt="User Avatar">
-
-                                    <div class="contacts-list-info">
-                                        <span class="contacts-list-name">
-                                            John K.
-                                            <small class="contacts-list-date float-right">1/27/2015</small>
-                                        </span>
-                                        <span class="contacts-list-msg">Can I take a look at...</span>
-                                    </div>
-                                    <!-- /.contacts-list-info -->
-                                </a>
-                            </li>
-                            <!-- End Contact Item -->
-                            <li>
-                                <a href="#">
-                                    <img class="contacts-list-img" src="dist/img/user8-128x128.jpg" alt="User Avatar">
-
-                                    <div class="contacts-list-info">
-                                        <span class="contacts-list-name">
-                                            Kenneth M.
-                                            <small class="contacts-list-date float-right">1/4/2015</small>
-                                        </span>
-                                        <span class="contacts-list-msg">Never mind I found...</span>
-                                    </div>
-                                    <!-- /.contacts-list-info -->
-                                </a>
-                            </li>
-                            <!-- End Contact Item -->
-                        </ul>
-                        <!-- /.contacts-list -->
-                    </div>
-                    <!-- /.direct-chat-pane -->
-                </div>
-                <!-- /.card-body -->
-                <div class="card-footer">
-                    <form action="#" method="post">
-                        <div class="input-group">
-                            <input type="text" name="message" placeholder="Type Message ..." class="form-control">
-                            <span class="input-group-append">
-                                <button type="button" class="btn btn-primary">Send</button>
-                            </span>
-                        </div>
-                    </form>
-                </div>
-                <!-- /.card-footer-->
-            </div>
-            <!--/.direct-chat -->
-
-            <!-- TO DO List -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="ion ion-clipboard mr-1"></i>
-                        To Do List
-                    </h3>
-
-                    <div class="card-tools">
-                        <ul class="pagination pagination-sm">
-                            <li class="page-item"><a href="#" class="page-link">&laquo;</a></li>
-                            <li class="page-item"><a href="#" class="page-link">1</a></li>
-                            <li class="page-item"><a href="#" class="page-link">2</a></li>
-                            <li class="page-item"><a href="#" class="page-link">3</a></li>
-                            <li class="page-item"><a href="#" class="page-link">&raquo;</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body">
-                    <ul class="todo-list" data-widget="todo-list">
-                        <li>
-                            <!-- drag handle -->
-                            <span class="handle">
-                                <i class="fas fa-ellipsis-v"></i>
-                                <i class="fas fa-ellipsis-v"></i>
-                            </span>
-                            <!-- checkbox -->
-                            <div class="icheck-primary d-inline ml-2">
-                                <input type="checkbox" value="" name="todo1" id="todoCheck1">
-                                <label for="todoCheck1"></label>
-                            </div>
-                            <!-- todo text -->
-                            <span class="text">Design a nice theme</span>
-                            <!-- Emphasis label -->
-                            <small class="badge badge-danger"><i class="far fa-clock"></i> 2 mins</small>
-                            <!-- General tools such as edit or delete-->
-                            <div class="tools">
-                                <i class="fas fa-edit"></i>
-                                <i class="fas fa-trash-o"></i>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="handle">
-                                <i class="fas fa-ellipsis-v"></i>
-                                <i class="fas fa-ellipsis-v"></i>
-                            </span>
-                            <div class="icheck-primary d-inline ml-2">
-                                <input type="checkbox" value="" name="todo2" id="todoCheck2" checked>
-                                <label for="todoCheck2"></label>
-                            </div>
-                            <span class="text">Make the theme responsive</span>
-                            <small class="badge badge-info"><i class="far fa-clock"></i> 4 hours</small>
-                            <div class="tools">
-                                <i class="fas fa-edit"></i>
-                                <i class="fas fa-trash-o"></i>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="handle">
-                                <i class="fas fa-ellipsis-v"></i>
-                                <i class="fas fa-ellipsis-v"></i>
-                            </span>
-                            <div class="icheck-primary d-inline ml-2">
-                                <input type="checkbox" value="" name="todo3" id="todoCheck3">
-                                <label for="todoCheck3"></label>
-                            </div>
-                            <span class="text">Let theme shine like a star</span>
-                            <small class="badge badge-warning"><i class="far fa-clock"></i> 1 day</small>
-                            <div class="tools">
-                                <i class="fas fa-edit"></i>
-                                <i class="fas fa-trash-o"></i>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="handle">
-                                <i class="fas fa-ellipsis-v"></i>
-                                <i class="fas fa-ellipsis-v"></i>
-                            </span>
-                            <div class="icheck-primary d-inline ml-2">
-                                <input type="checkbox" value="" name="todo4" id="todoCheck4">
-                                <label for="todoCheck4"></label>
-                            </div>
-                            <span class="text">Let theme shine like a star</span>
-                            <small class="badge badge-success"><i class="far fa-clock"></i> 3 days</small>
-                            <div class="tools">
-                                <i class="fas fa-edit"></i>
-                                <i class="fas fa-trash-o"></i>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="handle">
-                                <i class="fas fa-ellipsis-v"></i>
-                                <i class="fas fa-ellipsis-v"></i>
-                            </span>
-                            <div class="icheck-primary d-inline ml-2">
-                                <input type="checkbox" value="" name="todo5" id="todoCheck5">
-                                <label for="todoCheck5"></label>
-                            </div>
-                            <span class="text">Check your messages and notifications</span>
-                            <small class="badge badge-primary"><i class="far fa-clock"></i> 1 week</small>
-                            <div class="tools">
-                                <i class="fas fa-edit"></i>
-                                <i class="fas fa-trash-o"></i>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="handle">
-                                <i class="fas fa-ellipsis-v"></i>
-                                <i class="fas fa-ellipsis-v"></i>
-                            </span>
-                            <div class="icheck-primary d-inline ml-2">
-                                <input type="checkbox" value="" name="todo6" id="todoCheck6">
-                                <label for="todoCheck6"></label>
-                            </div>
-                            <span class="text">Let theme shine like a star</span>
-                            <small class="badge badge-secondary"><i class="far fa-clock"></i> 1 month</small>
-                            <div class="tools">
-                                <i class="fas fa-edit"></i>
-                                <i class="fas fa-trash-o"></i>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                <!-- /.card-body -->
-                <div class="card-footer clearfix">
-                    <button type="button" class="btn btn-primary float-right"><i class="fas fa-plus"></i> Add
-                        item</button>
-                </div>
-            </div>
-            <!-- /.card -->
-        </section>
-        <!-- /.Left col -->
-        <!-- right col (We are only adding the ID to make the widgets sortable)-->
-        <section class="col-lg-5 connectedSortable">
-
-            <!-- Map card -->
-            <div class="card bg-gradient-primary">
-                <div class="card-header border-0">
-                    <h3 class="card-title">
-                        <i class="fas fa-map-marker-alt mr-1"></i>
-                        Visitors
-                    </h3>
-                    <!-- card tools -->
-                    <div class="card-tools">
-                        <button type="button" class="btn btn-primary btn-sm daterange" title="Date range">
-                            <i class="far fa-calendar-alt"></i>
-                        </button>
-                        <button type="button" class="btn btn-primary btn-sm" data-card-widget="collapse"
-                            title="Collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                    </div>
-                    <!-- /.card-tools -->
-                </div>
-                <div class="card-body">
-                    <div id="world-map" style="height: 250px; width: 100%;"></div>
-                </div>
-                <!-- /.card-body-->
-                <div class="card-footer bg-transparent">
-                    <div class="row">
-                        <div class="col-4 text-center">
-                            <div id="sparkline-1"></div>
-                            <div class="text-white">Visitors</div>
-                        </div>
-                        <!-- ./col -->
-                        <div class="col-4 text-center">
-                            <div id="sparkline-2"></div>
-                            <div class="text-white">Online</div>
-                        </div>
-                        <!-- ./col -->
-                        <div class="col-4 text-center">
-                            <div id="sparkline-3"></div>
-                            <div class="text-white">Sales</div>
-                        </div>
-                        <!-- ./col -->
-                    </div>
-                    <!-- /.row -->
-                </div>
-            </div>
-            <!-- /.card -->
-
-            <!-- solid sales graph -->
-            <div class="card bg-gradient-info">
-                <div class="card-header border-0">
-                    <h3 class="card-title">
-                        <i class="fas fa-th mr-1"></i>
-                        Sales Graph
-                    </h3>
-
-                    <div class="card-tools">
-                        <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn bg-info btn-sm" data-card-widget="remove">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <canvas class="chart" id="line-chart"
-                        style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                </div>
-                <!-- /.card-body -->
-                <div class="card-footer bg-transparent">
-                    <div class="row">
-                        <div class="col-4 text-center">
-                            <input type="text" class="knob" data-readonly="true" value="20" data-width="60"
-                                data-height="60" data-fgColor="#39CCCC">
-
-                            <div class="text-white">Mail-Orders</div>
-                        </div>
-                        <!-- ./col -->
-                        <div class="col-4 text-center">
-                            <input type="text" class="knob" data-readonly="true" value="50" data-width="60"
-                                data-height="60" data-fgColor="#39CCCC">
-
-                            <div class="text-white">Online</div>
-                        </div>
-                        <!-- ./col -->
-                        <div class="col-4 text-center">
-                            <input type="text" class="knob" data-readonly="true" value="30" data-width="60"
-                                data-height="60" data-fgColor="#39CCCC">
-
-                            <div class="text-white">In-Store</div>
-                        </div>
-                        <!-- ./col -->
-                    </div>
-                    <!-- /.row -->
-                </div>
-                <!-- /.card-footer -->
-            </div>
-            <!-- /.card -->
-
-            <!-- Calendar -->
-            <div class="card bg-gradient-success">
-                <div class="card-header border-0">
-
-                    <h3 class="card-title">
-                        <i class="far fa-calendar-alt"></i>
-                        Calendar
-                    </h3>
-                    <!-- tools card -->
-                    <div class="card-tools">
-                        <!-- button with a dropdown -->
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown"
-                                data-offset="-52">
-                                <i class="fas fa-bars"></i>
-                            </button>
-                            <div class="dropdown-menu" role="menu">
-                                <a href="#" class="dropdown-item">Add new event</a>
-                                <a href="#" class="dropdown-item">Clear events</a>
-                                <div class="dropdown-divider"></div>
-                                <a href="#" class="dropdown-item">View calendar</a>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-success btn-sm" data-card-widget="collapse">
-                            <i class="fas fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-success btn-sm" data-card-widget="remove">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <!-- /. tools -->
-                </div>
-                <!-- /.card-header -->
-                <div class="card-body pt-0">
-                    <!--The calendar -->
-                    <div id="calendar" style="width: 100%"></div>
-                </div>
-                <!-- /.card-body -->
-            </div>
-            <!-- /.card -->
-        </section>
-        <!-- right col -->
-    </div>
-    <!-- /.row (main row) -->
-    <!-- /.main-content -->
+                // Chart Tahunan
+                const ctxTahunan = document.getElementById('prestasi-trend-canvas').getContext('2d');
+                new Chart(ctxTahunan, {
+                    type: 'bar',
+                    data: {
+                        labels: labelsTahunan,
+                        datasets: [{
+                            label: 'Jumlah Prestasi',
+                            data: valuesTahunan,
+                            backgroundColor: 'rgba(75, 192, 192, 1)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.8,
+                            categoryPercentage: 0.8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                min: 0,
+                                max: Math.max(20, Math.ceil(maxYearlyValue / 10) * 10),
+                                ticks: {
+                                    stepSize: 10,
+                                    precision: 0
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 12
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: 'Tren Prestasi Tahunan (2020-2025)',
+                                font: {
+                                    size: 16,
+                                    weight: 'bold'
+                                },
+                                padding: {
+                                    top: 10,
+                                    bottom: 20
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Jumlah Prestasi: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+    @endpush
 @endsection

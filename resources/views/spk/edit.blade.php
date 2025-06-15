@@ -34,6 +34,10 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
+                <div class="alert alert-warning m-3">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <strong>Perhatian!</strong> Total bobot harus berjumlah 1.0
+                </div>
                 <div class="modal-body p-4">
                     <div class="form-group">
                         <label class="font-weight-bold">Kesesuaian Keahlian</label>

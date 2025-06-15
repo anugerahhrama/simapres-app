@@ -13,6 +13,7 @@ use App\Http\Controllers\BimbinganController;
 use App\Http\Controllers\RekomendasiLombaController;
 use App\Http\Controllers\SpkController;
 use App\Http\Controllers\VerifLombaController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,9 +35,7 @@ Route::get('/', function () {
 
 Route::resource('spk', SpkController::class)->middleware('auth');
 
-Route::get('/dashboard', function () {
-    return view('index');
-})->name('dashboard')->middleware('auth');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
 
 Route::prefix('profile')->controller(ProfileController::class)->name('profile.')->middleware('auth')->group(function () {
     Route::get('/', 'index')->name('index');
