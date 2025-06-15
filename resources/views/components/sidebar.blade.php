@@ -99,12 +99,21 @@
                                 Verifikasi
                                 <i class="right fas fa-angle-left"></i>
                             </p>
+                            @if ($jumlahVerifPrestasi > 0)
+                                <span class="badge badge-danger mt-1 p-1">{{ $jumlahVerifPrestasi }}</span>
+                            @endif
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('verifPres.index') }}" class="nav-link {{ request()->is('*verifPres*') ? 'active' : '' }}" style="padding-left: 35px;">
                                     <i class="fas fa-solid fa-trophy nav-icon"></i>
-                                    <p>Prestasi</p>
+                                    <p>
+                                        Prestasi
+                                        @if ($jumlahVerifPrestasi > 0)
+                                            <span class="badge badge-danger right mt-1 p-1">{{ $jumlahVerifPrestasi }}</span>
+                                        @endif
+                                    </p>
+
                                 </a>
                             </li>
                             <li class="nav-item">

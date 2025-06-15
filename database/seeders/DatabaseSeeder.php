@@ -16,8 +16,8 @@ class DatabaseSeeder extends Seeder
             ProgramStudiSeeder::class,
             DetailUserSeeder::class,
             TingkatanLombaSeeder::class,
-            ManajemenPeriodeSeeder::class,
             SpkBobotSeeder::class,
+            // ManajemenPeriodeSeeder::class,
             // LombaKeahlianSeeder::class,
         ]);
     }

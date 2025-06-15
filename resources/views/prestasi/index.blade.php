@@ -1,138 +1,156 @@
-    @extends('layouts.app')
+@extends('layouts.app')
 
-    @section('content')
-        <div class="card card-outline card-primary">
-            <div class="card-header">
-            
-            </div>
-            <div class="card-body">
-                @if (session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                @if (session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
-                @endif
-                <div class="row mb-3">
-                    <div class="col-md-12">
-                        <div class="form-group-row">
-                            <label class="col-1 control-label col-form-label">Filter Kategori</label>
-                            <div class="col-3">
-                                {{-- Perhatikan bahwa $kategoris harus dilewatkan dari controller --}}
-                                <select class="form-control" id="kategori_filter" name="kategori_filter">
-                                    <option value="">- Semua Kategori -</option>
-                                    <option value="Regional">Regional</option>
-                                    <option value="Provinsi">Provinsi</option>
-                                    <option value="Nasional">Nasional</option>
-                                    <option value="Internasional">Internasional</option>
-                                    {{-- @foreach ($kategoris as $kategori)
-                                        <option value="{{ $kategori }}">{{ $kategori }}</option>
-                                    @endforeach --}}
-                                </select>
-                            </div>
-                        </div>
-                    </div> 
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-12 d-flex justify-content-end bs-success">
-                            <a href="{{ route('prestasi.create') }}"  class="btn btn-sm btn-success mt-1">Tambah Prestasi</a>
+@section('content')
+    <div class="card mt-4">
+        <div class="card-header" style="background: white; border-bottom: 1px solid #e2e8f0; padding: 15px 20px;">
+            <div class="d-flex justify-content-between align-items-center pb-3 border-bottom">
+                <div class="w-75">
+                    <div class="row px-3 mb-3 mt-2">
+                        <div class="col-md-3">
+                            <select class="form-control" id="filter_tingkatan" name="tingkatan">
+                                <option value="">Pilih Tingkatan</option>
+                                @foreach ($tingkatanLomba as $item)
+                                    <option value="{{ $item->nama }}">{{ $item->nama }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                <table class="table table-bordered table-striped table-hover table-sm" id="table_prestasi">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Lomba</th>
-                            <th>Penyelenggara</th> <th>Kategori</th>
-                            <th>Deskripsi</th>
-                            <th>Pencapaian</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                </table>
+                </div>
+                <div class="w-25 d-flex justify-content-end">
+                    <form action="{{ route('prestasi.create') }}" method="get" style="display: inline;">
+                        <button type="submit" class="btn btn-primary" style="font-weight: 500; padding: 6px 16px; font-size: 14px;">
+                            <i class="fas fa-plus mr-1"></i>
+                            Tambah
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding: 0;">
+                <div class="tab-content p-2">
+                    <div class="tab-pane fade show active" id="all">
+                        <div class="table-responsive" style="margin: 0 -1px;">
+                            <table class="table table-hover align-middle" id="table_prestasi">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Lomba</th>
+                                        <th>Penyelenggara</th>
+                                        <th>Kategori</th>
+                                        <th>Pencapaian</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
-    @endsection
+    </div>
 
-    @push('css')
-        @endpush
+    <div id="myModal" class="modal fade animate shake" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" data-width="75%" aria-hidden="true"></div>
+@endsection
 
-    @push('js')
+@push('css')
+@endpush
+
+@push('js')
+    @if (session('success'))
         <script>
-            function modalAction(url = '') {
-                $('#myModal').load(url, function() {
-                    $('#myModal').modal('show');
-                });
-            }
-
-            var dataPrestasi; // Ubah nama variabel agar lebih spesifik
-            $(document).ready(function() {
-                dataPrestasi = $('#table_prestasi').DataTable({ 
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        "url": "{{ route('prestasi.list') }}",
-                        "dataType": "json",
-                        "type": "POST",
-                        "data": function(d) {
-                            // Sesuaikan nama parameter filter dengan yang ada di controller
-                            d.kategori_filter = $('#kategori_filter').val();
-                        }
-                    },
-                    columns: [{
-                            data: "DT_RowIndex",
-                            className: "text-center",
-                            orderable: false,
-                            searchable: false
-                        },
-                        {
-                            data: "nama_lomba", // Sesuaikan dengan nama kolom dari controller
-                            className: "",
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: "penyelenggara", // Sesuaikan dengan nama kolom dari controller
-                            className: "",
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: "kategori", // Sesuaikan dengan nama kolom dari controller
-                            className: "",
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: "deskripsi", // Sesuaikan dengan nama kolom dari controller
-                            className: "",
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: "pencapaian", // Sesuaikan dengan nama kolom dari controller. Asumsi ini bukan deskripsi
-                            className: "",
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: "aksi",
-                            className: "",
-                            orderable: false,
-                            searchable: false
-                        }
-                    ]
-                });
-
-                // Ubah ID filter
-                $('#kategori_filter, #status_filter').on('change', function() {
-                    dataPrestasi.ajax.reload(); // Reload DataTable saat filter berubah
-                });
-
-            
-                $('#myModal').on('hidden.bs.modal', function (e) {
-                    dataPrestasi.ajax.reload(null, false); // false mempertahankan posisi pagination
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false
                 });
             });
         </script>
-    @endpush
+    @endif
+
+    @if (session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: '{{ session('error') }}',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+            });
+        </script>
+    @endif
+
+    <script>
+        function modalAction(url = '') {
+            $('#myModal').load(url, function() {
+                $('#myModal').modal('show');
+            });
+        }
+
+        var dataTable;
+        $(document).ready(function() {
+            dataTable = $('#table_prestasi').DataTable({
+                serverSide: true,
+                scrollX: false,
+                scrollCollapse: true,
+                autoWidth: false,
+                ajax: {
+                    url: "{{ route('prestasi.list') }}",
+                    type: "POST",
+                    dataType: "json",
+                    data: function(d) {
+                        d._token = '{{ csrf_token() }}';
+                        d.kategori = $('#filter_tingkatan').val();
+                    }
+                },
+                columns: [{
+                        data: 'DT_RowIndex',
+                        className: 'text-center',
+                        orderable: false,
+                        searchable: false,
+                        width: "5%"
+                    },
+                    {
+                        data: 'nama_lomba',
+                        width: "20%"
+                    },
+                    {
+                        data: 'penyelenggara',
+                        width: "15%"
+                    },
+                    {
+                        data: 'kategori',
+                        width: "10%"
+                    },
+                    {
+                        data: 'pencapaian',
+                        width: "15%"
+                    },
+                    {
+                        data: 'status',
+                        className: 'text-center',
+                        width: "10%"
+                    },
+                    {
+                        data: 'aksi',
+                        orderable: false,
+                        searchable: false,
+                        className: 'text-center',
+                        width: "15%"
+                    }
+                ]
+            });
+
+            $('#filter_tingkatan').on('change', function() {
+                dataTable.ajax.reload();
+            });
+        });
+    </script>
+@endpush

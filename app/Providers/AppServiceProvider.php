@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Prestasi;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        view()->composer('*', function ($view) {
+            $jumlahVerifPrestasi = Prestasi::where('status_verifikasi', 'pending')->count();
+            $view->with('jumlahVerifPrestasi', $jumlahVerifPrestasi);
+        });
     }
 }

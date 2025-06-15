@@ -49,7 +49,7 @@
                 <img class="hidden dark:block" src="https://flowbite.s3.amazonaws.com/blocks/e-commerce/girl-shopping-list-dark.svg" alt="shopping illustration" />
             </div>
         </div>
-        <div class="mx-auto grid max-w-screen-xl grid-cols-2 gap-8 text-gray-500 dark:text-gray-400 sm:grid-cols-3 sm:gap-12 lg:grid-cols-6 px-4">
+        {{-- <div class="mx-auto grid max-w-screen-xl grid-cols-2 gap-8 text-gray-500 dark:text-gray-400 sm:grid-cols-3 sm:gap-12 lg:grid-cols-6 px-4">
             <a href="#" class="flex items-center md:justify-center">
                 <svg class="h-10 hover:text-gray-900 dark:hover:text-white" viewBox="0 0 106 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <g clip-path="url(#clip0_1005_171562)">
@@ -93,7 +93,7 @@
                     <path d="M64.6271 0.832031C58.3883 0.832031 51.764 3.01358 48.02 6.44994C46.5927 7.7626 45.4533 9.36256 44.6752 11.1469C43.897 12.9312 43.4972 14.8603 43.5017 16.81C43.4794 18.7678 43.871 20.7079 44.6501 22.5007C45.4293 24.2935 46.5781 25.8978 48.02 27.2063C52.052 30.8681 58.1003 32.832 64.6271 32.832C71.1647 32.832 77.3423 30.89 81.2771 27.2063C82.6762 25.867 83.7924 24.2554 84.5583 22.4687C85.3242 20.6819 85.7239 18.757 85.7335 16.81C85.7528 14.865 85.3659 12.9377 84.598 11.1539C83.8302 9.37015 82.6986 7.76995 81.2771 6.45774C77.0543 2.58865 71.5283 0.832031 64.6271 0.832031ZM64.6271 4.99183C68.0399 4.99183 71.3266 6.23219 73.5406 8.43219C75.6826 10.5631 76.8017 13.574 76.8017 16.7958C76.8017 20.1704 75.7834 22.9049 73.5406 25.1595C71.2978 27.414 68.0867 28.6211 64.6271 28.6211C61.1927 28.6211 57.9128 27.3886 55.6988 25.1595C54.6399 24.0497 53.8086 22.7395 53.2526 21.3042C52.6965 19.8689 52.4268 18.3368 52.4588 16.7958C52.4588 13.5885 53.564 10.5667 55.6988 8.43219C57.9128 6.22128 61.2143 4.99183 64.6271 4.99183Z" fill="currentColor" />
                 </svg>
             </a>
-        </div>
+        </div> --}}
     </section>
 
     <section class="bg-white dark:bg-gray-900">
@@ -404,7 +404,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
+            {{-- <div class="mb-4 grid gap-4 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
                 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <div class="h-56 w-full">
                         <a href="#">
@@ -1163,7 +1163,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             <div class="w-full text-center">
                 <button type="button" class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700">Show more</button>
             </div>

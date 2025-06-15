@@ -101,7 +101,7 @@ class LombaController extends Controller
             'list'  => ['Home', 'Lomba', 'Create']
         ];
 
-        return view('lomba.create', compact('tingkatanLombas', 'keahlians', 'minats', 'breadcrumb'));
+        return view('lomba.create', compact('tingkatanLombas', 'keahlians', 'minats', 'breadcrumb', 'activeMenu'));
     }
 
     /**
