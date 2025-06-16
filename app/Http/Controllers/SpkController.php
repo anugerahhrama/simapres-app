@@ -88,7 +88,7 @@ class SpkController extends Controller
 
     private function getRawCValues(User $user, Lomba $lomba): array
     {
-        $userKeahlianIds = $user->keahlian->pluck('id')->toArray();
+        $userKeahlianIds = $user->keahlian2->pluck('id')->toArray();
         $lombaKeahlianIds = $lomba->keahlian->pluck('id')->toArray();
         $c1 = count(array_intersect($userKeahlianIds, $lombaKeahlianIds)) > 0 ? 3 : 1;
 

@@ -86,6 +86,11 @@ class User extends Authenticatable
         return $this->hasMany(UserKeahlian::class, 'user_id');
     }
 
+    public function keahlian2()
+    {
+        return $this->belongsToMany(Keahlian::class, 'user_keahlians', 'user_id', 'keahlian_id');
+    }
+
     /**
      * Get all of the pendaftaranLomba for the User
      *
