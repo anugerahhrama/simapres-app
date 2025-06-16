@@ -67,7 +67,7 @@
                             <span class="text-muted"><i class="fas fa-trophy mr-2"></i>Hadiah</span>
                             <span class="font-weight-bold text-dark">
                                 @if ($lomba->hadiah)
-                                    {{ implode(', ', $lomba->hadiah) }}
+                                    {{ implode(', ', json_decode($lomba->hadiah, true) ?? []) }}
                                 @else
                                     -
                                 @endif
@@ -94,7 +94,7 @@
                         <div class="d-flex justify-content-between align-items-center pb-2 bg-white p-3 rounded">
                             <span class="text-muted"><i class="fas fa-money-bill-wave mr-2"></i>Biaya Pendaftaran</span>
                             <span class="font-weight-bold text-dark">
-                                @if($lomba->harga_pendaftaran == 0)
+                                @if ($lomba->harga_pendaftaran == 0)
                                     Gratis
                                 @else
                                     Rp {{ number_format($lomba->harga_pendaftaran, 0, ',', '.') }}

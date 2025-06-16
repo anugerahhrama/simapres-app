@@ -55,17 +55,16 @@ class RekomendasiLombaController extends Controller
             default => 1
         };
 
-        $getBobot = SpkBobot::first();
+        $getBobot = SpkBobot::where('user_id', $user)->first();
 
         $bobot = [
-            'c1' => $getBobot->c1,
-            'c2' => $getBobot->c2,
-            'c3' => $getBobot->c3,
-            'c4' => $getBobot->c4,
-            'c5' => $getBobot->c5,
+            'c1' => $getBobot->c1 ?? 0,
+            'c2' => $getBobot->c2 ?? 0,
+            'c3' => $getBobot->c3 ?? 0,
+            'c4' => $getBobot->c4 ?? 0,
+            'c5' => $getBobot->c5 ?? 0,
         ];
 
-        // 6. Hitung skor akhir (bobot bisa diambil dari config/bobot_kriterias table)
         return $c1 * $bobot['c1'] + $c2 * $bobot['c2'] + $c3 * $bobot['c3'] + $c4 * $bobot['c4'] + $c5 * $bobot['c5'];
     }
 
@@ -103,6 +102,8 @@ class RekomendasiLombaController extends Controller
         // 3. Urutkan berdasarkan skor tertinggi
         usort($rekomendasi, fn($a, $b) => $b->skor <=> $a->skor);
 
+        // dd($rekomendasi);
+
         return view('lombaMhs.index', compact('breadcrumb', 'tingkatanLomba', 'rekomendasi'));
     }
 
@@ -130,7 +131,7 @@ class RekomendasiLombaController extends Controller
             return $lomba;
         })->sortByDesc('skor')->values();
 
-        dd($rekomendasi);
+        return response()->json($rekomendasi, 200);
 
         // Paginate manual (karena kita pakai collection)
         $perPage = $request->input('per_page', 12);
