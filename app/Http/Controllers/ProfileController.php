@@ -21,7 +21,7 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        $user = User::where('id', Auth::user()->id)->with('detailUser')->first();
+        $user = User::where('id', Auth::user()->id)->with('detailUser', 'keahlian')->first();
 
         $bobot = SpkBobot::where('user_id', $user->id)->first();
 

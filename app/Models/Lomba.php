@@ -51,7 +51,7 @@ class Lomba extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function keahlian(): BelongsToMany
+    public function keahlian()
     {
         return $this->belongsToMany(Keahlian::class, 'lomba_keahlians', 'lomba_id', 'keahlian_id');
     }
