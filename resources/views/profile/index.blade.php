@@ -122,6 +122,35 @@
                 </div>
 
             </div>
+
+            <div class="card card-primary card-outline p-4 mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>
+                        Bobot Spk
+                    </h4>
+                    <button type="button" onclick="modalAction('{{ route('spk.edit', auth()->user()->id) }}')" class="btn btn-primary" style="font-size: 12px;"><i class="far fa-solid fa-gear"></i></button>
+                </div>
+
+                <div class="mt-4">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C1 :</strong> {{ $bobot->c1 ?? '' }}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C2 :</strong> {{ $bobot->c2 ?? '' }}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C3 :</strong> {{ $bobot->c3 ?? '' }}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C4 :</strong> {{ $bobot->c4 ?? '' }}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C5 :</strong> {{ $bobot->c5 ?? '' }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 

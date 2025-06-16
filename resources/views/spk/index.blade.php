@@ -6,7 +6,7 @@
             <div class="mb-5 d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Perhitungan SPK (WASPAS) — Tahap per Tahap</h4>
 
-                <button onclick="modalAction('{{ route('spk.edit', $bobot->id) }}')" type="button" class="btn btn-primary">
+                <button onclick="modalAction('{{ route('spk.edit', auth()->user()->id) }}')" type="button" class="btn btn-primary">
                     Setting Bobot
                 </button>
             </div>

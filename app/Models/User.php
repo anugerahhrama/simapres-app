@@ -165,4 +165,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserTingkatLomba::class, 'user_id');
     }
+
+    /**
+     * Get all of the spk for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function spk(): HasMany
+    {
+        return $this->hasMany(SpkBobot::class, 'user_id');
+    }
 }

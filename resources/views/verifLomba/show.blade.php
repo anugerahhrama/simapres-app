@@ -66,11 +66,12 @@
                         <div class="d-flex justify-content-between align-items-center pb-2 bg-white p-3 rounded">
                             <span class="text-muted"><i class="fas fa-trophy mr-2"></i>Hadiah</span>
                             <span class="font-weight-bold text-dark">
-                                @if ($lomba->hadiah)
-                                    {{ implode(', ', $lomba->hadiah) }}
+                                @if (!empty($lomba->hadiah))
+                                    {{ implode(', ', json_decode($lomba->hadiah, true) ?? []) }}
                                 @else
                                     -
                                 @endif
+
                             </span>
                         </div>
                         <div class="d-flex justify-content-between align-items-start pb-2 bg-light p-3 rounded">

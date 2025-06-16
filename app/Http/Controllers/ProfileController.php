@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Keahlian;
 use App\Models\ProgramStudi;
+use App\Models\SpkBobot;
 use App\Models\TingkatanLomba;
 use App\Models\User;
 use App\Models\UserKeahlian;
@@ -22,12 +23,14 @@ class ProfileController extends Controller
     {
         $user = User::where('id', Auth::user()->id)->with('detailUser')->first();
 
+        $bobot = SpkBobot::where('user_id', $user->id)->first();
+
         $breadcrumb = (object) [
             'title' => 'Profile User',
             'list'  => ['Home', 'Profile']
         ];
 
-        return view('profile.index', compact('user', 'breadcrumb'));
+        return view('profile.index', compact('user', 'breadcrumb', 'bobot'));
     }
 
     /**

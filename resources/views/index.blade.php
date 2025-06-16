@@ -81,17 +81,14 @@
                         </div>
                         <div class="card-body">
                             <div class="tab-content p-0">
-                                <div class="chart tab-pane active" id="prestasi-chart"
-                                    style="position: relative; height: 500px;">
+                                <div class="chart tab-pane active" id="prestasi-chart" style="position: relative; height: 500px;">
                                     <div class="mb-3">
                                         <form action="{{ route('dashboard') }}" method="GET" class="form-inline">
                                             <div class="form-group">
                                                 <label for="tahun" class="mr-2">Tahun:</label>
-                                                <select name="tahun" id="tahun" class="form-control form-control-sm"
-                                                    onchange="this.form.submit()">
+                                                <select name="tahun" id="tahun" class="form-control form-control-sm" onchange="this.form.submit()">
                                                     @foreach ($tahunTersedia as $tahun)
-                                                        <option value="{{ $tahun }}"
-                                                            {{ $tahun == $tahunSekarang ? 'selected' : '' }}>
+                                                        <option value="{{ $tahun }}" {{ $tahun == $tahunSekarang ? 'selected' : '' }}>
                                                             {{ $tahun }}
                                                         </option>
                                                     @endforeach
@@ -196,15 +193,11 @@
                             <div class="space-y-2">
                                 @forelse($upcomingEvents as $event)
                                     @if ($event->status_verifikasi === 'verified')
-                                        <div
-                                            class="bg-white/10 backdrop-blur-sm rounded-xl p-3 hover:bg-white/20 transition-all">
+                                        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-3 hover:bg-white/20 transition-all">
                                             <div class="flex items-start gap-3">
-                                                <div
-                                                    class="flex-shrink-0 w-14 h-14 bg-white/20 rounded-xl flex flex-col items-center justify-center">
-                                                    <span
-                                                        class="text-lg font-bold">{{ \Carbon\Carbon::parse($event->awal_registrasi)->format('d') }}</span>
-                                                    <span
-                                                        class="text-sm">{{ \Carbon\Carbon::parse($event->awal_registrasi)->format('M') }}</span>
+                                                <div class="flex-shrink-0 w-14 h-14 bg-white/20 rounded-xl flex flex-col items-center justify-center">
+                                                    <span class="text-lg font-bold">{{ \Carbon\Carbon::parse($event->awal_registrasi)->format('d') }}</span>
+                                                    <span class="text-sm">{{ \Carbon\Carbon::parse($event->awal_registrasi)->format('M') }}</span>
                                                 </div>
                                                 <div class="flex-grow">
                                                     <h5 class="text-base font-semibold mb-0.5">{{ $event->nama_lomba }}
@@ -223,17 +216,11 @@
                                                             {{ \Carbon\Carbon::parse($event->akhir_registrasi)->format('d M Y') }}
                                                         </span>
                                                     </div>
-                                                    <button type="button"
-                                                        class="mt-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-all"
-                                                        data-toggle="modal"
-                                                        data-target="#modal-detail-{{ $event->id }}">
+                                                    <button type="button" class="mt-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg text-sm transition-all" data-toggle="modal" data-target="#modal-detail-{{ $event->id }}">
                                                         <i class="fas fa-info-circle mr-1"></i> Detail
                                                     </button>
 
-                                                    <div class="modal fade" id="modal-detail-{{ $event->id }}"
-                                                        tabindex="-1" role="dialog"
-                                                        aria-labelledby="modal-detail-label-{{ $event->id }}"
-                                                        aria-hidden="true">
+                                                    <div class="modal fade" id="modal-detail-{{ $event->id }}" tabindex="-1" role="dialog" aria-labelledby="modal-detail-label-{{ $event->id }}" aria-hidden="true">
                                                         <div class="modal-dialog modal-lg" role="document">
                                                             <div class="modal-body">
                                                                 @include('lomba.show', ['lomba' => $event])
@@ -269,22 +256,16 @@
                                             <div class="d-flex align-items-center">
                                                 <div class="flex-shrink-0" style="margin-left: 1rem;">
                                                     @if ($prestasi->user->detailUser->photo_file)
-                                                        <img src="{{ asset('storage/' . $prestasi->user->detailUser->photo_file) }}"
-                                                            class="rounded-circle"
-                                                            style="width: 50px; height: 50px; object-fit: cover;"
-                                                            alt="User Avatar">
+                                                        <img src="{{ asset('storage/' . $prestasi->user->detailUser->photo_file) }}" class="rounded-circle" style="width: 50px; height: 50px; object-fit: cover;" alt="User Avatar">
                                                     @else
-                                                        <img class="rounded-circle" style="width: 50px; height: 50px;"
-                                                            src="https://ui-avatars.com/api/?name={{ urlencode(optional($prestasi->user->detailUser)->name ?? 'User') }}&background=667eea&color=fff"
-                                                            alt="user photo">
+                                                        <img class="rounded-circle" style="width: 50px; height: 50px;" src="https://ui-avatars.com/api/?name={{ urlencode(optional($prestasi->user->detailUser)->name ?? 'User') }}&background=667eea&color=fff" alt="user photo">
                                                     @endif
                                                 </div>
                                                 <div class="flex-grow-1" style="margin-left: 1rem;">
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <h6 class="mb-0 fw-bold">{{ $prestasi->user->detailUser->name }}
                                                         </h6>
-                                                        <small
-                                                            class="text-muted">{{ \Carbon\Carbon::parse($prestasi->tanggal)->diffForHumans() }}</small>
+                                                        <small class="text-muted">{{ \Carbon\Carbon::parse($prestasi->tanggal)->diffForHumans() }}</small>
                                                     </div>
                                                     <p class="mb-1 text-muted">{{ $prestasi->pencapaian }}</p>
                                                     <div class="d-flex align-items-center">
@@ -343,14 +324,12 @@
                                         <td>{{ $prestasi->penyelenggara }}</td>
                                         <td>{{ $prestasi->tanggal }}</td>
                                         <td>
-                                            <span
-                                                class="badge bg-{{ $prestasi->status_verifikasi === 'verified' ? 'success' : ($prestasi->status_verifikasi === 'pending' ? 'warning' : 'danger') }}">
+                                            <span class="badge bg-{{ $prestasi->status_verifikasi === 'verified' ? 'success' : ($prestasi->status_verifikasi === 'pending' ? 'warning' : 'danger') }}">
                                                 {{ ucfirst($prestasi->status_verifikasi) }}
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('prestasi.index', $prestasi->id) }}"
-                                                class="btn btn-sm btn-info">
+                                            <a href="{{ route('prestasi.index', $prestasi->id) }}" class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         </td>
@@ -400,7 +379,7 @@
                                         <td>{{ $lomba->awal_registrasi }}</td>
                                         <td>{{ $lomba->akhir_registrasi }}</td>
                                         <td>
-                                            <a href="{{ route('lomba.index', $lomba->id) }}" class="btn btn-sm btn-info">
+                                            <a href="{{ route('rekomendasi.lomba') }}" class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         </td>
@@ -482,16 +461,12 @@
                             </thead>
                             <tbody>
                                 @forelse($mahasiswaBimbingan ?? [] as $bimbingan)
-                                    <tr
-                                        class="@if ($bimbingan->status == 1) border-secondary @elseif($bimbingan->status == 2) border-success @elseif($bimbingan->status == 3) border-danger @endif">
+                                    <tr class="@if ($bimbingan->status == 1) border-secondary @elseif($bimbingan->status == 2) border-success @elseif($bimbingan->status == 3) border-danger @endif">
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm me-2">
                                                     @if ($bimbingan->mahasiswa->detailUser->photo_file)
-                                                        <img src="{{ asset('storage/' . $bimbingan->mahasiswa->detailUser->photo_file) }}"
-                                                            class="rounded-circle"
-                                                            style="width: 40px; height: 40px; object-fit: cover;"
-                                                            alt="User Avatar">
+                                                        <img src="{{ asset('storage/' . $bimbingan->mahasiswa->detailUser->photo_file) }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="User Avatar">
                                                     @else
                                                         <i class="fas fa-user-circle fa-2x text-secondary"></i>
                                                     @endif
@@ -519,8 +494,7 @@
                                         </td>
                                         <td>
                                             <div class="btn-group">
-                                                <a href="{{ route('bimbingan.index') }}" class="btn btn-sm btn-info"
-                                                    title="Lihat Detail">
+                                                <a href="{{ route('bimbingan.index') }}" class="btn btn-sm btn-info" title="Lihat Detail">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                             </div>
@@ -581,12 +555,10 @@
                                         <td>{{ \Carbon\Carbon::parse($lomba->akhir_registrasi)->format('d/m/Y') }}</td>
                                         <td>
                                             <div class="btn-group">
-                                                <a href="{{ route('lomba.show', $lomba->id) }}"
-                                                    class="btn btn-sm btn-info" title="Lihat Detail">
+                                                <a href="{{ route('lomba.show', $lomba->id) }}" class="btn btn-sm btn-info" title="Lihat Detail">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="{{ route('lomba.verify', $lomba->id) }}"
-                                                    class="btn btn-sm btn-success" title="Verifikasi">
+                                                <a href="{{ route('lomba.verify', $lomba->id) }}" class="btn btn-sm btn-success" title="Verifikasi">
                                                     <i class="fas fa-check"></i>
                                                 </a>
                                             </div>
