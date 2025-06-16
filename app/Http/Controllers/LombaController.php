@@ -101,7 +101,7 @@ class LombaController extends Controller
             'list'  => ['Home', 'Lomba', 'Create']
         ];
 
-        return view('lomba.create', compact('tingkatanLombas', 'keahlians', 'minats', 'breadcrumb', 'activeMenu'));
+        return view('lomba.create', compact('tingkatanLombas', 'keahlians', 'minats', 'breadcrumb'));
     }
 
     /**
@@ -168,7 +168,7 @@ class LombaController extends Controller
                 'akhir_registrasi' => $validated['akhir_registrasi'],
                 'jenis_pendaftaran' => $validated['jenis_pendaftaran'],
                 'harga_pendaftaran' => $validated['harga_pendaftaran'],
-                'hadiah' => $validated['hadiah'],
+                'hadiah' => json_encode($validated['hadiah']),
                 'status_verifikasi' => $validated['status_verifikasi'],
                 'created_by' => auth()->id(),
             ]);
@@ -303,7 +303,7 @@ class LombaController extends Controller
                 'akhir_registrasi' => $validated['akhir_registrasi'],
                 'jenis_pendaftaran' => $validated['jenis_pendaftaran'],
                 'harga_pendaftaran' => $validated['harga_pendaftaran'],
-                'hadiah' => $validated['hadiah'],
+                'hadiah' => json_encode($validated['hadiah']),
                 'status_verifikasi' => $validated['status_verifikasi'],
             ]);
 

@@ -5,10 +5,7 @@
     <title>Laporan Monitoring Prestasi Mahasiswa</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 12px; }
-        .kop {
-            text-align: center;
-            margin-bottom: 0;
-        }
+        .kop { text-align: center; margin-bottom: 0; }
         .kop .instansi1 { font-size: 14px; font-weight: bold; text-transform: uppercase; }
         .kop .instansi2 { font-size: 16px; font-weight: bold; text-transform: uppercase; }
         .kop .instansi3 { font-size: 15px; font-weight: bold; text-transform: uppercase; }
@@ -128,24 +125,34 @@
         <thead>
             <tr>
                 <th style="width:5%;">No</th>
-                <th>Judul Lomba</th>
+                <th>Nama Lomba</th>
+                <th>Penyelenggara</th>
+                <th>Kategori</th>
+                <th>Pencapaian</th>
                 <th>Status</th>
-                <th>Progress</th>
-                <th>Label</th>
             </tr>
         </thead>
         <tbody>
-            @forelse ($pendaftaranLombas ?? [] as $index => $pendaftaran)
+            @forelse($daftarPrestasi as $i => $prestasi)
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $pendaftaran->lomba->judul ?? 'N/A' }}</td>
-                    <td>{{ $pendaftaran->status ?? '-' }}</td>
-                    <td>{{ $pendaftaran->progress ?? 0 }}%</td>
-                    <td>{{ $pendaftaran->label ?? '-' }}</td>
+                    <td>{{ $i+1 }}</td>
+                    <td>{{ $prestasi->nama_lomba }}</td>
+                    <td>{{ $prestasi->penyelenggara }}</td>
+                    <td>{{ $prestasi->kategori }}</td>
+                    <td>{{ $prestasi->pencapaian }}</td>
+                    <td>
+                        @if ($prestasi->status_verifikasi == 'verified')
+                            Disetujui
+                        @elseif ($prestasi->status_verifikasi == 'rejected')
+                            Ditolak
+                        @else
+                            Menunggu
+                        @endif
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" style="text-align:center;">Belum ada lomba yang diikuti.</td>
+                    <td colspan="6" style="text-align:center;">Belum ada lomba/prestasi yang diinput.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -170,13 +177,7 @@
                         {{ isset($dokumen->tanggal_upload) ? \Carbon\Carbon::parse($dokumen->tanggal_upload)->format('d M Y') : '-' }}
                     </td>
                     <td>
-                        @if (($dokumen->status_verifikasi ?? '') == 'Disetujui')
-                            Disetujui
-                        @elseif (($dokumen->status_verifikasi ?? '') == 'Menunggu')
-                            Menunggu
-                        @else
-                            {{ $dokumen->status_verifikasi ?? '-' }}
-                        @endif
+                        {{ $dokumen->status_verifikasi ?? '-' }}
                     </td>
                 </tr>
             @empty
@@ -193,17 +194,17 @@
             <tr>
                 <th style="width:5%;">No</th>
                 <th>Nama Lomba</th>
-                <th>Jenis Dokumen</th>
+                <th>Nama File</th>
                 <th>Tanggal Upload</th>
             </tr>
         </thead>
         <tbody>
             @php $i = 1; @endphp
-            @forelse ($dokumenDiunggah->where('jenis_dokumen', 'Sertifikat') as $sertifikat)
+            @forelse ($sertifikatList as $sertifikat)
                 <tr>
                     <td>{{ $i++ }}</td>
                     <td>{{ $sertifikat->prestasi->nama_lomba ?? '-' }}</td>
-                    <td>{{ $sertifikat->jenis_dokumen }}</td>
+                    <td>{{ $sertifikat->nama_file }}</td>
                     <td>{{ $sertifikat->tanggal_upload ? \Carbon\Carbon::parse($sertifikat->tanggal_upload)->format('d M Y') : '-' }}</td>
                 </tr>
             @empty

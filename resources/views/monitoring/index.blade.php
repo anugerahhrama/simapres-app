@@ -61,34 +61,34 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Judul Lomba</th>
+                                        <th>Nama Lomba</th>
+                                        <th>Penyelenggara</th>
+                                        <th>Kategori</th>
+                                        <th>Pencapaian</th>
                                         <th>Status</th>
-                                        <th>Progress</th>
-                                        <th>Label</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($pendaftaranLombas ?? [] as $index => $pendaftaran)
+                                    @forelse ($daftarPrestasi ?? [] as $index => $prestasi)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $pendaftaran->lomba->judul ?? 'N/A' }}</td>
+                                            <td>{{ $prestasi->nama_lomba }}</td>
+                                            <td>{{ $prestasi->penyelenggara }}</td>
+                                            <td>{{ $prestasi->kategori }}</td>
+                                            <td>{{ $prestasi->pencapaian }}</td>
                                             <td>
-                                                <span class="badge badge-{{ $pendaftaran->status == 'Aktif' ? 'success' : ($pendaftaran->status == 'Selesai' ? 'primary' : 'secondary') }}">
-                                                    {{ $pendaftaran->status ?? '-' }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="progress progress-xs" style="height: 8px;">
-                                                    <div class="progress-bar bg-danger" style="width: {{ $pendaftaran->progress ?? 0 }}%"></div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-danger">{{ $pendaftaran->label ?? '-' }}</span>
+                                                @if ($prestasi->status_verifikasi == 'verified')
+                                                    <span class="badge badge-success">Disetujui</span>
+                                                @elseif ($prestasi->status_verifikasi == 'rejected')
+                                                    <span class="badge badge-danger">Ditolak</span>
+                                                @else
+                                                    <span class="badge badge-warning">Menunggu</span>
+                                                @endif
                                             </td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center">Belum ada lomba yang diikuti.</td>
+                                            <td colspan="6" class="text-center">Belum ada lomba/prestasi yang diinput.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -122,10 +122,12 @@
                                                 {{ isset($dokumen->tanggal_upload) ? \Carbon\Carbon::parse($dokumen->tanggal_upload)->format('d M Y') : '-' }}
                                             </td>
                                             <td>
-                                                @if (($dokumen->status_verifikasi ?? '') == 'Disetujui')
+                                                @if ($dokumen->status_verifikasi == 'Disetujui')
                                                     <span class="badge badge-success">Disetujui</span>
-                                                @elseif (($dokumen->status_verifikasi ?? '') == 'Menunggu')
+                                                @elseif ($dokumen->status_verifikasi == 'Menunggu')
                                                     <span class="badge badge-warning">Menunggu</span>
+                                                @elseif ($dokumen->status_verifikasi == 'Ditolak')
+                                                    <span class="badge badge-danger">Ditolak</span>
                                                 @else
                                                     <span class="badge badge-secondary">{{ $dokumen->status_verifikasi ?? '-' }}</span>
                                                 @endif
@@ -154,17 +156,17 @@
                                     <tr>
                                         <th>No</th>
                                         <th>Nama Lomba</th>
-                                        <th>Jenis Dokumen</th>
+                                        <th>Nama File</th>
                                         <th>Tanggal Upload</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @php $i = 1; @endphp
-                                    @forelse ($dokumenDiunggah->where('jenis_dokumen', 'Sertifikat') as $sertifikat)
+                                    @forelse ($sertifikatList as $sertifikat)
                                         <tr>
                                             <td>{{ $i++ }}</td>
                                             <td>{{ $sertifikat->prestasi->nama_lomba ?? '-' }}</td>
-                                            <td>{{ $sertifikat->jenis_dokumen }}</td>
+                                            <td>{{ $sertifikat->nama_file }}</td>
                                             <td>{{ $sertifikat->tanggal_upload ? \Carbon\Carbon::parse($sertifikat->tanggal_upload)->format('d M Y') : '-' }}</td>
                                         </tr>
                                     @empty
@@ -187,10 +189,7 @@
                     <div class="card-body">
                         <ul class="list-group list-group-unbordered mb-3">
                             @php
-                                $logPrestasi = \App\Models\Prestasi::where('mahasiswa_id', auth()->id())
-                                    ->orderByDesc('created_at')
-                                    ->limit(10)
-                                    ->get();
+                                $logPrestasi = $daftarPrestasi->sortByDesc('created_at')->take(10);
                             @endphp
                             @forelse($logPrestasi as $log)
                                 <li class="list-group-item">
