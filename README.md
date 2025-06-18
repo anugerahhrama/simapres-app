@@ -45,9 +45,9 @@ SIMAPRES adalah sistem informasi berbasis web yang dirancang untuk mengelola dan
 ## 🚀Quick Start
 ### 1️⃣ Clone Repository
 ~~~bash
-git clone https://github.com/username/simapres.git
+git clone https://github.com/anugerahhrama/simapres-app.git
 
-cd simapres
+cd simapres-app
 ~~~
 
 ### 2️⃣ Environment Setup
