@@ -32,7 +32,7 @@ SIMAPRES adalah sistem informasi berbasis web yang dirancang untuk mengelola dan
 * `2341720220` [Fiera Ziadattun Nisa’](https://github.com/fieraziadattunnisa)
 * `2341720119` [Muhammad Al-Fatih Ulima Robby](https://github.com/pateh27)
 
-## ⚒🛠️Tech Stack
+## 🛠️Tech Stack
 ### FrontEnd
 [![My Skills](https://skillicons.dev/icons?i=html,css,js,bootstrap,jquery)]()
 
