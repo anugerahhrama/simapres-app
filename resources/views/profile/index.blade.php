@@ -151,6 +151,70 @@
                     </ul>
                 </div>
             </div>
+
+            <div class="card card-primary card-outline p-4 mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>
+                        Preferensi Jenis Pendaftaran
+                    </h4>
+                    <button type="button" onclick="modalAction('{{ route('profile.jenis.create') }}')" class="btn btn-primary" style="font-size: 12px;">
+                        <i class="far fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <div class="mt-4">
+                    @if ($user->jenis)
+                        <div class="alert alert-success">
+                            Jenis pendaftaran yang dipilih: <strong>{{ ucfirst($user->jenis->jenis_pendaftaran) }}</strong>
+                        </div>
+                    @else
+                        <div class="alert alert-info">
+                            Belum ada preferensi jenis pendaftaran.
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Preferensi Biaya --}}
+            <div class="card card-primary card-outline p-4 mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>Preferensi Biaya Pendaftaran</h4>
+                    <button type="button" onclick="modalAction('{{ route('profile.biaya.create') }}')" class="btn btn-primary" style="font-size: 12px;">
+                        <i class="far fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <div class="mt-4">
+                    @if ($user->biaya)
+                        <div class="alert alert-success">
+                            Biaya pendaftaran yang dipilih: <strong>{{ ucfirst($user->biaya->biaya) }}</strong>
+                        </div>
+                    @else
+                        <div class="alert alert-info">
+                            Belum ada preferensi biaya pendaftaran.
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Preferensi Hadiah --}}
+            <div class="card card-primary card-outline p-4 mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>Preferensi Hadiah/Benefit</h4>
+                    <button type="button" onclick="modalAction('{{ route('profile.hadiah.create') }}')" class="btn btn-primary" style="font-size: 12px;">
+                        <i class="far fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <div class="mt-4">
+                    @if ($user->hadiah)
+                        <div class="alert alert-success">
+                            Hadiah/benefit yang dipilih: <strong>{{ ucfirst($user->hadiah->hadiah) }}</strong>
+                        </div>
+                    @else
+                        <div class="alert alert-info">
+                            Belum ada preferensi hadiah/benefit.
+                        </div>
+                    @endif
+                </div>
+            </div>
         </div>
     </div>
 
@@ -197,5 +261,74 @@
                 }
             });
         });
+
+        $(document).on('click', '.btn-delete-preferensi', function() {
+            let id = $(this).data('id');
+            let type = $(this).data('type');
+            let url = '';
+            if (type === 'jenis') {
+                url = `{{ route('profile.jenis.destroy', '__ID__') }}`.replace('__ID__', id);
+            } else if (type === 'biaya') {
+                url = `{{ route('profile.biaya.destroy', '__ID__') }}`.replace('__ID__', id);
+            } else if (type === 'hadiah') {
+                url = `{{ route('profile.hadiah.destroy', '__ID__') }}`.replace('__ID__', id);
+            }
+
+            Swal.fire({
+                title: 'Yakin ingin menghapus?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(res) {
+                            if (res.status) {
+                                Swal.fire('Terhapus!', res.message, 'success').then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire('Gagal!', res.message, 'error');
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+    $(document).on('submit', '#form-tambah-jenis, #form-tambah-biaya, #form-tambah-hadiah', function(e) {
+        e.preventDefault();
+        var form = $(this);
+        var url = form.attr('action');
+        var data = form.serialize();
+
+        $.post(url, data, function(res) {
+            if (res.status) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: res.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: res.message
+                });
+            }
+        });
+    });
     </script>
 @endpush

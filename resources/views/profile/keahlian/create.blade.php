@@ -12,8 +12,9 @@
             </div>
             <div class="modal-body p-4">
                 <div class="form-group">
-                    <label>Pilih Keahlian atau tambahkan data baru</label>
-                    <select class="select2bs4" name="keahlian[]" multiple="multiple" data-placeholder="Pilih atau buat tag baru" style="width: 100%;">
+                    <label>Pilih Keahlian yang tersedia (maksimal 5)</label>
+                    <select class="select2bs4" name="keahlian[]" multiple="multiple"
+                        data-placeholder="Pilih keahlian yang tersedia" style="width: 100%;">
                         @foreach ($allKeahlian as $keahlian)
                             <option value="{{ $keahlian->id }}">{{ $keahlian->nama_keahlian }}</option>
                         @endforeach
@@ -33,22 +34,40 @@
 </form>
 
 <script>
-    $(document).ready(function() {
+    function initSelect2() {
         $('.select2bs4').select2({
-            tags: true,
-            tokenSeparators: [','],
-            placeholder: "Pilih atau buat tag baru",
+            tags: false, // 🔒 Nonaktifkan penambahan tag baru
+            placeholder: "Pilih keahlian yang tersedia",
             allowClear: true,
-            theme: 'bootstrap4'
+            theme: 'bootstrap4',
+            maximumSelectionLength: 5
+        });
+    }
+
+    $(document).ready(function () {
+        initSelect2();
+
+        $('#myModal').on('shown.bs.modal', function () {
+            initSelect2();
         });
 
         $("#form-tambah").validate({
-            submitHandler: function(form) {
+            submitHandler: function (form) {
+                const selected = $('.select2bs4').val();
+                if (selected.length > 5) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Maksimal 5 Keahlian',
+                        text: 'Kamu hanya bisa memilih hingga 5 keahlian.'
+                    });
+                    return false;
+                }
+
                 $.ajax({
                     url: form.action,
                     type: form.method,
                     data: $(form).serialize(),
-                    success: function(response) {
+                    success: function (response) {
                         if (response.status) {
                             $('#modal-master').modal('hide');
                             Swal.fire({
@@ -66,7 +85,7 @@
                             });
                         }
                     },
-                    error: function(xhr) {
+                    error: function () {
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -74,6 +93,7 @@
                         });
                     }
                 });
+
                 return false;
             }
         });

@@ -15,6 +15,7 @@ class SpkBobotSeeder extends Seeder
     {
         DB::table('spk_bobots')->insert([
             [
+                'user_id' => 1,
                 'c1' => 0,
                 'c2' => 0,
                 'c3' => 0,

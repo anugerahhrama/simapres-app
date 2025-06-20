@@ -9,6 +9,9 @@ use App\Models\TingkatanLomba;
 use App\Models\User;
 use App\Models\UserKeahlian;
 use App\Models\UserTingkatLomba;
+use App\Models\Jenis;
+use App\Models\Biaya;
+use App\Models\Hadiah;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -20,18 +23,42 @@ class ProfileController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        $user = User::where('id', Auth::user()->id)->with('detailUser', 'keahlian')->first();
+{
+    $user = User::where('id', Auth::user()->id)
+        ->with(['jenis', 'biaya', 'hadiah'])
+        ->first();
 
-        $bobot = SpkBobot::where('user_id', $user->id)->first();
+    $bobot = SpkBobot::where('user_id', $user->id)->first();
+    $tingkatanLomba = TingkatanLomba::all();
 
-        $breadcrumb = (object) [
+    // Ambil preferensi tingkatan lomba jadi array untuk ditampilkan
+    $preferensi = $user->preferensiTingkatLomba;
+    $tingkatanDipilih = collect();
+
+    if ($preferensi) {
+        if ($preferensi->pilihan_utama_id) {
+            $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_utama_id));
+        }
+        if ($preferensi->pilihan_kedua_id) {
+            $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_kedua_id));
+        }
+        if ($preferensi->pilihan_ketiga_id) {
+            $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_ketiga_id));
+        }
+    }
+
+    return view('profile.index', [
+        'user' => $user,
+        'breadcrumb' => (object) [
             'title' => 'Profile User',
             'list'  => ['Home', 'Profile']
-        ];
+        ],
+        'bobot' => $bobot,
+        'tingkatanLomba' => $tingkatanLomba,
+        'tingkatanDipilih' => $tingkatanDipilih,
+    ]);
+}
 
-        return view('profile.index', compact('user', 'breadcrumb', 'bobot'));
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -243,23 +270,148 @@ class ProfileController extends Controller
     }
 
     public function tingkatanStore(Request $request)
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $urutan = $request->input('urutan');
+    $request->validate([
+        'tingkatan_id' => 'required|exists:tingkatan_lombas,id'
+    ]);
 
-        UserTingkatLomba::where('user_id', $user->id)->delete();
+    UserTingkatLomba::updateOrCreate(
+        ['user_id' => $user->id],
+        [
+            'pilihan_utama_id' => $request->tingkatan_id,
+            'pilihan_kedua_id' => null,
+            'pilihan_ketiga_id' => null,
+        ]
+    );
 
-        UserTingkatLomba::create([
-            'user_id' => $user->id,
-            'pilihan_utama_id' => $urutan[0] ?? null,
-            'pilihan_kedua_id' => $urutan[1] ?? null,
-            'pilihan_ketiga_id' => $urutan[2] ?? null,
-        ]);
+    return response()->json([
+        'status' => true,
+        'message' => 'Referensi tingkatan lomba berhasil disimpan.'
+    ]);
+}
 
+// --- JENIS PENDAFTARAN ---
+public function createJenis()
+{
+    return view('profile.jenis.create');
+}
+
+public function storeJenis(Request $request)
+{
+    $user = Auth::user();
+    $request->validate([
+        'jenis_pendaftaran' => 'required|in:individu,tim'
+    ]);
+
+    Jenis::updateOrCreate(
+        ['user_id' => $user->id],
+        ['jenis_pendaftaran' => $request->jenis_pendaftaran]
+    );
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Preferensi jenis pendaftaran berhasil disimpan.'
+    ]);
+}
+
+public function deleteJenis($id)
+{
+    $user = Auth::user();
+    $data = Jenis::where('id', $id)->where('user_id', $user->id)->first();
+    if (!$data) {
         return response()->json([
-            'status' => true,
-            'message' => 'Preferensi berhasil disimpan!'
+            'status' => false,
+            'message' => 'Data tidak ditemukan atau bukan milik Anda.'
         ]);
     }
+    $data->delete();
+    return response()->json([
+        'status' => true,
+        'message' => 'Preferensi jenis pendaftaran berhasil dihapus.'
+    ]);
+}
+
+// --- BIAYA PENDAFTARAN ---
+public function createBiaya()
+{
+    return view('profile.biaya.create');
+}
+
+public function storeBiaya(Request $request)
+{
+    $user = Auth::user();
+    $request->validate([
+        'biaya' => 'required|in:gratis,berbayar'
+    ]);
+
+    Biaya::updateOrCreate(
+        ['user_id' => $user->id],
+        ['biaya' => $request->biaya]
+    );
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Preferensi biaya pendaftaran berhasil disimpan.'
+    ]);
+}
+
+public function deleteBiaya($id)
+{
+    $user = Auth::user();
+    $data = Biaya::where('id', $id)->where('user_id', $user->id)->first();
+    if (!$data) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Data tidak ditemukan atau bukan milik Anda.'
+        ]);
+    }
+    $data->delete();
+    return response()->json([
+        'status' => true,
+        'message' => 'Preferensi biaya pendaftaran berhasil dihapus.'
+    ]);
+}
+
+// --- HADIAH/BENEFIT ---
+public function createHadiah()
+{
+    return view('profile.hadiah.create');
+}
+
+public function storeHadiah(Request $request)
+{
+    $user = Auth::user();
+    $request->validate([
+        'hadiah' => 'required|in:uang,sertifikat,trofi,benefit'
+    ]);
+
+    Hadiah::updateOrCreate(
+        ['user_id' => $user->id],
+        ['hadiah' => $request->hadiah]
+    );
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Preferensi hadiah/benefit berhasil disimpan.'
+    ]);
+}
+
+public function deleteHadiah($id)
+{
+    $user = Auth::user();
+    $data = Hadiah::where('id', $id)->where('user_id', $user->id)->first();
+    if (!$data) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Data tidak ditemukan atau bukan milik Anda.'
+        ]);
+    }
+    $data->delete();
+    return response()->json([
+        'status' => true,
+        'message' => 'Preferensi hadiah/benefit berhasil dihapus.'
+    ]);
+}
 }

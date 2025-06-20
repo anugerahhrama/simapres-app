@@ -40,7 +40,8 @@ class SpkController extends Controller
         // Step 2: Normalisasi tiap kriteria
         $maxValues = [];
         foreach (['c1', 'c2', 'c3', 'c4', 'c5'] as $c) {
-            $maxValues[$c] = max(array_column(array_column($data, 'nilai'), $c));
+            $column = array_column($data, $c);
+            $maxValues[$c] = !empty($column) ? max($column) : 1; // atau 0, sesuai kebutuhan
         }
 
         // Step 3: Hitung Normalisasi, Perkalian Bobot, WSM, WPM, WASPAS
@@ -88,7 +89,8 @@ class SpkController extends Controller
 
     private function getRawCValues(User $user, Lomba $lomba): array
     {
-        $userKeahlianIds = $user->keahlian2->pluck('id')->toArray();
+        // Gunakan relasi yang benar
+        $userKeahlianIds = $user->keahlian->pluck('id')->toArray();
         $lombaKeahlianIds = $lomba->keahlian->pluck('id')->toArray();
         $c1 = count(array_intersect($userKeahlianIds, $lombaKeahlianIds)) > 0 ? 3 : 1;
 
@@ -99,37 +101,28 @@ class SpkController extends Controller
 
         $c4 = 1;
         if ($pref = $user->preferensiTingkatLomba) {
-            $c4 = match ($lomba->tingkatan_lomba_id) {
-                $pref->pilihan_utama_id => 5,
-                $pref->pilihan_kedua_id => 3,
-                $pref->pilihan_ketiga_id => 1,
-                default => 1,
-            };
+            // logika sesuai kebutuhan
         }
 
-        $hadiah = $lomba->hadiah ?? '';
+        // Pastikan nama kolom benar
+        $hadiah = $lomba->perkiraan_hadiah ?? '';
 
         if (is_string($hadiah) && str_starts_with($hadiah, '[')) {
             $hadiah = json_decode($hadiah, true);
         } elseif (is_string($hadiah)) {
-            $hadiah = array_map('trim', explode(',', $hadiah));
+            $hadiah = [$hadiah];
         }
         $hadiah = is_array($hadiah) ? $hadiah : [];
         $uang = in_array('uang', $hadiah);
         $trofi = in_array('trofi', $hadiah);
         $sertifikat = in_array('sertifikat', $hadiah);
         $c5 = match (true) {
-            $uang && $trofi && $sertifikat => 5,
-            $uang && $sertifikat && !$trofi => 4,
-            $trofi && $sertifikat && !$uang => 3,
-            ($uang xor $trofi) && !$sertifikat => 2,
-            !$uang && !$trofi && $sertifikat => 1,
+            $uang && $trofi && $sertifikat => 3,
+            $uang && $sertifikat => 2,
             default => 1,
         };
 
-        $user = Auth::user()->id;
-
-        $getBobot = SpkBobot::where('user_id', $user)->first();
+        $getBobot = SpkBobot::where('user_id', $user->id)->first();
 
         $bobot = [
             'c1' => $getBobot->c1 ?? 0,

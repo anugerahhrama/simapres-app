@@ -56,6 +56,27 @@ Route::prefix('profile')->controller(ProfileController::class)->name('profile.')
         Route::get('create', 'tingkatanCreate')->name('create');
         Route::post('store', 'tingkatanStore')->name('store');
     });
+
+    // jenis pendaftaran
+    Route::prefix('jenis')->name('jenis.')->group(function () {
+        Route::get('create', 'createJenis')->name('create');
+        Route::post('store', 'storeJenis')->name('store');
+        Route::delete('{id}', 'deleteJenis')->name('destroy');
+    });
+
+    // biaya pendaftaran
+    Route::prefix('biaya')->name('biaya.')->group(function () {
+        Route::get('create', 'createBiaya')->name('create');
+        Route::post('store', 'storeBiaya')->name('store');
+        Route::delete('{id}', 'deleteBiaya')->name('destroy');
+    });
+
+    // hadiah/benefit
+    Route::prefix('hadiah')->name('hadiah.')->group(function () {
+        Route::get('create', 'createHadiah')->name('create');
+        Route::post('store', 'storeHadiah')->name('store');
+        Route::delete('{id}', 'deleteHadiah')->name('destroy');
+    });
 });
 
 Route::prefix('manajemen')->group(function () {
@@ -148,4 +169,6 @@ Route::prefix('bimbingan')->controller(BimbinganController::class)->name('bimbin
     Route::post('list', 'list')->name('list');
     Route::get('confirm/{id}', 'confirm')->name('confirm');
 });
+
+
 require __DIR__ . '/auth.php';
