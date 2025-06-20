@@ -133,6 +133,7 @@ class LombaController extends Controller
             'harga_pendaftaran' => 'nullable|numeric|min:0',
             'hadiah' => 'required|array|min:1',
             'hadiah.*' => 'in:uang,trofi,sertifikat',
+            'hadiah_uang' => 'nullable|numeric|min:0',
             'status_verifikasi' => 'required|in:pending,verified,rejected',
         ]);
 
@@ -169,6 +170,7 @@ class LombaController extends Controller
                 'jenis_pendaftaran' => $validated['jenis_pendaftaran'],
                 'harga_pendaftaran' => $validated['harga_pendaftaran'],
                 'hadiah' => json_encode($validated['hadiah']),
+                'hadiah_uang' => $validated['hadiah_uang'] ?? 0,
                 'status_verifikasi' => $validated['status_verifikasi'],
                 'created_by' => auth()->id(),
             ]);

@@ -40,8 +40,7 @@ class SpkController extends Controller
         // Step 2: Normalisasi tiap kriteria
         $maxValues = [];
         foreach (['c1', 'c2', 'c3', 'c4', 'c5'] as $c) {
-            $column = array_column($data, $c);
-            $maxValues[$c] = !empty($column) ? max($column) : 1; // atau 0, sesuai kebutuhan
+            $maxValues[$c] = max(array_column(array_column($data, 'nilai'), $c));
         }
 
         // Step 3: Hitung Normalisasi, Perkalian Bobot, WSM, WPM, WASPAS
@@ -94,31 +93,41 @@ class SpkController extends Controller
         $lombaKeahlianIds = $lomba->keahlian->pluck('id')->toArray();
         $c1 = count(array_intersect($userKeahlianIds, $lombaKeahlianIds)) > 0 ? 3 : 1;
 
-        $c2 = $lomba->jenis_pendaftaran === 'tim' ? 3 : 1;
+        $c2 = $lomba->jenis_pendaftaran === $user->jenis->jenis_pendaftaran ? 3 : 1;
 
         $harga = $lomba->harga_pendaftaran ?? 0;
-        $c3 = $harga == 0 ? 3 : 1;
+        $preferensiHargaUser = $user->biaya->biaya ?? 'bebayar';
+        if ($harga === 0) {
+            $c3 = 3;
+        } else {
+            $c3 = $harga == 0 ? 3 : 1;
+        }
 
         $c4 = 1;
         if ($pref = $user->preferensiTingkatLomba) {
-            // logika sesuai kebutuhan
+            $c4 = match ($lomba->tingkatan_lomba_id) {
+                $pref->pilihan_utama_id => 5,
+                $pref->pilihan_kedua_id => 3,
+                $pref->pilihan_ketiga_id => 1,
+                default => 1,
+            };
         }
 
-        // Pastikan nama kolom benar
-        $hadiah = $lomba->perkiraan_hadiah ?? '';
+        $preferensiHadiahUser = strtolower(trim($user->hadiah->hadiah ?? ''));
+        $hadiah = $lomba->hadiah ?? '';
 
         if (is_string($hadiah) && str_starts_with($hadiah, '[')) {
             $hadiah = json_decode($hadiah, true);
         } elseif (is_string($hadiah)) {
             $hadiah = [$hadiah];
         }
-        $hadiah = is_array($hadiah) ? $hadiah : [];
-        $uang = in_array('uang', $hadiah);
-        $trofi = in_array('trofi', $hadiah);
-        $sertifikat = in_array('sertifikat', $hadiah);
+
+        $hadiah = is_array($hadiah) ? array_map('strtolower', $hadiah) : [];
+
+        // Hitung nilai C5
         $c5 = match (true) {
-            $uang && $trofi && $sertifikat => 3,
-            $uang && $sertifikat => 2,
+            in_array($preferensiHadiahUser, $hadiah) => 3,
+            count($hadiah) >= 2 => 2,
             default => 1,
         };
 

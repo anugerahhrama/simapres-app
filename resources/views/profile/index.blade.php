@@ -12,54 +12,88 @@
 
     <div class="row px-2">
         <!-- Profile Image -->
-        <div class="col-sm-4 card card-primary card-outline h-100 mt-4 mr-lg-2">
-            <div class="card-body box-profile">
-                <div class="position-relative mx-auto" style="width: 128px; height: 128px;">
-                    @if ($user->detailUser?->photo_file)
-                        <img src="{{ asset('storage/' . $user->detailUser->photo_file) }}" class="rounded-circle border border-white shadow-sm w-100 h-100" style="object-fit: cover; object-position: center" alt="User profile picture">
-                    @else
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->detailUser?->name ?? $user->name) }}&background=667eea&color=fff" class="rounded-circle border border-white shadow-sm w-100 h-100 object-fit-cover" alt="Default avatar">
-                    @endif
+        <div class="col-sm-4">
+            <div class="card card-primary card-outline mt-4 mr-lg-2">
+                <div class="card-body box-profile">
+                    <div class="position-relative mx-auto" style="width: 128px; height: 128px;">
+                        @if ($user->detailUser?->photo_file)
+                            <img src="{{ asset('storage/' . $user->detailUser->photo_file) }}" class="rounded-circle border border-white shadow-sm w-100 h-100" style="object-fit: cover; object-position: center" alt="User profile picture">
+                        @else
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($user->detailUser?->name ?? $user->name) }}&background=667eea&color=fff" class="rounded-circle border border-white shadow-sm w-100 h-100 object-fit-cover" alt="Default avatar">
+                        @endif
 
-                    <!-- Pencil icon -->
-                    <button type="button" onclick="modalAction('{{ route('profile.photo.edit', $user->id) }}')" class="position-absolute bg-white border rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="bottom: 0; right: 0; width: 32px; height: 32px; cursor: pointer;" title="Edit photo">
-                        <i class="fas fa-pencil-alt text-secondary small"></i>
-                    </button>
+                        <!-- Pencil icon -->
+                        <button type="button" onclick="modalAction('{{ route('profile.photo.edit', $user->id) }}')" class="position-absolute bg-white border rounded-circle shadow-sm d-flex align-items-center justify-content-center" style="bottom: 0; right: 0; width: 32px; height: 32px; cursor: pointer;" title="Edit photo">
+                            <i class="fas fa-pencil-alt text-secondary small"></i>
+                        </button>
+                    </div>
+
+                    <h3 class="profile-username text-center">
+                        {{ $user->detailUser->name }}
+                    </h3>
+                    @if (auth()->user()->level->level_code !== 'ADM')
+                        <p class="text-muted text-center">
+                            {{ $user->detailUser?->prodi?->name }}
+                        </p>
+
+                        <table class="table table-md table-borderless">
+                            <tr>
+                                <th class="text-left col-3">No Induk</th>
+                                <td>:</td>
+                                <td class="col-9">{{ $user->detailUser?->no_induk }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-left col-3">Phone</th>
+                                <td>:</td>
+                                <td class="col-9">{{ $user->detailUser?->phone }}</td>
+                            </tr>
+                        </table>
+
+                        <button type="button" onclick="modalAction('{{ route('profile.edit', $user->id) }}')" class="btn btn-primary w-100 mt-4">Edit Profile</button>
+                    @endif
+                </div>
+            </div>
+
+            <div class="card card-primary card-outline p-4 mt-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4>
+                        Tentukan Bobot Spk
+                    </h4>
+                    <button type="button" onclick="modalAction('{{ route('spk.edit', auth()->user()->id) }}')" class="btn btn-primary" style="font-size: 12px;"><i class="far fa-solid fa-gear"></i></button>
                 </div>
 
-                <h3 class="profile-username text-center">
-                    {{ $user->detailUser->name }}
-                </h3>
-                @if (auth()->user()->level->level_code !== 'ADM')
-                    <p class="text-muted text-center">
-                        {{ $user->detailUser?->prodi?->name }}
-                    </p>
-
-                    <table class="table table-md table-borderless">
-                        <tr>
-                            <th class="text-left col-3">No Induk</th>
-                            <td>:</td>
-                            <td class="col-9">{{ $user->detailUser?->no_induk }}</td>
-                        </tr>
-                        <tr>
-                            <th class="text-left col-3">Phone</th>
-                            <td>:</td>
-                            <td class="col-9">{{ $user->detailUser?->phone }}</td>
-                        </tr>
-                    </table>
-
-                    <button type="button" onclick="modalAction('{{ route('profile.edit', $user->id) }}')" class="btn btn-primary w-100 mt-4">Edit Profile</button>
-                @endif
+                <div class="mt-4">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C1 :</strong> {{ $bobot->c1 ?? '' }}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C2 :</strong> {{ $bobot->c2 ?? '' }}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C3 :</strong> {{ $bobot->c3 ?? '' }}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C4 :</strong> {{ $bobot->c4 ?? '' }}
+                        </li>
+                        <li class="list-group-item d-flex justify-content-start align-items-center">
+                            <strong class="mr-1">C5 :</strong> {{ $bobot->c5 ?? '' }}
+                        </li>
+                    </ul>
+                </div>
             </div>
             <!-- /.card-body -->
         </div>
         <!-- /.card -->
 
         <div class="col h-100 {{ auth()->user()->level->level_code !== 'ADM' ? '' : 'd-none' }}">
-            <div class="card card-primary card-outline p-4 mt-4">
+            <div class="card mt-4 px-4 py-2">
+                <h4 class="m-0 p-0">Preferensi</h4>
+            </div>
+            <div class="card card-primary card-outline p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4>
-                        Keahlian
+                        Kriteria Keahlian
                     </h4>
                     <button type="button" onclick="modalAction('{{ route('profile.keahlian.create') }}')" class="btn btn-primary" style="font-size: 12px;"><i class="far fa-solid fa-plus"></i></button>
                 </div>
@@ -88,7 +122,7 @@
             <div class="card card-primary card-outline p-4 mt-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4>
-                        Tentukan Tingkat Lomba
+                        Kriteria Tingkat Lomba
                     </h4>
                     <button type="button" onclick="modalAction('{{ route('profile.tingkatan.create') }}')" class="btn btn-primary" style="font-size: 12px;"><i class="far fa-solid fa-gear"></i></button>
                 </div>
@@ -126,36 +160,7 @@
             <div class="card card-primary card-outline p-4 mt-2">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4>
-                        Bobot Spk
-                    </h4>
-                    <button type="button" onclick="modalAction('{{ route('spk.edit', auth()->user()->id) }}')" class="btn btn-primary" style="font-size: 12px;"><i class="far fa-solid fa-gear"></i></button>
-                </div>
-
-                <div class="mt-4">
-                    <ul class="list-group">
-                        <li class="list-group-item d-flex justify-content-start align-items-center">
-                            <strong class="mr-1">C1 :</strong> {{ $bobot->c1 ?? '' }}
-                        </li>
-                        <li class="list-group-item d-flex justify-content-start align-items-center">
-                            <strong class="mr-1">C2 :</strong> {{ $bobot->c2 ?? '' }}
-                        </li>
-                        <li class="list-group-item d-flex justify-content-start align-items-center">
-                            <strong class="mr-1">C3 :</strong> {{ $bobot->c3 ?? '' }}
-                        </li>
-                        <li class="list-group-item d-flex justify-content-start align-items-center">
-                            <strong class="mr-1">C4 :</strong> {{ $bobot->c4 ?? '' }}
-                        </li>
-                        <li class="list-group-item d-flex justify-content-start align-items-center">
-                            <strong class="mr-1">C5 :</strong> {{ $bobot->c5 ?? '' }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="card card-primary card-outline p-4 mt-2">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4>
-                        Preferensi Jenis Pendaftaran
+                        Kriteria Jenis Pendaftaran
                     </h4>
                     <button type="button" onclick="modalAction('{{ route('profile.jenis.create') }}')" class="btn btn-primary" style="font-size: 12px;">
                         <i class="far fa-solid fa-plus"></i>
@@ -163,7 +168,7 @@
                 </div>
                 <div class="mt-4">
                     @if ($user->jenis)
-                        <div class="alert alert-success">
+                        <div class="alert alert-info">
                             Jenis pendaftaran yang dipilih: <strong>{{ ucfirst($user->jenis->jenis_pendaftaran) }}</strong>
                         </div>
                     @else
@@ -177,14 +182,14 @@
             {{-- Preferensi Biaya --}}
             <div class="card card-primary card-outline p-4 mt-2">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h4>Preferensi Biaya Pendaftaran</h4>
+                    <h4>Kriteria Biaya Pendaftaran</h4>
                     <button type="button" onclick="modalAction('{{ route('profile.biaya.create') }}')" class="btn btn-primary" style="font-size: 12px;">
                         <i class="far fa-solid fa-plus"></i>
                     </button>
                 </div>
                 <div class="mt-4">
                     @if ($user->biaya)
-                        <div class="alert alert-success">
+                        <div class="alert alert-info">
                             Biaya pendaftaran yang dipilih: <strong>{{ ucfirst($user->biaya->biaya) }}</strong>
                         </div>
                     @else
@@ -198,14 +203,14 @@
             {{-- Preferensi Hadiah --}}
             <div class="card card-primary card-outline p-4 mt-2">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h4>Preferensi Hadiah/Benefit</h4>
+                    <h4>Kriteria Hadiah/Benefit</h4>
                     <button type="button" onclick="modalAction('{{ route('profile.hadiah.create') }}')" class="btn btn-primary" style="font-size: 12px;">
                         <i class="far fa-solid fa-plus"></i>
                     </button>
                 </div>
                 <div class="mt-4">
                     @if ($user->hadiah)
-                        <div class="alert alert-success">
+                        <div class="alert alert-info">
                             Hadiah/benefit yang dipilih: <strong>{{ ucfirst($user->hadiah->hadiah) }}</strong>
                         </div>
                     @else
@@ -304,31 +309,31 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-    $(document).on('submit', '#form-tambah-jenis, #form-tambah-biaya, #form-tambah-hadiah', function(e) {
-        e.preventDefault();
-        var form = $(this);
-        var url = form.attr('action');
-        var data = form.serialize();
+        $(document).on('submit', '#form-tambah-jenis, #form-tambah-biaya, #form-tambah-hadiah', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var url = form.attr('action');
+            var data = form.serialize();
 
-        $.post(url, data, function(res) {
-            if (res.status) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: res.message,
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    location.reload();
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Gagal!',
-                    text: res.message
-                });
-            }
+            $.post(url, data, function(res) {
+                if (res.status) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: res.message,
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: res.message
+                    });
+                }
+            });
         });
-    });
     </script>
 @endpush
