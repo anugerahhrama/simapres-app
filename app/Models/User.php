@@ -180,4 +180,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(SpkBobot::class, 'user_id');
     }
+
+    public function jenis()
+    {
+        return $this->hasOne(Jenis::class);
+    }
+
+    public function biaya()
+    {
+        return $this->hasOne(Biaya::class);
+    }
+
+    public function hadiah()
+    {
+        return $this->hasOne(Hadiah::class);
+    }
 }
