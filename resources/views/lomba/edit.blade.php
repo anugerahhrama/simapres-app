@@ -119,20 +119,41 @@
                     </div>
 
                     {{-- Hadiah --}}
+                    @php
+                        $selectedHadiahRaw = old('hadiah', $lomba->hadiah ?? []);
+
+                        if (is_string($selectedHadiahRaw) && str_starts_with($selectedHadiahRaw, '[')) {
+                            $selectedHadiah = json_decode($selectedHadiahRaw, true);
+                        } elseif (is_string($selectedHadiahRaw)) {
+                            $selectedHadiah = [$selectedHadiahRaw];
+                        } else {
+                            $selectedHadiah = $selectedHadiahRaw;
+                        }
+
+                        $selectedHadiah = is_array($selectedHadiah) ? $selectedHadiah : [];
+                    @endphp
+
                     <div class="col-md-6">
                         <div class="form-group mb-4">
                             <label class="font-weight-bold text-muted">Hadiah</label>
                             <select class="select2bs4-2 form-control" name="hadiah[]" multiple="multiple" style="width: 100%;">
-                                @php $selectedHadiah = old('hadiah', $lomba->hadiah ?? []); @endphp
-                                <option value="uang" {{ in_array('uang', $selectedHadiah) ? 'selected' : '' }}>Uang
-                                </option>
-                                <option value="trofi" {{ in_array('trofi', $selectedHadiah) ? 'selected' : '' }}>Trofi
-                                </option>
-                                <option value="sertifikat" {{ in_array('sertifikat', $selectedHadiah) ? 'selected' : '' }}>
-                                    Sertifikat</option>
+                                <option value="uang" {{ in_array('uang', $selectedHadiah) ? 'selected' : '' }}>Uang</option>
+                                <option value="trofi" {{ in_array('trofi', $selectedHadiah) ? 'selected' : '' }}>Trofi</option>
+                                <option value="sertifikat" {{ in_array('sertifikat', $selectedHadiah) ? 'selected' : '' }}>Sertifikat</option>
                             </select>
                             <small id="error-hadiah" class="form-text text-danger error-text"></small>
                         </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-group" id="formHadiah" style="{{ in_array('uang', $selectedHadiah) ? '' : 'display: none;' }}">
+                        <label class="font-weight-bold text-muted">Jumlah Hadiah Uang</label>
+                        <div class="input-group">
+                            {!! $inputIcon('money-bill-wave') !!}
+                            <input type="number" name="hadiah_uang" class="form-control border-left-0" placeholder="Masukkan total hadiah (Rp)" value="{{ old('hadiah_uang', $lomba->hadiah_uang ?? '') }}">
+                        </div>
+                        <small id="error-hadiah_uang" class="form-text text-danger error-text"></small>
                     </div>
                 </div>
 
@@ -230,9 +251,9 @@
 
             $('input[name="jenis_biaya"]').on('change', function() {
                 if ($(this).val() === 'berbayar') {
-                    $('#formHarga').show();
+                    $('#formHarga').slideDown();
                 } else {
-                    $('#formHarga').hide();
+                    $('#formHarga').slideUp();
                 }
             });
 
@@ -243,6 +264,18 @@
                     $('#formHarga').hide();
                 }
             });
+
+            function toggleHadiahUang() {
+                const selected = $('#hadiahSelect').val() || [];
+                if (selected.includes('uang')) {
+                    $('#formHadiah').slideDown();
+                } else {
+                    $('#formHadiah').slideUp();
+                }
+            }
+
+            $('#hadiahSelect').on('change', toggleHadiahUang);
+            toggleHadiahUang(); // initial load
         });
     </script>
 

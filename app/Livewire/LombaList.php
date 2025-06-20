@@ -154,19 +154,21 @@ class LombaList extends Component
      */
     private function getRawCValues(User $user, Lomba $lomba): array
     {
-        // C1: Kecocokan Keahlian
-        $userKeahlianIds = $user->keahlian2->pluck('id')->toArray();
+        // Gunakan relasi yang benar
+        $userKeahlianIds = $user->keahlian->pluck('id')->toArray();
         $lombaKeahlianIds = $lomba->keahlian->pluck('id')->toArray();
         $c1 = count(array_intersect($userKeahlianIds, $lombaKeahlianIds)) > 0 ? 3 : 1;
 
-        // C2: Jenis Pendaftaran
-        $c2 = $lomba->jenis_pendaftaran === 'tim' ? 3 : 1;
+        $c2 = $lomba->jenis_pendaftaran === $user->jenis->jenis_pendaftaran ? 3 : 1;
 
-        // C3: Biaya Pendaftaran
         $harga = $lomba->harga_pendaftaran ?? 0;
-        $c3 = $harga == 0 ? 3 : 1;
+        $preferensiHargaUser = $user->biaya->biaya ?? 'bebayar';
+        if ($preferensiHargaUser === 'gratis') {
+            $c3 = 3;
+        } else {
+            $c3 = $harga == 0 ? 3 : 1;
+        }
 
-        // C4: Preferensi Tingkatan Lomba
         $c4 = 1;
         if ($pref = $user->preferensiTingkatLomba) {
             $c4 = match ($lomba->tingkatan_lomba_id) {
@@ -177,29 +179,34 @@ class LombaList extends Component
             };
         }
 
-        // C5: Benefit (Hadiah dan Sertifikat)
+        $preferensiHadiahUser = strtolower(trim($user->hadiah->hadiah ?? ''));
         $hadiah = $lomba->hadiah ?? '';
 
         if (is_string($hadiah) && str_starts_with($hadiah, '[')) {
             $hadiah = json_decode($hadiah, true);
         } elseif (is_string($hadiah)) {
-            $hadiah = array_map('trim', explode(',', $hadiah));
+            $hadiah = [$hadiah];
         }
-        $hadiah = is_array($hadiah) ? $hadiah : [];
 
-        $uang = in_array('uang', $hadiah);
-        $trofi = in_array('trofi', $hadiah);
-        $sertifikat = in_array('sertifikat', $hadiah);
+        $hadiah = is_array($hadiah) ? array_map('strtolower', $hadiah) : [];
 
+        // Hitung nilai C5
         $c5 = match (true) {
-            $uang && $trofi && $sertifikat => 5,
-            $uang && $sertifikat && !$trofi => 4,
-            $trofi && $sertifikat && !$uang => 3,
-            ($uang xor $trofi) && !$sertifikat => 2,
-            !$uang && !$trofi && $sertifikat => 1,
+            in_array($preferensiHadiahUser, $hadiah) => 3,
+            count($hadiah) >= 2 => 2,
             default => 1,
         };
 
-        return compact('c1', 'c2', 'c3', 'c4', 'c5');
+        $getBobot = SpkBobot::where('user_id', $user->id)->first();
+
+        $bobot = [
+            'c1' => $getBobot->c1 ?? 0,
+            'c2' => $getBobot->c2 ?? 0,
+            'c3' => $getBobot->c3 ?? 0,
+            'c4' => $getBobot->c4 ?? 0,
+            'c5' => $getBobot->c5 ?? 0,
+        ];
+
+        return compact('c1', 'c2', 'c3', 'c4', 'c5', 'bobot');
     }
 }

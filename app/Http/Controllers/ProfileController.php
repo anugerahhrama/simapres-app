@@ -23,41 +23,41 @@ class ProfileController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-{
-    $user = User::where('id', Auth::user()->id)
-        ->with(['jenis', 'biaya', 'hadiah'])
-        ->first();
+    {
+        $user = User::where('id', Auth::user()->id)
+            ->with(['jenis', 'biaya', 'hadiah'])
+            ->first();
 
-    $bobot = SpkBobot::where('user_id', $user->id)->first();
-    $tingkatanLomba = TingkatanLomba::all();
+        $bobot = SpkBobot::where('user_id', $user->id)->first();
+        $tingkatanLomba = TingkatanLomba::all();
 
-    // Ambil preferensi tingkatan lomba jadi array untuk ditampilkan
-    $preferensi = $user->preferensiTingkatLomba;
-    $tingkatanDipilih = collect();
+        // Ambil preferensi tingkatan lomba jadi array untuk ditampilkan
+        $preferensi = $user->preferensiTingkatLomba;
+        $tingkatanDipilih = collect();
 
-    if ($preferensi) {
-        if ($preferensi->pilihan_utama_id) {
-            $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_utama_id));
+        if ($preferensi) {
+            if ($preferensi->pilihan_utama_id) {
+                $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_utama_id));
+            }
+            if ($preferensi->pilihan_kedua_id) {
+                $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_kedua_id));
+            }
+            if ($preferensi->pilihan_ketiga_id) {
+                $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_ketiga_id));
+            }
         }
-        if ($preferensi->pilihan_kedua_id) {
-            $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_kedua_id));
-        }
-        if ($preferensi->pilihan_ketiga_id) {
-            $tingkatanDipilih->push(TingkatanLomba::find($preferensi->pilihan_ketiga_id));
-        }
+
+        return view('profile.index', [
+            'user' => $user,
+            'breadcrumb' => (object) [
+                'title' => 'Profile User',
+                'list'  => ['Home', 'Profile']
+            ],
+            'bobot' => $bobot,
+            'tingkatanLomba' => $tingkatanLomba,
+            'tingkatanDipilih' => $tingkatanDipilih,
+        ]);
     }
-
-    return view('profile.index', [
-        'user' => $user,
-        'breadcrumb' => (object) [
-            'title' => 'Profile User',
-            'list'  => ['Home', 'Profile']
-        ],
-        'bobot' => $bobot,
-        'tingkatanLomba' => $tingkatanLomba,
-        'tingkatanDipilih' => $tingkatanDipilih,
-    ]);
-}
 
 
     /**
@@ -270,148 +270,146 @@ class ProfileController extends Controller
     }
 
     public function tingkatanStore(Request $request)
-{
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    $request->validate([
-        'tingkatan_id' => 'required|exists:tingkatan_lombas,id'
-    ]);
+        $urutan = $request->input('urutan');
 
-    UserTingkatLomba::updateOrCreate(
-        ['user_id' => $user->id],
-        [
-            'pilihan_utama_id' => $request->tingkatan_id,
-            'pilihan_kedua_id' => null,
-            'pilihan_ketiga_id' => null,
-        ]
-    );
+        UserTingkatLomba::where('user_id', $user->id)->delete();
 
-    return response()->json([
-        'status' => true,
-        'message' => 'Referensi tingkatan lomba berhasil disimpan.'
-    ]);
-}
+        UserTingkatLomba::create([
+            'user_id' => $user->id,
+            'pilihan_utama_id' => $urutan[0] ?? null,
+            'pilihan_kedua_id' => $urutan[1] ?? null,
+            'pilihan_ketiga_id' => $urutan[2] ?? null,
+        ]);
 
-// --- JENIS PENDAFTARAN ---
-public function createJenis()
-{
-    return view('profile.jenis.create');
-}
-
-public function storeJenis(Request $request)
-{
-    $user = Auth::user();
-    $request->validate([
-        'jenis_pendaftaran' => 'required|in:individu,tim'
-    ]);
-
-    Jenis::updateOrCreate(
-        ['user_id' => $user->id],
-        ['jenis_pendaftaran' => $request->jenis_pendaftaran]
-    );
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Preferensi jenis pendaftaran berhasil disimpan.'
-    ]);
-}
-
-public function deleteJenis($id)
-{
-    $user = Auth::user();
-    $data = Jenis::where('id', $id)->where('user_id', $user->id)->first();
-    if (!$data) {
         return response()->json([
-            'status' => false,
-            'message' => 'Data tidak ditemukan atau bukan milik Anda.'
+            'status' => true,
+            'message' => 'Preferensi berhasil disimpan!'
         ]);
     }
-    $data->delete();
-    return response()->json([
-        'status' => true,
-        'message' => 'Preferensi jenis pendaftaran berhasil dihapus.'
-    ]);
-}
 
-// --- BIAYA PENDAFTARAN ---
-public function createBiaya()
-{
-    return view('profile.biaya.create');
-}
+    // --- JENIS PENDAFTARAN ---
+    public function createJenis()
+    {
+        return view('profile.jenis.create');
+    }
 
-public function storeBiaya(Request $request)
-{
-    $user = Auth::user();
-    $request->validate([
-        'biaya' => 'required|in:gratis,berbayar'
-    ]);
+    public function storeJenis(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'jenis_pendaftaran' => 'required|in:individu,tim'
+        ]);
 
-    Biaya::updateOrCreate(
-        ['user_id' => $user->id],
-        ['biaya' => $request->biaya]
-    );
+        Jenis::updateOrCreate(
+            ['user_id' => $user->id],
+            ['jenis_pendaftaran' => $request->jenis_pendaftaran]
+        );
 
-    return response()->json([
-        'status' => true,
-        'message' => 'Preferensi biaya pendaftaran berhasil disimpan.'
-    ]);
-}
-
-public function deleteBiaya($id)
-{
-    $user = Auth::user();
-    $data = Biaya::where('id', $id)->where('user_id', $user->id)->first();
-    if (!$data) {
         return response()->json([
-            'status' => false,
-            'message' => 'Data tidak ditemukan atau bukan milik Anda.'
+            'status' => true,
+            'message' => 'Preferensi jenis pendaftaran berhasil disimpan.'
         ]);
     }
-    $data->delete();
-    return response()->json([
-        'status' => true,
-        'message' => 'Preferensi biaya pendaftaran berhasil dihapus.'
-    ]);
-}
 
-// --- HADIAH/BENEFIT ---
-public function createHadiah()
-{
-    return view('profile.hadiah.create');
-}
-
-public function storeHadiah(Request $request)
-{
-    $user = Auth::user();
-    $request->validate([
-        'hadiah' => 'required|in:uang,sertifikat,trofi,benefit'
-    ]);
-
-    Hadiah::updateOrCreate(
-        ['user_id' => $user->id],
-        ['hadiah' => $request->hadiah]
-    );
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Preferensi hadiah/benefit berhasil disimpan.'
-    ]);
-}
-
-public function deleteHadiah($id)
-{
-    $user = Auth::user();
-    $data = Hadiah::where('id', $id)->where('user_id', $user->id)->first();
-    if (!$data) {
+    public function deleteJenis($id)
+    {
+        $user = Auth::user();
+        $data = Jenis::where('id', $id)->where('user_id', $user->id)->first();
+        if (!$data) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan atau bukan milik Anda.'
+            ]);
+        }
+        $data->delete();
         return response()->json([
-            'status' => false,
-            'message' => 'Data tidak ditemukan atau bukan milik Anda.'
+            'status' => true,
+            'message' => 'Preferensi jenis pendaftaran berhasil dihapus.'
         ]);
     }
-    $data->delete();
-    return response()->json([
-        'status' => true,
-        'message' => 'Preferensi hadiah/benefit berhasil dihapus.'
-    ]);
-}
+
+    // --- BIAYA PENDAFTARAN ---
+    public function createBiaya()
+    {
+        return view('profile.biaya.create');
+    }
+
+    public function storeBiaya(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'biaya' => 'required|in:gratis,berbayar'
+        ]);
+
+        Biaya::updateOrCreate(
+            ['user_id' => $user->id],
+            ['biaya' => $request->biaya]
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Preferensi biaya pendaftaran berhasil disimpan.'
+        ]);
+    }
+
+    public function deleteBiaya($id)
+    {
+        $user = Auth::user();
+        $data = Biaya::where('id', $id)->where('user_id', $user->id)->first();
+        if (!$data) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan atau bukan milik Anda.'
+            ]);
+        }
+        $data->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'Preferensi biaya pendaftaran berhasil dihapus.'
+        ]);
+    }
+
+    // --- HADIAH/BENEFIT ---
+    public function createHadiah()
+    {
+        return view('profile.hadiah.create');
+    }
+
+    public function storeHadiah(Request $request)
+    {
+        $user = Auth::user();
+        $request->validate([
+            'hadiah' => 'required|in:uang,sertifikat,trofi,benefit'
+        ]);
+
+        Hadiah::updateOrCreate(
+            ['user_id' => $user->id],
+            ['hadiah' => $request->hadiah]
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Preferensi hadiah/benefit berhasil disimpan.'
+        ]);
+    }
+
+    public function deleteHadiah($id)
+    {
+        $user = Auth::user();
+        $data = Hadiah::where('id', $id)->where('user_id', $user->id)->first();
+        if (!$data) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Data tidak ditemukan atau bukan milik Anda.'
+            ]);
+        }
+        $data->delete();
+        return response()->json([
+            'status' => true,
+            'message' => 'Preferensi hadiah/benefit berhasil dihapus.'
+        ]);
+    }
 }

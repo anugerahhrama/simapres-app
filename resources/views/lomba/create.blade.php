@@ -135,7 +135,7 @@
                     <div class="col-md-6">
                         <div class="form-group mb-4">
                             <label class="font-weight-bold text-muted">Hadiah</label>
-                            <select class="select2bs4-2 form-control" name="hadiah[]" multiple="multiple" data-placeholder="Pilih hadiah" style="width: 100%;" required>
+                            <select id="hadiahSelect" class="select2bs4-2 form-control" name="hadiah[]" multiple="multiple" data-placeholder="Pilih hadiah" style="width: 100%;" required>
                                 <option value="uang" {{ in_array('uang', old('hadiah', [])) ? 'selected' : '' }}>Uang
                                 </option>
                                 <option value="trofi" {{ in_array('trofi', old('hadiah', [])) ? 'selected' : '' }}>Trofi
@@ -144,6 +144,19 @@
                                     Sertifikat</option>
                             </select>
                             <small id="error-hadiah" class="form-text text-danger error-text"></small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group" id="formHadiah" style="{{ in_array('uang', old('hadiah', [])) ? '' : 'display: none;' }}">
+                            <label class="font-weight-bold text-muted">Jumlah Hadiah Uang</label>
+                            <div class="input-group">
+                                {!! $inputIcon('money-bill-wave') !!}
+                                <input type="number" name="hadiah_uang" class="form-control border-left-0" placeholder="Masukkan total hadiah (Rp)" value="{{ old('hadiah_uang') }}">
+                            </div>
+                            <small id="error-hadiah_uang" class="form-text text-danger error-text"></small>
                         </div>
                     </div>
                 </div>
@@ -182,7 +195,7 @@
                 </div>
 
                 {{-- Harga Pendaftaran --}}
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <div class="form-group" id="formHarga" style="{{ old('jenis_biaya') == 'berbayar' ? '' : 'display: none;' }}">
                         <label class="font-weight-bold text-muted">Harga Pendaftaran</label>
                         <div class="input-group">
@@ -253,9 +266,9 @@
 
             $('input[name="jenis_biaya"]').on('change', function() {
                 if ($(this).val() === 'berbayar') {
-                    $('#formHarga').show();
+                    $('#formHarga').slideDown();
                 } else {
-                    $('#formHarga').hide();
+                    $('#formHarga').slideUp();
                 }
             });
 
@@ -265,6 +278,22 @@
                 } else {
                     $('#formHarga').hide();
                 }
+            });
+
+            function toggleHadiahUang() {
+                const selected = $('#hadiahSelect').val() || [];
+
+                if (selected.includes('uang')) {
+                    $('#formHadiah').slideDown();
+                } else {
+                    $('#formHadiah').slideUp();
+                }
+            }
+
+            toggleHadiahUang();
+
+            $('#hadiahSelect').on('change', function() {
+                toggleHadiahUang();
             });
         });
     </script>
