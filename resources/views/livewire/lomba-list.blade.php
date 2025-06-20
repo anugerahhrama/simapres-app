@@ -89,7 +89,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <div class="text-right">
-                                        <a href="{{ $lomba->link_registrasi }}" class="btn btn-sm btn-primary" target="_blank">
+                                        <a href="{{ route('pendaftaran', base64_encode($lomba->id)) }}" class="btn btn-sm btn-primary">
                                             Daftar
                                         </a>
                                     </div>
