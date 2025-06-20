@@ -14,6 +14,7 @@ use App\Http\Controllers\RekomendasiLombaController;
 use App\Http\Controllers\SpkController;
 use App\Http\Controllers\VerifLombaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PendaftaranLombasController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -123,6 +124,10 @@ Route::prefix('manajemen')->middleware(['auth', 'level:MHS', 'check.profile.comp
     // rekomendasi lomba
     Route::get('rekomendasi-lomba', [RekomendasiLombaController::class, 'index'])->name('rekomendasi.lomba');
     Route::get('rekomendasi-list', [RekomendasiLombaController::class, 'list'])->name('rekomendasi.list');
+
+    // pendaftaran lomba
+    Route::get('pendaftaran-lomba/{slug}', [PendaftaranLombasController::class, 'create'])->name('pendaftaran');
+    Route::post('pendaftaran-lomba', [PendaftaranLombasController::class, 'store'])->name('pendaftaran.store');
 
     // Prestasi
     Route::resource('prestasi', PrestasiController::class);
