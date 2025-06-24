@@ -15,6 +15,7 @@ use App\Http\Controllers\SpkController;
 use App\Http\Controllers\VerifLombaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PendaftaranLombasController;
+use App\Models\PendaftaranLombas;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -118,6 +119,14 @@ Route::prefix('manajemen')->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
+
+    // Bimbingan
+    Route::resource('bimbingan', BimbinganController::class);
+    Route::prefix('bimbingan')->controller(BimbinganController::class)->name('bimbingan.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+        Route::post('{id}/update-status', [BimbinganController::class, 'updateStatus'])->name('updateStatus');
+    });
 });
 
 Route::prefix('verifikasi')->middleware(['auth', 'level:ADM'])->group(function () {
@@ -133,6 +142,13 @@ Route::prefix('verifikasi')->middleware(['auth', 'level:ADM'])->group(function (
     // Lomba
     Route::resource('verifLomba', VerifLombaController::class);
     Route::prefix('verifLomba')->controller(VerifLombaController::class)->name('verifLomba.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
+
+    // Pendaftar Lomba
+    Route::resource('pendaftaranLomba', PendaftaranLombasController::class);
+    Route::prefix('pendaftaranLomba')->controller(PendaftaranLombasController::class)->name('pendaftaranLomba.')->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });
@@ -166,14 +182,5 @@ Route::prefix('manajemen')->middleware(['auth', 'level:MHS', 'check.profile.comp
 Route::resource('minats', MinatController::class);
 Route::get('minats/list', [MinatController::class, 'list'])->name('minats.list');
 Route::get('minats/{minat}/confirm', [MinatController::class, 'confirm'])->name('minats.confirm');
-
-
-// Bimbingan
-Route::resource('bimbingan', BimbinganController::class);
-Route::prefix('bimbingan')->controller(BimbinganController::class)->name('bimbingan.')->group(function () {
-    Route::post('list', 'list')->name('list');
-    Route::get('confirm/{id}', 'confirm')->name('confirm');
-});
-
 
 require __DIR__ . '/auth.php';

@@ -213,19 +213,23 @@
                     <small id="error-deskripsi" class="form-text text-danger error-text"></small>
                 </div>
 
-                {{-- Status Verifikasi --}}
-                <div class="form-group">
-                    <label class="font-weight-bold text-muted">Status Verifikasi</label>
-                    <select name="status_verifikasi" class="form-control" required>
-                        <option value="pending" {{ old('status_verifikasi') == 'pending' ? 'selected' : '' }}>Pending
-                        </option>
-                        <option value="verified" {{ old('status_verifikasi') == 'verified' ? 'selected' : '' }}>Disetujui
-                        </option>
-                        <option value="rejected" {{ old('status_verifikasi') == 'rejected' ? 'selected' : '' }}>Ditolak
-                        </option>
-                    </select>
-                    <small id="error-status_verifikasi" class="form-text text-danger error-text"></small>
-                </div>
+                @if (auth()->user()->level->level_code === 'DSN')
+                    {{-- Status Verifikasi --}}
+                    <div class="form-group">
+                        <label class="font-weight-bold text-muted">Status Verifikasi</label>
+                        <select name="status_verifikasi" class="form-control" required>
+                            <option value="pending" {{ old('status_verifikasi') == 'pending' ? 'selected' : '' }}>Pending
+                            </option>
+                            <option value="verified" {{ old('status_verifikasi') == 'verified' ? 'selected' : '' }}>Disetujui
+                            </option>
+                            <option value="rejected" {{ old('status_verifikasi') == 'rejected' ? 'selected' : '' }}>Ditolak
+                            </option>
+                        </select>
+                        <small id="error-status_verifikasi" class="form-text text-danger error-text"></small>
+                    </div>
+                @else
+                    <input type="hidden" name="status_verifikasi" value="verified">
+                @endif
 
                 {{-- Buttons --}}
                 <div class="d-flex justify-content-end mt-4">

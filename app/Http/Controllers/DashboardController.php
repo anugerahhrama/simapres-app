@@ -9,6 +9,8 @@ use App\Models\Prestasi;
 use App\Models\Lomba;
 use App\Models\ProgramStudi;
 use App\Models\Bimbingan;
+use App\Models\PendaftaranLombas;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -19,6 +21,7 @@ class DashboardController extends Controller
 
     public function index()
     {
+        Carbon::setLocale('id');
         $user = Auth::user();
         $data = [];
 
@@ -89,11 +92,8 @@ class DashboardController extends Controller
                         ->latest()
                         ->take(5)
                         ->get(),
-                    'lombaTerdaftar' => Lomba::with('tingkatanLomba')
-                        ->where('status_verifikasi', 'verified')
-                        ->where('awal_registrasi', '<=', now())
-                        ->where('akhir_registrasi', '>=', now())
-                        ->orderBy('awal_registrasi', 'asc')
+                    'lombaTerdaftar' => PendaftaranLombas::with(['lomba', 'user.bimbingan'])
+                        ->where('user_id', $user->id)
                         ->take(5)
                         ->get(),
                     'statistikPrestasi' => [

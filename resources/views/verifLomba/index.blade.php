@@ -38,6 +38,7 @@
                                         <th>Kategori</th>
                                         <th>Tingkatan</th>
                                         <th>Penyelenggara</th>
+                                        <th>Penginput</th>
                                         <th>Status Verifikasi</th>
                                         <th>Aksi</th>
                                     </tr>
@@ -143,7 +144,12 @@
                     {
                         data: 'penyelenggara',
                         className: 'text-wrap',
-                        width: "25%"
+                        width: "15%"
+                    },
+                    {
+                        data: 'createdBy',
+                        className: 'text-wrap',
+                        width: "15%"
                     },
                     {
                         data: 'status',
@@ -154,7 +160,7 @@
                         data: 'aksi',
                         orderable: false,
                         searchable: false,
-                        width: "20%",
+                        width: "15%",
                         className: 'text-center'
                     }
                 ]
