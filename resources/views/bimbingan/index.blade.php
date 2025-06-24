@@ -126,9 +126,9 @@
                             if (data == 0)
                                 return '<span class="badge badge-secondary">Belum Mulai</span>';
                             if (data == 1)
-                                return '<span class="badge badge-warning">Berjalan</span>';
+                                return '<span class="badge badge-success">Berjalan</span>';
                             if (data == 2)
-                                return '<span class="badge badge-success">Selesai</span>';
+                                return '<span class="badge badge-danger">Selesai</span>';
                             return data;
                         }
                     },

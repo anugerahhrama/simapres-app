@@ -127,6 +127,13 @@ Route::prefix('manajemen')->group(function () {
         Route::get('confirm/{id}', 'confirm')->name('confirm');
         Route::post('{id}/update-status', [BimbinganController::class, 'updateStatus'])->name('updateStatus');
     });
+    
+    // Pendaftar Lomba
+    Route::resource('pendaftaranLomba', PendaftaranLombasController::class);
+    Route::prefix('pendaftaranLomba')->controller(PendaftaranLombasController::class)->name('pendaftaranLomba.')->group(function () {
+        Route::post('list', 'list')->name('list');
+        Route::get('confirm/{id}', 'confirm')->name('confirm');
+    });
 });
 
 Route::prefix('verifikasi')->middleware(['auth', 'level:ADM'])->group(function () {
@@ -142,13 +149,6 @@ Route::prefix('verifikasi')->middleware(['auth', 'level:ADM'])->group(function (
     // Lomba
     Route::resource('verifLomba', VerifLombaController::class);
     Route::prefix('verifLomba')->controller(VerifLombaController::class)->name('verifLomba.')->group(function () {
-        Route::post('list', 'list')->name('list');
-        Route::get('confirm/{id}', 'confirm')->name('confirm');
-    });
-
-    // Pendaftar Lomba
-    Route::resource('pendaftaranLomba', PendaftaranLombasController::class);
-    Route::prefix('pendaftaranLomba')->controller(PendaftaranLombasController::class)->name('pendaftaranLomba.')->group(function () {
         Route::post('list', 'list')->name('list');
         Route::get('confirm/{id}', 'confirm')->name('confirm');
     });

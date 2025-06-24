@@ -66,6 +66,9 @@
                                 Manajemen
                                 <i class="right fas fa-angle-left"></i>
                             </p>
+                            @if (($jumlahDaftar) > 0)
+                                <span class="badge badge-danger mt-1 p-1">{{ $jumlahDaftar }}</span>
+                            @endif
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
@@ -114,6 +117,17 @@
                                     <p>Bimbingan</p>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a href="{{ route('pendaftaranLomba.index') }}"
+                                    class="nav-link {{ request()->is('*pendaftaranLomba*') ? 'active' : '' }}">
+                                    <i class="nav-icon fas fa-clipboard-list"></i>
+                                    <p>Pendaftar Lomba
+                                        @if ($jumlahDaftar > 0)
+                                            <span class="badge badge-danger right mt-1 p-1">{{ $jumlahDaftar }}</span>
+                                        @endif
+                                    </p>
+                                </a>
+                            </li>
                         </ul>
                     </li>
 
@@ -124,7 +138,7 @@
                                 Verifikasi
                                 <i class="right fas fa-angle-left"></i>
                             </p>
-                            @if (($total = $jumlahVerifPrestasi + $jumlahVerifLomba + $jumlahDaftar) > 0)
+                            @if (($total = $jumlahVerifPrestasi + $jumlahVerifLomba) > 0)
                                 <span class="badge badge-danger mt-1 p-1">{{ $total }}</span>
                             @endif
                         </a>
@@ -152,18 +166,6 @@
                                         @if ($jumlahVerifLomba > 0)
                                             <span
                                                 class="badge badge-danger right mt-1 p-1">{{ $jumlahVerifLomba }}</span>
-                                        @endif
-                                    </p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('pendaftaranLomba.index') }}"
-                                    class="nav-link {{ request()->is('*pendaftaranLomba*') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-clipboard-list"></i>
-                                    <p>Pendaftar Lomba
-                                        @if ($jumlahDaftar > 0)
-                                            <span
-                                                class="badge badge-danger right mt-1 p-1">{{ $jumlahDaftar }}</span>
                                         @endif
                                     </p>
                                 </a>
@@ -196,7 +198,7 @@
                     </li>
                     <li class="nav-item bg- bg-[#1A2151]">
                         <a href="{{ route('pendaftaranLomba.index') }}"
-                            class="nav-link {{ request()->is('*monitoring*') ? 'active' : '' }}">
+                            class="nav-link {{ request()->is('*pendaftaranLomba*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-list"></i>
                             <p>Lomba Diikuti</p>
                         </a>
