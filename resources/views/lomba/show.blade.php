@@ -67,7 +67,21 @@
                             <span class="text-muted"><i class="fas fa-trophy mr-2"></i>Hadiah</span>
                             <span class="font-weight-bold text-dark">
                                 @if ($lomba->hadiah)
-                                    {{ implode(', ', json_decode($lomba->hadiah, true) ?? []) }}
+                                    @php
+                                        $hadiah = $lomba->hadiah;
+                                        if (is_array($hadiah)) {
+                                            echo implode(', ', $hadiah);
+                                        } elseif (is_string($hadiah)) {
+                                            $hadiahArr = json_decode($hadiah, true);
+                                            if (is_array($hadiahArr)) {
+                                                echo implode(', ', $hadiahArr);
+                                            } else {
+                                                echo $hadiah;
+                                            }
+                                        } else {
+                                            echo '-';
+                                        }
+                                    @endphp
                                 @else
                                     -
                                 @endif
@@ -108,6 +122,12 @@
                                     {{ $lomba->link_registrasi ?? '-' }}
                                 </a>
                             </span>
+                        </div>
+
+                        <h6 class="text-muted mb-3 mt-4 font-weight-bold">Diinput oleh</h6>
+                        <div class="d-flex justify-content-between align-items-center pb-2 bg-light p-3 rounded">
+                            <span class="text-muted"><i class="fas fa-user mr-2"></i>Nama Penginput</span>
+                            <span class="font-weight-bold text-primary">{{ $lomba->createdBy->detailUser->name ?? '-' }}</span>
                         </div>
 
                         <h6 class="text-muted mb-3 mt-4 font-weight-bold">Status</h6>

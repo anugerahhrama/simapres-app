@@ -110,6 +110,12 @@
                                 </a>
                             </span>
                         </div>
+                        
+                        <h6 class="text-muted mb-3 mt-4 font-weight-bold">Diinput oleh</h6>
+                        <div class="d-flex justify-content-between align-items-center pb-2 bg-light p-3 rounded">
+                            <span class="text-muted"><i class="fas fa-user mr-2"></i>Nama Penginput</span>
+                            <span class="font-weight-bold text-primary">{{ $lomba->createdBy->detailUser->name ?? '-' }}</span>
+                        </div>
 
                         <h6 class="text-muted mb-3 mt-4 font-weight-bold">Status</h6>
                         <div class="d-flex justify-content-between align-items-center pb-2 bg-light p-3 rounded">

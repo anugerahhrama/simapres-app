@@ -322,7 +322,7 @@
                                         <td>{{ $prestasi->nama_lomba }}</td>
                                         <td>{{ $prestasi->pencapaian }}</td>
                                         <td>{{ $prestasi->penyelenggara }}</td>
-                                        <td>{{ $prestasi->tanggal }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($prestasi->tanggal)->translatedFormat('d F Y') }}</td>
                                         <td>
                                             <span class="badge bg-{{ $prestasi->status_verifikasi === 'verified' ? 'success' : ($prestasi->status_verifikasi === 'pending' ? 'warning' : 'danger') }}">
                                                 {{ ucfirst($prestasi->status_verifikasi) }}
@@ -350,7 +350,7 @@
                 <div class="card-header bg-white">
                     <h5 class="card-title mb-0">
                         <i class="fas fa-flag me-2"></i>
-                        Lomba Aktif
+                        Lomba Diikuti
                     </h5>
                 </div>
                 <div class="card-body">
@@ -360,26 +360,39 @@
                                 <tr>
                                     <th>Nama Lomba</th>
                                     <th>Penyelenggara</th>
-                                    <th>Tingkat</th>
-                                    <th>Kategori</th>
-                                    <th>Jenis Pendaftaran</th>
                                     <th>Tanggal Mulai</th>
                                     <th>Tanggal Selesai</th>
+                                    <th>Dosen Pembimbing</th>
+                                    <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($lombaTerdaftar as $lomba)
+                                @forelse($lombaTerdaftar as $daftar)
                                     <tr>
-                                        <td>{{ $lomba->judul }}</td>
-                                        <td>{{ $lomba->penyelenggara }}</td>
-                                        <td>{{ $lomba->tingkatanLomba->nama }}</td>
-                                        <td>{{ $lomba->kategori }}</td>
-                                        <td>{{ $lomba->jenis_pendaftaran }}</td>
-                                        <td>{{ $lomba->awal_registrasi }}</td>
-                                        <td>{{ $lomba->akhir_registrasi }}</td>
+                                        <td>{{ $daftar->lomba->judul }}</td>
+                                        <td>{{ $daftar->lomba->penyelenggara }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($daftar->lomba->awal_registrasi)->translatedFormat('d F Y') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($daftar->lomba->akhir_registrasi)->translatedFormat('d F Y') }}</td>
                                         <td>
-                                            <a href="{{ route('rekomendasi.lomba') }}" class="btn btn-sm btn-info">
+                                            @php
+                                                $bimbingan = optional($daftar->user)->mahasiswa->first();
+                                                echo optional(optional($bimbingan)->dosen)->detailUser->name ?? '-';
+                                            @endphp
+                                        </td>
+                                        <td>
+                                            <span class="font-weight-bold text-dark">
+                                                @if ($daftar->status == 'accepted')
+                                                    <span class="badge badge-success">Disetujui</span>
+                                                @elseif($daftar->status == 'rejected')
+                                                    <span class="badge badge-danger">Ditolak</span>
+                                                @else
+                                                    <span class="badge badge-warning">Pending</span>
+                                                @endif
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('pendaftaranLomba.index') }}" class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                         </td>

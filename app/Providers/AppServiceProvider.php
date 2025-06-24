@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Prestasi;
+use App\Models\Lomba;
+use App\Models\PendaftaranLombas;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,7 +24,14 @@ class AppServiceProvider extends ServiceProvider
     {
         view()->composer('*', function ($view) {
             $jumlahVerifPrestasi = Prestasi::where('status_verifikasi', 'pending')->count();
-            $view->with('jumlahVerifPrestasi', $jumlahVerifPrestasi);
+            $jumlahVerifLomba = Lomba::where('status_verifikasi', 'pending')->count();
+            $jumlahDaftar = PendaftaranLombas::where('status', 'pending')->count();
+            
+            $view->with([
+                'jumlahVerifPrestasi' => $jumlahVerifPrestasi,
+                'jumlahVerifLomba' => $jumlahVerifLomba,
+                'jumlahDaftar' => $jumlahDaftar,
+            ]);
         });
     }
 }

@@ -195,4 +195,14 @@ class User extends Authenticatable
     {
         return $this->hasOne(Hadiah::class);
     }
+
+    /**
+     * Get all of the bimbingan for the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function bimbingan(): HasMany
+    {
+        return $this->hasMany(Bimbingan::class, 'dosen_id');
+    }
 }

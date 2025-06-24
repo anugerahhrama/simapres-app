@@ -35,4 +35,14 @@ class Bimbingan extends Model
     {
         return $this->belongsTo(User::class, 'mahasiswa_id', 'id');
     }
+
+    public function pendaftaranLomba(): BelongsTo
+    {
+        return $this->belongsTo(PendaftaranLombas::class, 'lomba_id', 'id');
+    }
+
+    public function lomba(): BelongsTo
+    {
+        return $this->belongsTo(Lomba::class, 'id', 'id');
+    }
 }

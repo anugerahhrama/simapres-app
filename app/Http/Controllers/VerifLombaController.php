@@ -38,7 +38,7 @@ class VerifLombaController extends Controller
             })
             ->when($request->kategori, function ($query) use ($request) {
                 $query->where('kategori', $request->kategori);
-            })->where('status_verifikasi', 'pending');
+            })->where('status_verifikasi', 'pending')->with('createdBy');
 
         return DataTables::of($data)
             ->addIndexColumn()
@@ -53,6 +53,9 @@ class VerifLombaController extends Controller
             })
             ->addColumn('penyelenggara', function ($row) {
                 return $row->penyelenggara ?? '-';
+            })
+            ->addColumn('createdBy', function ($row) {
+                return $row->createdBy->detailUSer->name ?? '-';
             })
             ->addColumn('status', function ($row) {
                 if ($row->status_verifikasi === 'verified') {

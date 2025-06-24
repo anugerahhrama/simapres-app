@@ -43,6 +43,7 @@ class LombaController extends Controller
     public function list(Request $request)
     {
         $data = Lomba::with(['tingkatanLomba'])
+            ->orderByDesc('id')
             ->when($request->tingkatan, function ($query) use ($request) {
                 $query->whereHas('tingkatanLomba', function ($q) use ($request) {
                     $q->where('nama', 'like', '%' . $request->tingkatan . '%');
@@ -78,8 +79,13 @@ class LombaController extends Controller
             ->addColumn('aksi', function ($row) {
                 $btn = '<div class="d-flex justify-content-center align-items-center" style="gap: 2px;">';
                 $btn .= '<button onclick="modalAction(\'' . route('lomba.show', $row->id) . '\')" class="btn btn-info btn-sm">Detail</button>';
-                $btn .= '<a href="' . route('lomba.edit', $row->id) . '" class="btn btn-warning btn-sm" style="text-decoration: none;">Edit</a>';
-                $btn .= '<button onclick="modalAction(\'' . route('lomba.confirm', $row->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
+
+                if (auth()->check() && auth()->user()->level->level_code === 'ADM') {
+                    $btn .= '<a href="' . route('lomba.edit', $row->id) . '" class="btn btn-warning btn-sm" style="text-decoration: none;">Edit</a>';
+                    $btn .= '<button onclick="modalAction(\'' . route('lomba.confirm', $row->id) . '\')" class="btn btn-danger btn-sm">Hapus</button>';
+                }
+
+                $btn .= '</div>';
                 return $btn;
             })
             ->rawColumns(['status', 'aksi'])
@@ -156,6 +162,10 @@ class LombaController extends Controller
             if ($validated['jenis_biaya'] === 'gratis') {
                 $validated['harga_pendaftaran'] = 0;
                 Log::info('Jenis biaya gratis, harga di-set ke 0');
+            }
+
+            if (auth()->user()->level->level_code === 'ADM') {
+                $validated['status_verifikasi'] = 'verified';
             }
 
             $lomba = Lomba::create([
